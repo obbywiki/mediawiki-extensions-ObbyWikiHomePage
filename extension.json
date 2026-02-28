@@ -1,0 +1,53 @@
+{
+	"manifest_version": 2,
+	"name": "ObbyWikiHomePage",
+	"description": "Custom home page for ObbyWiki.",
+	"author": ["[https://obbywiki.com ObbyWiki]"],
+	"version": "0.1.0",
+	"license-name": "MIT",
+	"url": "https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage",
+
+	"type": "other",
+
+	"requires": {
+		"MediaWiki": ">=1.45.1"
+	},
+
+	"AutoloadClasses": {
+		"MediaWiki\\Extension\\ObbyWikiHomePage\\Hooks": "src/Hooks.php"
+	},
+
+	"HookHandlers": {
+		"ObbyWikiHomePageHooks": {
+			"class": "MediaWiki\\Extension\\ObbyWikiHomePage\\Hooks"
+		}
+	},
+
+	"Hooks": {
+		"ArticleViewHeader": "ObbyWikiHomePageHooks",
+		"BeforePageDisplay": "ObbyWikiHomePageHooks"
+	},
+
+	"ResourceFileModulePaths": {
+		"localBasePath": "",
+		"remoteExtPath": "ObbyWikiHomePage"
+	},
+
+	"ResourceModules": {
+		"ext.ObbyWikiHomePage.styles": {
+			"styles": "resources/ext.ObbyWikiHomePage.styles.css",
+			"targets": ["desktop", "mobile"]
+		},
+		"ext.ObbyWikiHomePage.scripts": {
+			"scripts": "resources/ext.ObbyWikiHomePage.js",
+			"targets": ["desktop", "mobile"]
+		}
+	},
+
+	"config": {
+		"ObbyWikiHomePageTitle": {
+			"value": "Home",
+			"description": "The title of the page to replace with the custom home page."
+		}
+	}
+}
