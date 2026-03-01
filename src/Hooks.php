@@ -32,12 +32,22 @@ class Hooks {
 		$out->setPageTitle( '' );
 		$out->setSubtitle( '' );
 
-		$logoSvg = self::logoSVG();
-		$carouselItems = self::getObbyPages();
-		$siteStats = self::getSiteStatistics();
-		$thisMonthPages = self::getThisMonthPages();
-		$archiveMonths = self::getArchiveMonths();
-		$html = self::buildHomePageHTML( $logoSvg, $carouselItems, $siteStats, $thisMonthPages, $archiveMonths );
+		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
+		global $wgObbyWikiHomePageCacheTTL;
+		$ttl = (int)( $wgObbyWikiHomePageCacheTTL ?? 900 );
+
+		if ( $ttl > 0 ) {
+			$cacheKey = $cache->makeKey( 'obbywikihomepage', 'html', 'v1' );
+			$html = $cache->getWithSetCallback(
+				$cacheKey,
+				$ttl,
+				function () {
+					return self::buildHomePage();
+				}
+			);
+		} else {
+			$html = self::buildHomePage();
+		}
 
 		$out->addHTML( $html );
 	}
@@ -52,6 +62,15 @@ class Hooks {
 		$out->addModuleStyles( [ 'ext.ObbyWikiHomePage.styles' ] );
 		$out->addModules( [ 'ext.ObbyWikiHomePage.scripts' ] );
 		$out->addBodyClasses( [ 'obbywiki-homepage' ] );
+	}
+
+	private static function buildHomePage(): string {
+		$logoSvg = self::logoSVG();
+		$carouselItems = self::getObbyPages();
+		$siteStats = self::getSiteStatistics();
+		$thisMonthPages = self::getThisMonthPages();
+		$archiveMonths = self::getArchiveMonths();
+		return self::buildHomePageHTML( $logoSvg, $carouselItems, $siteStats, $thisMonthPages, $archiveMonths );
 	}
 
 	private static function getObbyPages(): array {
@@ -120,7 +139,7 @@ class Hooks {
 					: null;
 
 				$pageLength = isset( $page['length'] ) ? (int)$page['length'] : 0;
-				$editCount = self::getRevisionCount( $page['title'] );
+				// $editCount = self::getRevisionCount( $page['title'] );
 
 				// little finicky, TODO FIXME
 				$displayTitle = isset( $page['pageprops']['displaytitle'] )
@@ -132,7 +151,7 @@ class Hooks {
 					'url' => $title->getLocalURL(),
 					'thumbnail' => $thumb,
 					'description' => $desc,
-					'editCount' => $editCount,
+					// 'editCount' => $editCount,
 					'pageLength' => $pageLength,
 				];
 
@@ -146,37 +165,37 @@ class Hooks {
 		return $pages;
 	}
 
-	private static function getRevisionCount( string $pageTitle ): int {
-		$request = new FauxRequest( [
-			'action' => 'query',
-			'titles' => $pageTitle,
-			'prop' => 'revisions',
-			'rvprop' => 'ids',
-			'rvlimit' => 'max',
-		] );
+	// private static function getRevisionCount( string $pageTitle ): int {
+	// 	$request = new FauxRequest( [
+	// 		'action' => 'query',
+	// 		'titles' => $pageTitle,
+	// 		'prop' => 'revisions',
+	// 		'rvprop' => 'ids',
+	// 		'rvlimit' => 'max',
+	// 	] );
 
-		$api = new ApiMain( $request, false );
+	// 	$api = new ApiMain( $request, false );
 
-		try {
-			$api->execute();
-		} catch ( \Throwable $e ) {
-			return 0;
-		}
+	// 	try {
+	// 		$api->execute();
+	// 	} catch ( \Throwable $e ) {
+	// 		return 0;
+	// 	}
 
-		$data = $api->getResult()->getResultData( null, [
-			'Strip' => 'all',
-		] );
+	// 	$data = $api->getResult()->getResultData( null, [
+	// 		'Strip' => 'all',
+	// 	] );
 
-		if ( isset( $data['query']['pages'] ) ) {
-			foreach ( $data['query']['pages'] as $p ) {
-				if ( isset( $p['revisions'] ) ) {
-					return count( $p['revisions'] );
-				}
-			}
-		}
+	// 	if ( isset( $data['query']['pages'] ) ) {
+	// 		foreach ( $data['query']['pages'] as $p ) {
+	// 			if ( isset( $p['revisions'] ) ) {
+	// 				return count( $p['revisions'] );
+	// 			}
+	// 		}
+	// 	}
 
-		return 0;
-	}
+	// 	return 0;
+	// }
 
 	private static function logoSVG(): string {
 		return <<<'SVG'
@@ -361,7 +380,7 @@ SVG;
 			[
 				'url' => Title::newFromText( 'Category:Stubs' )->getLocalURL(),
 				'label' => 'Stubs',
-				'iconSVG' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"><title>edit</title><g fill="currentColor"><path d="m16.77 8 1.94-2a1 1 0 0 0 0-1.41l-3.34-3.3a1 1 0 0 0-1.41 0L12 3.23zM1 14.25V19h4.75l9.96-9.96-4.75-4.75z"/></g></svg>',
+				'iconSVG' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"><g fill="currentColor"><path d="m16.77 8 1.94-2a1 1 0 0 0 0-1.41l-3.34-3.3a1 1 0 0 0-1.41 0L12 3.23zM1 14.25V19h4.75l9.96-9.96-4.75-4.75z"/></g></svg>',
 			],
 			[
 				'url' => 'https://forum.wou.gg',
@@ -562,6 +581,8 @@ SVG;
 			'dco' => htmlspecialchars( Title::newFromText( 'Category:Difficulty Chart Obby' )->getLocalURL() ),
 			'gimmick' => htmlspecialchars( Title::newFromText( 'Category:Gimmick Obby' )->getLocalURL() ),
 			'tier' => htmlspecialchars( Title::newFromText( 'Category:Tier Obby' )->getLocalURL() ),
+			'troll' => htmlspecialchars( Title::newFromText( 'Category:Troll Obby' )->getLocalURL() ),
+			'coop' => htmlspecialchars( Title::newFromText( 'Category:Co-Op Obby' )->getLocalURL() ),
 			'stubs' => htmlspecialchars( Title::newFromText( 'Category:Stubs' )->getLocalURL() ),
 			'contributing' => htmlspecialchars( Title::newFromText( 'Help:Contributing' )->getLocalURL() ),
 		];
@@ -663,6 +684,8 @@ SVG;
 				<a href="{$categoryUrls['dco']}" class="obbywiki-featured__aside-tag">Difficulty Chart Obby</a>
 				<a href="{$categoryUrls['gimmick']}" class="obbywiki-featured__aside-tag">Gimmick Obby</a>
 				<a href="{$categoryUrls['tier']}" class="obbywiki-featured__aside-tag">Tiered Obby</a>
+				<a href="{$categoryUrls['troll']}" class="obbywiki-featured__aside-tag">Troll Obby</a>
+				<a href="{$categoryUrls['coop']}" class="obbywiki-featured__aside-tag">Co-Op Obby</a>
 			</div>
 		</div>
 		<div class="obbywiki-aside__card">
@@ -679,6 +702,11 @@ SVG;
 				<a href="{$categoryUrls['stubs']}" class="obbywiki-featured__aside-cta-link">
 					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
 					View Stubs
+				</a>
+
+				<a href="/wiki/Special:WantedPages" class="obbywiki-featured__aside-cta-link" rel="nofollow"> <!-- engines cant crawl special pages -->
+					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
+					View Wanted Pages
 				</a>
 			</div>
 		</div>

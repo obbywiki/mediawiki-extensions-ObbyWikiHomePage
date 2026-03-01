@@ -48,6 +48,10 @@
 		"ObbyWikiHomePageTitle": {
 			"value": "Home",
 			"description": "The title of the page to replace with the custom home page."
+		},
+		"ObbyWikiHomePageCacheTTL": {
+			"value": 900,
+			"description": "Cache TTL in seconds for the home page HTML. Set to 0 to disable caching. Default is 900 (15 minutes)."
 		}
 	}
 }
