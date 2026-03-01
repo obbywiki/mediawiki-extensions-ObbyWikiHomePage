@@ -36,7 +36,8 @@ class Hooks {
 		$carouselItems = self::getObbyPages();
 		$siteStats = self::getSiteStatistics();
 		$thisMonthPages = self::getThisMonthPages();
-		$html = self::buildHomePageHTML( $logoSvg, $carouselItems, $siteStats, $thisMonthPages );
+		$archiveMonths = self::getArchiveMonths();
+		$html = self::buildHomePageHTML( $logoSvg, $carouselItems, $siteStats, $thisMonthPages, $archiveMonths );
 
 		$out->addHTML( $html );
 	}
@@ -295,9 +296,59 @@ SVG;
 		return $pages;
 	}
 
+	private static function getArchiveMonths(): array {
+		$months = [];
+		// start from last month and go back up to 8 months
+		for ( $i = 1; $i <= 12; $i++ ) {
+			$timestamp = strtotime( "-{$i} months" );
+			$monthName = date( 'F Y', $timestamp ); // e.g. "February 2026"
+			$catTitle = 'Category:' . $monthName;
+
+			$request = new FauxRequest( [
+				'action' => 'query',
+				'titles' => $catTitle,
+				'prop' => 'categoryinfo',
+			] );
+
+			$api = new ApiMain( $request, false );
+
+			try {
+				$api->execute();
+			} catch ( \Throwable $e ) {
+				continue;
+			}
+
+			$data = $api->getResult()->getResultData( null, [
+				'Strip' => 'all',
+			] );
+
+			$count = 0;
+			if ( isset( $data['query']['pages'] ) ) {
+				foreach ( $data['query']['pages'] as $page ) {
+					if ( isset( $page['categoryinfo']['pages'] ) ) {
+						$count = (int)$page['categoryinfo']['pages'];
+					}
+				}
+			}
+
+			if ( $count > 0 ) {
+				$title = Title::newFromText( $catTitle );
+				if ( $title ) {
+					$months[] = [
+						'label' => $monthName,
+						'url' => $title->getLocalURL(),
+						'count' => $count,
+					];
+				}
+			}
+		}
+
+		return $months;
+	}
+
 	// MAIN
 	// builds the full html
-	private static function buildHomePageHTML( string $logoSvg, array $carouselItems, array $siteStats, array $thisMonthPages ): string {
+	private static function buildHomePageHTML( string $logoSvg, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths ): string {
 		$scriptPath = wfScript();
 
 		// mini nav links
@@ -428,7 +479,7 @@ SVG;
 				'url' => Title::newFromText( 'New' )->getLocalURL(),
 				'label' => 'New Releases',
 				'image' => 'https://ss1-legacy.content.wolfite.dev/ss1/backgrounds/wlftgbg/v1/collections/default-1/XDCOV3Medium1.png',
-				'priority' => 7,
+				'priority' => 2,
 			],
 			[
 				'url' => Title::newFromText( 'Category:Studios' )->getLocalURL(),
@@ -437,10 +488,10 @@ SVG;
 				'priority' => 3,
 			],
 			[
-				'url' => Title::newFromText( 'Category:Difficulty_Chart_Obby' )->getLocalURL(),
-				'label' => 'Difficulty Chart Obbies',
+				'url' => Title::newFromText( 'Special:MyLanguage/Tiers' )->getLocalURL(),
+				'label' => 'Tiers',
 				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
-				'priority' => 2,
+				'priority' => 4,
 			],
 			// [
 			// 	'url' => Title::newFromText( 'Category:Developers' )->getLocalURL(),
@@ -515,6 +566,29 @@ SVG;
 			'contributing' => htmlspecialchars( Title::newFromText( 'Help:Contributing' )->getLocalURL() ),
 		];
 
+		// archive section html
+		$archiveHtml = '';
+		if ( !empty( $archiveMonths ) ) {
+			$archiveCardsHtml = '';
+			foreach ( $archiveMonths as $am ) {
+				$amUrl = htmlspecialchars( $am['url'] );
+				$amLabel = htmlspecialchars( $am['label'] );
+				$amCount = (int)$am['count'];
+				$amDesc = htmlspecialchars( "View all {$amCount} obbies released in {$am['label']}" );
+				$archiveCardsHtml .= '<a href="' . $amUrl . '" class="obbywiki-archive__card">' .
+					'<span class="obbywiki-archive__card-title">' . $amLabel . '</span>' .
+					'<span class="obbywiki-archive__card-desc">' . $amDesc . '</span>' .
+					'</a>';
+			}
+			$archiveHtml = '<section class="obbywiki-archive" aria-label="Monthly archive">' .
+				// '<div class="obbywiki-archive__header">' .
+				// 	'<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg>' .
+				// 	'<h3 class="obbywiki-archive__title">Archive</h3>' .
+				// '</div>' .
+				'<div class="obbywiki-archive__grid">' . $archiveCardsHtml . '</div>' .
+			'</section>';
+		}
+
 		// RAW CONSTRUCT
 
 		return <<<HTML
@@ -562,50 +636,53 @@ SVG;
 				</button>
 			</div>
 		</div>
-		<aside class="obbywiki-featured__aside">
-			<div class="obbywiki-featured__aside-inner">
-				<div class="obbywiki-featured__aside-card">
-					<div class="obbywiki-featured__aside-header">
-						<span class="obbywiki-featured__aside-icon">🆕</span>
-						<h3 class="obbywiki-featured__aside-title">This Month</h3>
-					</div>
-					<div class="obbywiki-featured__aside-month-list">
-						{$thisMonthHtml}
-					</div>
-				</div>
-				<div class="obbywiki-featured__aside-card">
-					<div class="obbywiki-featured__aside-header">
-						<span class="obbywiki-featured__aside-icon">🏷️</span>
-						<h3 class="obbywiki-featured__aside-title">Browse by Type</h3>
-					</div>
-					<div class="obbywiki-featured__aside-tags">
-						<a href="{$categoryUrls['classic']}" class="obbywiki-featured__aside-tag">🏃 Classic</a>
-						<a href="{$categoryUrls['tower']}" class="obbywiki-featured__aside-tag">🗼 Tower</a>
-						<a href="{$categoryUrls['dco']}" class="obbywiki-featured__aside-tag">📊 Difficulty Chart</a>
-						<a href="{$categoryUrls['gimmick']}" class="obbywiki-featured__aside-tag">🎭 Gimmick</a>
-						<a href="{$categoryUrls['tier']}" class="obbywiki-featured__aside-tag">🪜 Tier</a>
-					</div>
-				</div>
-				<div class="obbywiki-featured__aside-card obbywiki-featured__aside-card--cta">
-					<div class="obbywiki-featured__aside-header">
-						<span class="obbywiki-featured__aside-icon">✏️</span>
-						<h3 class="obbywiki-featured__aside-title">Get Involved</h3>
-					</div>
-					<p class="obbywiki-featured__aside-text">Help grow the wiki! Pick a stub to improve or learn how to contribute.</p>
-					<div class="obbywiki-featured__aside-cta-links">
-						<a href="{$categoryUrls['stubs']}" class="obbywiki-featured__aside-cta-link">
-							<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
-							View Stubs
-						</a>
-						<a href="{$categoryUrls['contributing']}" class="obbywiki-featured__aside-cta-link">
-							<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M10 1a9 9 0 109 9 9 9 0 00-9-9m1 14H9v-2h2zm0-4H9V5h2z"/></svg>
-							How to Contribute
-						</a>
-					</div>
-				</div>
+		<div class="obbywiki-month">
+			<div class="obbywiki-month__header">
+				<span class="obbywiki-month__icon">
+					<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg>
+				</span>
+				<h3 class="obbywiki-month__title">This Month</h3>
 			</div>
-		</aside>
+			<div class="obbywiki-month__list">
+				{$thisMonthHtml}
+			</div>
+		</div>
 	</section>
+
+	{$archiveHtml}
+
+	<aside class="obbywiki-aside">
+		<div class="obbywiki-aside__card">
+			<div class="obbywiki-aside__header">
+				<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="m240-160 40-160H120l20-80h160l40-160H180l20-80h160l40-160h80l-40 160h160l40-160h80l-40 160h160l-20 80H660l-40 160h160l-20 80H600l-40 160h-80l40-160H360l-40 160h-80Zm140-240h160l40-160H420l-40 160Z"/></svg></span>
+				<h3 class="obbywiki-aside__title">Browse by Type</h3>
+			</div>
+			<div class="obbywiki-featured__aside-tags">
+				<a href="{$categoryUrls['classic']}" class="obbywiki-featured__aside-tag">Classic Obby</a>
+				<a href="{$categoryUrls['tower']}" class="obbywiki-featured__aside-tag">Tower Obby</a>
+				<a href="{$categoryUrls['dco']}" class="obbywiki-featured__aside-tag">Difficulty Chart Obby</a>
+				<a href="{$categoryUrls['gimmick']}" class="obbywiki-featured__aside-tag">Gimmick Obby</a>
+				<a href="{$categoryUrls['tier']}" class="obbywiki-featured__aside-tag">Tiered Obby</a>
+			</div>
+		</div>
+		<div class="obbywiki-aside__card">
+			<div class="obbywiki-aside__header">
+				<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"><title>edit</title><g fill="currentColor"><path d="m16.77 8 1.94-2a1 1 0 0 0 0-1.41l-3.34-3.3a1 1 0 0 0-1.41 0L12 3.23zM1 14.25V19h4.75l9.96-9.96-4.75-4.75z"/></g></svg></span>
+				<h3 class="obbywiki-aside__title">Start Contributing</h3>
+			</div>
+			<p class="obbywiki-aside__text">Whether you're a casual obby player, a content creator, or a developer, there's a place for you here. Learn more below.</p>
+			<div class="obbywiki-featured__aside-cta-links">
+				<a href="{$categoryUrls['contributing']}" class="obbywiki-featured__aside-cta-link">
+					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M10 1a9 9 0 109 9 9 9 0 00-9-9m1 14H9v-2h2zm0-4H9V5h2z"/></svg>
+					How to Contribute
+				</a>
+				<a href="{$categoryUrls['stubs']}" class="obbywiki-featured__aside-cta-link">
+					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
+					View Stubs
+				</a>
+			</div>
+		</div>
+	</aside>
 </div>
 HTML;
 	}

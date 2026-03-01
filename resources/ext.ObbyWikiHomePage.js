@@ -128,76 +128,9 @@
 		startAutoplay();
 	}
 
-	// sync "This Month" list height to carousel (independent of carousel)
-	function syncMonthListHeight() {
-		var carousel = document.querySelector( '.obbywiki-spotlight' );
-		var aside = document.querySelector( '.obbywiki-featured__aside-inner' );
-		var monthList = document.querySelector( '.obbywiki-featured__aside-month-list' );
-		var monthCard = monthList ? monthList.closest( '.obbywiki-featured__aside-card' ) : null;
-
-		if ( !carousel || !aside || !monthList || !monthCard ) {
-			return;
-		}
-
-		// reset so we can measure natural layout
-		monthList.style.maxHeight = '';
-
-		// only apply when aside is beside the carousel (not stacked)
-		var carouselRect = carousel.getBoundingClientRect();
-		var asideRect = aside.getBoundingClientRect();
-		if ( asideRect.top >= carouselRect.bottom - 1 ) {
-			// Stacked layout — no constraint
-			return;
-		}
-
-		var carouselHeight = carousel.offsetHeight;
-
-		// sum heights of all other cards + gaps in the aside
-		var cards = aside.querySelectorAll( '.obbywiki-featured__aside-card' );
-		var gapStr = window.getComputedStyle( aside ).gap || '0';
-		var gap = parseFloat( gapStr ) || 0;
-		var otherCardsHeight = 0;
-		for ( var i = 0; i < cards.length; i++ ) {
-			if ( cards[ i ] !== monthCard ) {
-				otherCardsHeight += cards[ i ].offsetHeight;
-			}
-		}
-		var totalGaps = ( cards.length - 1 ) * gap;
-
-		// available height for the entire month card
-		var availableForCard = carouselHeight - otherCardsHeight - totalGaps;
-		if ( availableForCard <= 0 ) {
-			return;
-		}
-
-		// subtract the card's own padding, border, header and gap from the available space
-		var cardStyle = window.getComputedStyle( monthCard );
-		var cardPaddingTop = parseFloat( cardStyle.paddingTop ) || 0;
-		var cardPaddingBottom = parseFloat( cardStyle.paddingBottom ) || 0;
-		var cardBorderTop = parseFloat( cardStyle.borderTopWidth ) || 0;
-		var cardBorderBottom = parseFloat( cardStyle.borderBottomWidth ) || 0;
-		var cardGap = parseFloat( cardStyle.gap ) || 0;
-		var header = monthCard.querySelector( '.obbywiki-featured__aside-header' );
-		var headerHeight = header ? header.offsetHeight : 0;
-
-		var maxListHeight = availableForCard - cardPaddingTop - cardPaddingBottom - cardBorderTop - cardBorderBottom - headerHeight - cardGap;
-		if ( maxListHeight > 0 ) {
-			monthList.style.maxHeight = maxListHeight + 'px';
-		}
-	}
-
-	function initMonthSync() {
-		syncMonthListHeight();
-		window.addEventListener( 'resize', syncMonthListHeight );
-	}
-
 	if ( document.readyState === 'loading' ) {
-		document.addEventListener( 'DOMContentLoaded', function () {
-			init();
-			initMonthSync();
-		} );
+		document.addEventListener( 'DOMContentLoaded', init );
 	} else {
 		init();
-		initMonthSync();
 	}
 }() );
