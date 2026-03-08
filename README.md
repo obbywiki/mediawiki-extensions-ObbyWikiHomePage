@@ -10,6 +10,7 @@ Add an ObbyWiki-specific custom home page, overwriting `Home` by default with cu
 * **Dynamic Browse**: Move hardcoded categories to extension configuration.
 * **Site Statistics**: Create a visual "At a Glance" section for wiki-wide stats. Somewhere below the area, maybe split the contributing section and put this as the other half.
 * **Trending Section**: Feature pages with high recent growth or view counts. (NEEDS EXTENSION SUPPORT FIRST)
+* Add dynamic site events like seasonal obby highlights and other events like sales in games
 
 ### UX
 * **Micro-animations**: Add glassmorphism and smooth hover effects to cards.
