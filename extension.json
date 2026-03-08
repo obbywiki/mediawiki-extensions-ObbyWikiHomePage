@@ -52,6 +52,10 @@
 		"ObbyWikiHomePageCacheTTL": {
 			"value": 900,
 			"description": "Cache TTL in seconds for the home page HTML. Set to 0 to disable caching. Default is 900 (15 minutes)."
+		},
+		"ObbyWikiHomePageFeaturedPages": {
+			"value": [],
+			"description": "An array of specific page titles to feature in the highlight carousel instead of automatically fetching them."
 		}
 	}
 }

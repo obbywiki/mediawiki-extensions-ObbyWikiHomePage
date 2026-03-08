@@ -74,6 +74,12 @@ class Hooks {
 	}
 
 	private static function getObbyPages(): array {
+		global $wgObbyWikiHomePageFeaturedPages;
+
+		if ( isset( $wgObbyWikiHomePageFeaturedPages ) && is_array( $wgObbyWikiHomePageFeaturedPages ) && count( $wgObbyWikiHomePageFeaturedPages ) > 0 ) {
+			return self::getConfiguredObbyPages( $wgObbyWikiHomePageFeaturedPages );
+		}
+
 		// use 'Above 1,000,000 visits' as the source, then filter by 'Category:Obby' membership and exclude 'Category:Stubs'
 		// we want high-enough quality pages to be highlighted, preferrably
 		$request = new FauxRequest( [
@@ -196,6 +202,86 @@ class Hooks {
 
 	// 	return 0;
 	// }
+
+	private static function getConfiguredObbyPages( array $pageTitles ): array {
+		if ( empty( $pageTitles ) ) {
+			return [];
+		}
+
+		$request = new FauxRequest( [
+			'action' => 'query',
+			'titles' => implode( '|', $pageTitles ),
+			'prop' => 'pageimages|pageprops|info',
+			'piprop' => 'thumbnail',
+			'pithumbsize' => '400',
+			'ppprop' => 'shortdesc|displaytitle',
+		] );
+
+		$api = new ApiMain( $request, false );
+
+		try {
+			$api->execute();
+		} catch ( \Throwable $e ) {
+			return [];
+		}
+
+		$data = $api->getResult()->getResultData( null, [
+			'Strip' => 'all',
+		] );
+
+		$pages = [];
+		if ( isset( $data['query']['pages'] ) ) {
+			foreach ( $data['query']['pages'] as $page ) {
+				if ( !isset( $page['title'] ) ) continue;
+
+				$title = Title::newFromText( $page['title'] );
+				if ( !$title ) {
+					continue;
+				}
+
+				$thumb = isset( $page['thumbnail']['source'] )
+					? $page['thumbnail']['source']
+					: null;
+				$desc = isset( $page['pageprops']['shortdesc'] )
+					? $page['pageprops']['shortdesc']
+					: null;
+
+				$pageLength = isset( $page['length'] ) ? (int)$page['length'] : 0;
+
+				$displayTitle = isset( $page['pageprops']['displaytitle'] )
+					? $page['pageprops']['displaytitle']
+					: ucwords( $title->getText() );
+
+				$pages[$page['title']] = [
+					'title' => $displayTitle,
+					'url' => $title->getLocalURL(),
+					'thumbnail' => $thumb,
+					'description' => $desc,
+					// 'editCount' => 0,
+					'pageLength' => $pageLength,
+				];
+			}
+		}
+
+		$orderedPages = [];
+		foreach ( $pageTitles as $titleText ) {
+			$wantedTitle = Title::newFromText( $titleText );
+			if ( !$wantedTitle ) {
+				continue;
+			}
+			$wantedPrefixedText = $wantedTitle->getPrefixedText();
+
+			foreach ( $pages as $pTitle => $pData ) {
+				$pTitleObj = Title::newFromText( $pTitle );
+				if ( $pTitleObj && $pTitleObj->getPrefixedText() === $wantedPrefixedText ) {
+					$orderedPages[] = $pData;
+					break;
+				}
+			}
+		}
+
+		return $orderedPages;
+	}
 
 	private static function logoSVG(): string {
 		return <<<'SVG'
