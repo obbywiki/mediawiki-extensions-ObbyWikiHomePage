@@ -624,12 +624,13 @@ SVG;
 
 			$slidesHtml .= '<a href="' . $urlEsc . '" class="obbywiki-spotlight__slide' . $activeClass
 				. '" data-index="' . $index . '">'
-				. '<div class="obbywiki-spotlight__slide-media">' . $mediaHtml . '</div>'
 				. '<div class="obbywiki-spotlight__slide-info">'
 				. '<h3 class="obbywiki-spotlight__slide-title">' . $titleEsc . '</h3>'
 				// . $statsHtml
 				. $descHtml
-				. '</div></a>';
+				. '</div>'
+				. '<div class="obbywiki-spotlight__slide-media">' . $mediaHtml . '</div>'
+				. '</a>';
 
 			$dotActive = $index === 0 ? ' obbywiki-spotlight__bar--active' : '';
 			$dotsHtml .= '<button class="obbywiki-spotlight__bar' . $dotActive
@@ -856,18 +857,20 @@ SVG;
 	<section class="obbywiki-featured">
 		<div class="obbywiki-spotlight">
 			<div class="obbywiki-spotlight__viewport">
-				<span class="obbywiki-spotlight__chip">FEATURED</span>
-				{$slidesHtml}
+				<span class="obbywiki-spotlight__chip">OBBY WIKI HIGHLIGHTS</span>
+				<div class="obbywiki-spotlight__track">
+					{$slidesHtml}
+				</div>
 				{$emptyState}
-			</div>
-			<div class="obbywiki-spotlight__nav">
-				<button class="obbywiki-spotlight__arrow obbywiki-spotlight__arrow--prev" aria-label="Previous">
-					<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/></svg>
-				</button>
-				<div class="obbywiki-spotlight__bars">{$dotsHtml}</div>
-				<button class="obbywiki-spotlight__arrow obbywiki-spotlight__arrow--next" aria-label="Next">
-					<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
-				</button>
+				<nav class="obbywiki-spotlight__nav">
+					<button class="obbywiki-spotlight__arrow obbywiki-spotlight__arrow--prev" aria-label="Previous">
+						<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/></svg>
+					</button>
+					<div class="obbywiki-spotlight__bars">{$dotsHtml}</div>
+					<button class="obbywiki-spotlight__arrow obbywiki-spotlight__arrow--next" aria-label="Next">
+						<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
+					</button>
+				</nav>
 			</div>
 		</div>
 		<div class="obbywiki-month">

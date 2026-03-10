@@ -333,10 +333,16 @@
 
 .obbywiki-spotlight {
 	position: relative;
-	border-radius: var(--border-radius-medium, 12px);
+	border-radius: 16px;
 	overflow: hidden;
 	background: var(--color-surface-2, #eaecf0);
 	min-width: 0;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.obbywiki-spotlight:hover {
+	box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
 }
 
 .obbywiki-spotlight__viewport {
@@ -349,39 +355,45 @@
 .obbywiki-spotlight__chip {
 	position: absolute;
 	top: 0.75rem;
-	left: 0.75rem;
+	right: 0.75rem;
 	z-index: 4;
-	padding: 0.5rem 0.75rem;
-	border-radius: var(--border-radius-medium, 6px);
-	background: rgba(0, 0, 0, 0.45);
-	backdrop-filter: blur(8px);
-	-webkit-backdrop-filter: blur(8px);
+	padding: 0.3125rem 0.5rem;
+	border-radius: 999px;
+	background: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
 	color: #fff;
-	font-size: 0.6875rem;
+	font-size: 0.625rem;
 	font-weight: 700;
-	letter-spacing: 0.08em;
+	letter-spacing: 0.1em;
 	line-height: 1;
 	pointer-events: none;
 }
 
-.obbywiki-spotlight__slide,
-.obbywiki-spotlight__slide:visited {
-	position: absolute;
-	inset: 0;
+/* slide track — continuous horizontal strip */
+.obbywiki-spotlight__track {
 	display: flex;
-	flex-direction: column;
-	text-decoration: none;
-	color: #fff;
-	opacity: 0;
-	transition: opacity 0.6s ease;
-	pointer-events: none;
-	z-index: 0;
+	height: 100%;
+	will-change: transform;
+	transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.obbywiki-spotlight__slide--active {
-	opacity: 1;
-	pointer-events: auto;
-	z-index: 1;
+.obbywiki-spotlight__slide,
+.obbywiki-spotlight__slide:visited {
+	flex: 0 0 100%;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	display: block;
+	text-decoration: none;
+	color: #fff;
+	overflow: hidden;
+}
+
+.obbywiki-spotlight__slide:hover,
+.obbywiki-spotlight__slide:visited:hover {
+	text-decoration: none;
+	color: #fff;
 }
 
 .obbywiki-spotlight__slide-media {
@@ -417,29 +429,39 @@
 	text-transform: uppercase;
 }
 
+/* Info overlay — positioned at top as a split header */
 .obbywiki-spotlight__slide-info {
 	position: absolute;
-	bottom: 0;
+	top: 0;
 	left: 0;
 	right: 0;
-	padding: 3rem 1.25rem 2.5rem;
-	background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+	padding: 0.875rem 1rem;
+	background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.35) 70%, transparent 100%);
 	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
 }
 
 .obbywiki-spotlight__slide-title {
-	font-size: 1.25rem;
+	font-size: 1.125rem;
 	font-weight: 700;
 	margin: 0;
 	color: #fff;
-	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	line-height: 1.3;
 }
 
 .obbywiki-spotlight__slide-desc {
-	font-size: 0.8125rem;
-	margin: 0.25rem 0 0;
-	color: rgba(255, 255, 255, 0.85);
+	font-size: 0.75rem;
+	margin: 0;
+	color: rgba(255, 255, 255, 0.8);
 	line-height: 1.4;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
 /* page stats row (if enabled) */
@@ -470,53 +492,56 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 24px;
-	height: 24px;
+	width: 22px;
+	height: 22px;
 	border-radius: 50%;
 	border: none;
-	background: #00000000;
+	background: transparent;
 	color: #fff;
 	cursor: pointer;
 	flex-shrink: 0;
-	transition: background 0.15s ease;
+	transition: background 0.15s ease, opacity 0.15s ease;
 	padding: 0;
+	opacity: 0.8;
 }
 
 .obbywiki-spotlight__arrow:hover {
-	background: rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.2);
+	opacity: 1;
 }
 
 .obbywiki-spotlight__arrow svg {
 	display: block;
-	width: 18px;
-	height: 18px;
+	width: 16px;
+	height: 16px;
 }
 
-/* rectangular progress bar nav */
+/* progress bar nav */
 .obbywiki-spotlight__nav {
 	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
+	bottom: 0.75rem;
+	right: 0.75rem;
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 0.5rem;
-	padding: 0.75rem 1rem;
-	z-index: 3;
+	gap: 0.375rem;
+	padding: 0.375rem 0.5rem;
+	z-index: 5;
+	background: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	border-radius: 999px;
 }
 
 .obbywiki-spotlight__bars {
 	display: flex;
 	gap: 4px;
-	width: 100%;
-	max-width: 280px;
+	width: 60px;
 }
 
 .obbywiki-spotlight__bar {
 	flex: 1;
 	height: 3px;
-	border-radius: 2px;
+	border-radius: 999px;
 	border: none;
 	background: rgba(255, 255, 255, 0.3);
 	cursor: pointer;
@@ -538,7 +563,7 @@
 	height: 100%;
 	width: 0%;
 	background: #fff;
-	border-radius: 2px;
+	border-radius: 999px;
 }
 
 .obbywiki-spotlight__bar--active .obbywiki-spotlight__bar-fill {
@@ -567,7 +592,7 @@
 	color: var(--color-primary, #3366cc);
 }
 
-/* THIS MONTH — standalone card in the featured grid */
+/* THIS MONTH */
 .obbywiki-month {
 	padding: 1rem 1.125rem;
 	border-radius: var(--border-radius-medium, 12px);
