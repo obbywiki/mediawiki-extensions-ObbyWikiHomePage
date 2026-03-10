@@ -62,6 +62,14 @@ class Hooks {
 		$out->addModuleStyles( [ 'ext.ObbyWikiHomePage.styles' ] );
 		$out->addModules( [ 'ext.ObbyWikiHomePage.scripts' ] );
 		$out->addBodyClasses( [ 'obbywiki-homepage' ] );
+
+		$description = 'Welcome to the Obby Wiki! The leading community-run and independent wiki for information and archives on Roblox obbies that anyone can contribute to.'; // TODO convert to config
+
+		$out->addMeta( 'description', $description );
+		$out->addHeadItem(
+			'og-description',
+			'<meta property="og:description" content="' . htmlspecialchars( $description ) . '"/>'
+		);
 	}
 
 	private static function buildHomePage(): string {
