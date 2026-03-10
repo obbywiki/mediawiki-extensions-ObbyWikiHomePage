@@ -181,7 +181,8 @@
 	margin-bottom: auto;
 }
 
-.obbywiki-home__nav-btn {
+.obbywiki-home__nav-btn,
+.obbywiki-home__nav-btn:visited {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -202,10 +203,12 @@
 	gap: 0.35rem;
 }
 
-.obbywiki-home__nav-btn:hover {
+.obbywiki-home__nav-btn:hover,
+.obbywiki-home__nav-btn:visited:hover {
 	background: var(--color-surface-2, #eaecf0);
 	border-color: var(--border-color-interactive, rgba(0, 0, 0, 0.1));
 	text-decoration: none;
+	color: var(--color-base, #202122);
 }
 
 .obbywiki-home__nav-icon {
@@ -241,7 +244,8 @@
 	display: none;
 }
 
-.obbywiki-content-link {
+.obbywiki-content-link,
+.obbywiki-content-link:visited {
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -281,7 +285,8 @@
 	z-index: 0;
 }
 
-.obbywiki-content-link:hover {
+.obbywiki-content-link:hover,
+.obbywiki-content-link:visited:hover {
 	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 	text-decoration: none;
 	color: #fff;
@@ -359,7 +364,8 @@
 	pointer-events: none;
 }
 
-.obbywiki-spotlight__slide {
+.obbywiki-spotlight__slide,
+.obbywiki-spotlight__slide:visited {
 	position: absolute;
 	inset: 0;
 	display: flex;
@@ -605,7 +611,8 @@
 	scrollbar-width: thin;
 }
 
-.obbywiki-featured__aside-month-item {
+.obbywiki-featured__aside-month-item,
+.obbywiki-featured__aside-month-item:visited {
 	display: flex;
 	align-items: center;
 	gap: 0.625rem;
@@ -617,9 +624,11 @@
 	flex-shrink: 0;
 }
 
-.obbywiki-featured__aside-month-item:hover {
+.obbywiki-featured__aside-month-item:hover,
+.obbywiki-featured__aside-month-item:visited:hover {
 	background: var(--color-surface-2, #eaecf0);
 	text-decoration: none;
+	color: var(--color-base, #202122);
 }
 
 .obbywiki-featured__aside-month-thumb {
@@ -715,7 +724,8 @@
 	gap: 0.375rem;
 }
 
-.obbywiki-featured__aside-tag {
+.obbywiki-featured__aside-tag,
+.obbywiki-featured__aside-tag:visited {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.25rem;
@@ -731,7 +741,8 @@
 	white-space: nowrap;
 }
 
-.obbywiki-featured__aside-tag:hover {
+.obbywiki-featured__aside-tag:hover,
+.obbywiki-featured__aside-tag:visited:hover {
 	background: var(--color-primary, #3366cc);
 	border-color: var(--color-primary, #3366cc);
 	color: #fff;
@@ -745,7 +756,8 @@
 	gap: 0.375rem;
 }
 
-.obbywiki-featured__aside-cta-link {
+.obbywiki-featured__aside-cta-link,
+.obbywiki-featured__aside-cta-link:visited {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.375rem;
@@ -760,14 +772,16 @@
 	transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.obbywiki-featured__aside-cta-link:hover {
+.obbywiki-featured__aside-cta-link:hover,
+.obbywiki-featured__aside-cta-link:visited:hover {
 	background: var(--color-primary, #3366cc);
 	border-color: var(--color-primary, #3366cc);
 	color: #fff;
 	text-decoration: none;
 }
 
-.obbywiki-featured__aside-cta-link:hover svg {
+.obbywiki-featured__aside-cta-link:hover svg,
+.obbywiki-featured__aside-cta-link:visited:hover svg {
 	color: #fff;
 }
 
@@ -775,6 +789,197 @@
 	flex-shrink: 0;
 	color: var(--color-primary, #3366cc);
 	transition: color 0.15s ease;
+}
+
+/* RECENT CHANGES SECTION */
+.obbywiki-recent {
+	display: flex;
+	flex-direction: column;
+	gap: 0.625rem;
+}
+
+.obbywiki-recent__header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.obbywiki-recent__icon {
+	color: var(--color-subtle, #54595d);
+	display: flex;
+}
+
+.obbywiki-recent__title {
+	font-size: 0.8125rem;
+	font-weight: 700;
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--color-subtle, #54595d);
+}
+
+.obbywiki-recent__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 1rem;
+}
+
+.obbywiki-recent__card,
+.obbywiki-recent__card:visited {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 1rem 1.125rem;
+	border-radius: var(--border-radius-medium, 12px);
+	background: var(--color-surface-1, #f8f9fa);
+	border: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.08));
+	text-decoration: none;
+	color: var(--color-base, #202122);
+	transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.obbywiki-recent__card::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 4px;
+	background: var(--color-primary, #3366cc);
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.obbywiki-recent__card:hover,
+.obbywiki-recent__card:visited:hover {
+	background: var(--color-surface-2, #eaecf0);
+	border-color: var(--border-color-interactive, rgba(0, 0, 0, 0.12));
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+	text-decoration: none;
+	color: var(--color-base, #202122);
+}
+
+.obbywiki-recent__card:hover::before {
+	opacity: 1;
+}
+
+.obbywiki-recent__card:focus-visible {
+	outline: 2px solid var(--color-primary, #3366cc);
+	outline-offset: 2px;
+}
+
+.obbywiki-recent__card-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 0.75rem;
+}
+
+.obbywiki-recent__card-title,
+.obbywiki-recent__card-title:visited {
+	font-size: 0.875rem;
+	font-weight: 700;
+	line-height: 1.3;
+	color: var(--color-emphasized, var(--color-base, #202122));
+	word-break: break-word;
+}
+
+.obbywiki-recent__card-title:hover,
+.obbywiki-recent__card-title:visited:hover {
+	text-decoration: underline;
+	color: var(--color-emphasized, var(--color-base, #202122));
+}
+
+.obbywiki-recent__card-diff {
+	font-size: 0.75rem;
+	font-weight: 700;
+	padding: 0.125rem 0.375rem;
+	border-radius: 4px;
+	white-space: nowrap;
+	flex-shrink: 0;
+	line-height: 1;
+}
+
+.obbywiki-recent__card-diff--pos {
+	background: rgba(0, 175, 137, 0.1);
+	color: #00af89;
+}
+
+.obbywiki-recent__card-diff--neg {
+	background: rgba(212, 83, 83, 0.1);
+	color: #d45353;
+}
+
+.obbywiki-recent__card-diff--zero {
+	background: var(--color-surface-2, #eaecf0);
+	color: var(--color-subtle, #54595d);
+}
+
+.obbywiki-recent__card-meta {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.75rem;
+	color: var(--color-subtle, #72777d);
+	flex-wrap: wrap;
+}
+
+.obbywiki-recent__card-user {
+	font-weight: 600;
+	color: var(--color-base, #202122);
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.obbywiki-recent__card-time {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.obbywiki-recent__card-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	margin-left: auto;
+}
+
+.obbywiki-recent__card-action,
+.obbywiki-recent__card-action:visited {
+	color: var(--color-subtle, #72777d);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 4px;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.obbywiki-recent__card-action:hover,
+.obbywiki-recent__card-action:visited:hover {
+	background: rgba(0, 0, 0, 0.05);
+	color: var(--color-primary, #3366cc);
+}
+
+.obbywiki-recent__card-action svg {
+	width: 14px;
+	height: 14px;
+}
+
+.obbywiki-recent__card-comment {
+	font-size: 0.8125rem;
+	color: var(--color-subtle, #72777d);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	line-height: 1.4;
+	font-style: italic;
 }
 
 /* ARCHIVE SECTION */
@@ -806,7 +1011,8 @@
 	display: none;
 }
 
-.obbywiki-archive__card {
+.obbywiki-archive__card,
+.obbywiki-archive__card:visited {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -821,7 +1027,8 @@
 	transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.obbywiki-archive__card:hover {
+.obbywiki-archive__card:hover,
+.obbywiki-archive__card:visited:hover {
 	background: var(--color-surface-2, #eaecf0);
 	border-color: var(--border-color-interactive, rgba(0, 0, 0, 0.12));
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -901,33 +1108,5 @@
 
 	.obbywiki-featured {
 		grid-template-columns: 1fr;
-	}
-
-	.obbywiki-month {
-		max-height: 300px;
-	}
-
-	.obbywiki-aside {
-		flex-direction: column;
-	}
-
-	.obbywiki-spotlight__slide-title {
-		font-size: 0.9375rem;
-	}
-
-	.obbywiki-spotlight__slide-desc {
-		display: none;
-	}
-
-	.obbywiki-content-link[data-priority="4"],
-	.obbywiki-content-link[data-priority="5"],
-	.obbywiki-content-link[data-priority="6"],
-	.obbywiki-content-link[data-priority="7"] {
-		display: none;
-	}
-
-	.obbywiki-content-link {
-		min-width: 110px;
-		height: 64px;
 	}
 }

@@ -5,7 +5,6 @@ Add an ObbyWiki-specific custom home page, overwriting `Home` by default with cu
 ## TODO
 
 ### Functionality
-* **Recently Changed Section**: Implement a block showing the latest activity/new releases.
 * **External Links**: Add a section for community hubs (Discord, Twitter, Roblox Groups).
 * **Dynamic Browse**: Move hardcoded categories to extension configuration.
 * **Site Statistics**: Create a visual "At a Glance" section for wiki-wide stats. Somewhere below the area, maybe split the contributing section and put this as the other half.
