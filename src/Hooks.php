@@ -661,7 +661,7 @@ SVG;
 				'priority' => 2,
 			],
 			[
-				'url' => Title::newFromText( 'Category:Studios' )->getLocalURL(),
+				'url' => Title::newFromText( 'Category:Studio' )->getLocalURL(),
 				'label' => 'Studios',
 				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5f2Fjbht9Xth87gDveuM46VKbLTBUms3wzar0R',
 				'priority' => 3,
@@ -857,7 +857,7 @@ SVG;
 	<section class="obbywiki-featured">
 		<div class="obbywiki-spotlight">
 			<div class="obbywiki-spotlight__viewport">
-				<span class="obbywiki-spotlight__chip">OBBY WIKI HIGHLIGHTS</span>
+				<span class="obbywiki-spotlight__chip">OBBY WIKI 	HIGHLIGHTS</span>
 				<div class="obbywiki-spotlight__track">
 					{$slidesHtml}
 				</div>
