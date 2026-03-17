@@ -12,7 +12,6 @@ Add an ObbyWiki-specific custom home page, overwriting `Home` by default with cu
 * Add dynamic site events like seasonal obby highlights and other events like sales in games
 * "On this day..." releases (potentialy better with a template and cargo)
 * Cache poorly updates $wgObbyWikiHomePageFeaturedPages on featured carousel, maybe use a job queue or something to update it every 10 minutes?
-* **Wiki Rules?**: Add a wiki rules section and related meta wiki information for better SEO
 * Backfill recent/this month section with sub-section "last month" if there's not enough games released so far in the month or its empty
 
 ### UX

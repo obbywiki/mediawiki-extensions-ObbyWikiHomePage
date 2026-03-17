@@ -865,18 +865,6 @@
 	overflow: hidden;
 }
 
-.obbywiki-recent__card::before {
-	content: '';
-	position: absolute;
-	left: 0;
-	top: 0;
-	bottom: 0;
-	width: 4px;
-	background: var(--color-primary, #3366cc);
-	opacity: 0;
-	transition: opacity 0.2s ease;
-}
-
 .obbywiki-recent__card:hover,
 .obbywiki-recent__card:visited:hover {
 	background: var(--color-surface-2, #eaecf0);
@@ -884,10 +872,6 @@
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 	text-decoration: none;
 	color: var(--color-base, #202122);
-}
-
-.obbywiki-recent__card:hover::before {
-	opacity: 1;
 }
 
 .obbywiki-recent__card:focus-visible {
