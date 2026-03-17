@@ -177,7 +177,7 @@
 .obbywiki-home__nav {
 	display: none; /* hidden by default, shown on large screens */
 	align-items: center;
-	gap: 2px;
+	gap: 0.5rem;
 	margin-bottom: auto;
 }
 
