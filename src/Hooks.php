@@ -824,6 +824,25 @@ SVG;
 			'</section>';
 		}
 
+		// about section html
+		$aboutUrl = htmlspecialchars( Title::newFromText( 'OW:About' )->getLocalURL() );
+		$obbyUrl = htmlspecialchars( Title::newFromText( 'Obby' )->getLocalURL() );
+		$aboutHtml = '<section class="obbywiki-about" aria-label="About the Wiki">' .
+			'<div class="obbywiki-about__header">' .
+				'<span class="obbywiki-about__icon">' .
+					'<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M425-265h110v-255H425v255Zm97.5-332.25Q540-614.5 540-640t-17.25-42.75Q505.5-700 480-700t-42.75 17.25Q420-665.5 420-640t17.5 42.75Q455-580 480-580t42.5-17.25ZM480-46q-91 0-169.99-34.08-78.98-34.09-137.41-92.52-58.43-58.43-92.52-137.41Q46-389 46-480q0-91 34.08-169.99 34.09-78.98 92.52-137.41 58.43-58.43 137.41-92.52Q389-914 480-914q91 0 169.99 34.08 78.98 34.09 137.41 92.52 58.43 58.43 92.52 137.41Q914-571 914-480q0 91-34.08 169.99-34.09 78.98-92.52 137.41-58.43 58.43-137.41 92.52Q571-46 480-46Z"/></svg>' .
+				'</span>' .
+				'<h3 class="obbywiki-about__title">About The Obby Wiki</h3>' .
+			'</div>' .
+			'<div class="obbywiki-about__content">' .
+				'<p class="obbywiki-about__text">The Obby Wiki is an independent and community-run wiki/encyclopedia dedicated to documenting <a href="' . $obbyUrl . '">Roblox obby</a> games (obbies), their creators, mechanics, conventions, terminology, etc. Our goal is to provide the most comprehensive, accurate, and complete information about as many obbies as possible.</p>' .
+				'<p class="obbywiki-about__text">Whether you want detailed information about a certain obby, or you want to search our database for a new obby to play, information about a certain mechanic or glitch, or just anything related to obbies, you can find it here.</p>' .
+				'<br />' .
+				'<p class="obbywiki-about__text">Anyone can contribute by editing articles, adding new information, or participating in discussions on the <a href="https://forum.wou.gg">Obby Forum</a>.</p>' .
+				'<p class="obbywiki-about__text">Learn more <a href="' . $aboutUrl . '">about our project</a> and our advantages as well as how you can help or why you should use us over existing platforms.</p>' .
+			'</div>' .
+		'</section>';
+
 		// RAW CONSTRUCT
 
 		return <<<HTML
@@ -929,6 +948,8 @@ SVG;
 	</aside>
 
 	{$recentChangesHtml}
+
+	{$aboutHtml}
 
 	<section class="obbywiki-rules" aria-label="Wiki Rules">
 		<div class="obbywiki-rules__header">

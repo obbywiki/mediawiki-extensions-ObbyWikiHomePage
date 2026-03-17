@@ -1069,6 +1069,60 @@
 	overflow: hidden;
 }
 
+/* ABOUT SECTION */
+.obbywiki-about {
+	display: flex;
+	flex-direction: column;
+	gap: 0.625rem;
+}
+
+.obbywiki-about__header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.obbywiki-about__icon {
+	color: var(--color-subtle, #54595d);
+	display: flex;
+}
+
+.obbywiki-about__title {
+	font-size: 0.8125rem;
+	font-weight: 700;
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--color-subtle, #54595d);
+}
+
+.obbywiki-about__content {
+	padding: 1rem 1.125rem;
+	border-radius: var(--border-radius-medium, 12px);
+	background: var(--color-surface-1, #f8f9fa);
+	border: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.08));
+}
+
+.obbywiki-about__text {
+	font-size: 0.8125rem;
+	color: var(--color-subtle, #54595d);
+	margin: 0 0 0.5rem 0;
+	line-height: 1.5;
+}
+
+.obbywiki-about__text:last-child {
+	margin-bottom: 0;
+}
+
+.obbywiki-about__text a {
+	color: var(--color-primary, #3366cc);
+	text-decoration: none;
+}
+
+.obbywiki-about__text a:hover {
+	text-decoration: underline;
+}
+
 /* RULES SECTION */
 .obbywiki-rules {
 	display: flex;
