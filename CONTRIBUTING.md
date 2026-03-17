@@ -1,0 +1,1 @@
+Please make sure all changes are compatible with PHP 8.3 and MediaWiki 1.45.1.
