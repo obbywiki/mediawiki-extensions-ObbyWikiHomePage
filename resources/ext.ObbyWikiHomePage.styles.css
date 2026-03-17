@@ -333,7 +333,7 @@
 
 .obbywiki-spotlight {
 	position: relative;
-	border-radius: 16px;
+	border-radius: var(--border-radius-medium, 8px);
 	overflow: hidden;
 	background: var(--color-surface-2, #eaecf0);
 	min-width: 0;
@@ -358,7 +358,7 @@
 	right: 0.75rem;
 	z-index: 4;
 	padding: 0.3125rem 0.5rem;
-	border-radius: 999px;
+	border-radius: var(--border-radius-large);
 	background: rgba(0, 0, 0, 0.5);
 	backdrop-filter: blur(10px);
 	-webkit-backdrop-filter: blur(10px);
@@ -529,7 +529,7 @@
 	background: rgba(0, 0, 0, 0.5);
 	backdrop-filter: blur(8px);
 	-webkit-backdrop-filter: blur(8px);
-	border-radius: 999px;
+	border-radius: var(--border-radius-large);
 }
 
 .obbywiki-spotlight__bars {
