@@ -929,6 +929,31 @@ SVG;
 	</aside>
 
 	{$recentChangesHtml}
+
+	<section class="obbywiki-rules" aria-label="Wiki Rules">
+		<div class="obbywiki-rules__header">
+			<span class="obbywiki-rules__icon">
+				<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M270-80q-45 0-77.5-30.5T160-186v-558q0-38 23.5-68t61.5-38l395-78v640l-379 76q-9 2-15 9.5t-6 16.5q0 11 9 18.5t21 7.5h450v-640h80v720H270Zm10-217 80-16v-478l-80 16v478Z"/></svg>
+			</span>
+			<h3 class="obbywiki-rules__title">Wiki Rules</h3>
+		</div>
+		<div class="obbywiki-rules__content">
+			<ul class="obbywiki-rules__list">
+				<li class="obbywiki-rules__item">
+					<h4 class="obbywiki-rules__item-title">1. Respect other contributors</h4>
+					<p class="obbywiki-rules__item-text">rule here</p>
+				</li>
+				<li class="obbywiki-rules__item">
+					<h4 class="obbywiki-rules__item-title">2. Provide accurate information</h4>
+					<p class="obbywiki-rules__item-text">rule here</p>
+				</li>
+				<li class="obbywiki-rules__item">
+					<h4 class="obbywiki-rules__item-title">3. Do not vandalize</h4>
+					<p class="obbywiki-rules__item-text">rule here</p>
+				</li>
+			</ul>
+		</div>
+	</section>
 </div>
 HTML;
 	}
