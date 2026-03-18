@@ -559,40 +559,40 @@ SVG;
 			],
 		];
 
-		$navHtml = '';
+		$navHTML = '';
 		foreach ( $navLinks as $link ) {
 			$urlEsc = htmlspecialchars( $link['url'] );
 			$labelEsc = htmlspecialchars( $link['label'] );
 
 			if ( isset( $link['iconSVG'] ) ) {
-				$iconHtml = $link['iconSVG'];
+				$iconHTML = $link['iconSVG'];
 			} else {
-				$iconHtml = '<span class="obbywiki-home__nav-icon">' . $link['icon'] . '</span>';
+				$iconHTML = '<span class="obbywiki-home__nav-icon">' . $link['icon'] . '</span>';
 			}
 
-			$badgeHtml = '';
+			$badgeHTML = '';
 			if ( isset( $link['badge'] ) ) {
-				$badgeHtml = '<span class="obbywiki-home__nav-badge">' . htmlspecialchars( $link['badge'] ) . '</span>';
+				$badgeHTML = '<span class="obbywiki-home__nav-badge">' . htmlspecialchars( $link['badge'] ) . '</span>';
 			}
 
-			$navHtml .= '<a href="' . $urlEsc . '" class="obbywiki-home__nav-btn" title="' . $labelEsc . '">'
-				. $iconHtml . $badgeHtml
+			$navHTML .= '<a href="' . $urlEsc . '" class="obbywiki-home__nav-btn" title="' . $labelEsc . '">'
+				. $iconHTML . $badgeHTML
 				. '</a>';
 		}
 
 		// spotlight/featured
-		$slidesHtml = '';
-		$dotsHtml = '';
+		$slidesHTML = '';
+		$dotsHTML = '';
 		$index = 0;
 		foreach ( $carouselItems as $item ) {
 			$titleEsc = htmlspecialchars( $item['title'] );
 			$urlEsc = htmlspecialchars( $item['url'] );
 			$activeClass = $index === 0 ? ' obbywiki-spotlight__slide--active' : '';
 
-			$descHtml = '';
+			$descHTML = '';
 			if ( $item['description'] ) {
 				$descEsc = htmlspecialchars( $item['description'] );
-				$descHtml = '<p class="obbywiki-spotlight__slide-desc">' . $descEsc . '</p>';
+				$descHTML = '<p class="obbywiki-spotlight__slide-desc">' . $descEsc . '</p>';
 			}
 
 			if ( $item['thumbnail'] ) {
@@ -622,18 +622,18 @@ SVG;
 			// }
 			// $statsHtml .= '</div>';
 
-			$slidesHtml .= '<a href="' . $urlEsc . '" class="obbywiki-spotlight__slide' . $activeClass
+			$slidesHTML .= '<a href="' . $urlEsc . '" class="obbywiki-spotlight__slide' . $activeClass
 				. '" data-index="' . $index . '">'
 				. '<div class="obbywiki-spotlight__slide-info">'
 				. '<h3 class="obbywiki-spotlight__slide-title">' . $titleEsc . '</h3>'
 				// . $statsHtml
-				. $descHtml
+				. $descHTML
 				. '</div>'
 				. '<div class="obbywiki-spotlight__slide-media">' . $mediaHtml . '</div>'
 				. '</a>';
 
 			$dotActive = $index === 0 ? ' obbywiki-spotlight__bar--active' : '';
-			$dotsHtml .= '<button class="obbywiki-spotlight__bar' . $dotActive
+			$dotsHTML .= '<button class="obbywiki-spotlight__bar' . $dotActive
 				. '" data-index="' . $index . '" aria-label="Slide ' . ( $index + 1 ) . '">'
 				. '<span class="obbywiki-spotlight__bar-fill"></span></button>';
 
@@ -692,13 +692,13 @@ SVG;
 			// ],
 		];
 
-		$contentLinksHtml = '';
+		$contentLinksHTML = '';
 		foreach ( $contentLinks as $cl ) {
 			$clUrl = htmlspecialchars( $cl['url'] );
 			$clLabel = htmlspecialchars( $cl['label'] );
 			$clImage = htmlspecialchars( $cl['image'] );
 			$clPriority = (int)$cl['priority'];
-			$contentLinksHtml .= '<a href="' . $clUrl
+			$contentLinksHTML .= '<a href="' . $clUrl
 				. '" class="obbywiki-content-link" data-priority="' . $clPriority
 				. '" style="background-image: url(' . $clImage . ')"'
 				. '>'
@@ -707,9 +707,9 @@ SVG;
 		}
 
 		// this month
-		$thisMonthHtml = '';
+		$thisMonthHTML = '';
 		if ( empty( $thisMonthPages ) ) {
-			$thisMonthHtml = '<p class="obbywiki-featured__aside-month-empty">No new releases this month yet.</p>';
+			$thisMonthHTML = '<p class="obbywiki-featured__aside-month-empty">No new releases this month yet.</p>';
 		} else {
 			foreach ( $thisMonthPages as $mp ) {
 				$mpUrl = htmlspecialchars( $mp['url'] );
@@ -727,7 +727,7 @@ SVG;
 						. $hue . '">' . htmlspecialchars( $initial ) . '</span>';
 				}
 
-				$thisMonthHtml .= '<a href="' . $mpUrl . '" class="obbywiki-featured__aside-month-item">'
+				$thisMonthHTML .= '<a href="' . $mpUrl . '" class="obbywiki-featured__aside-month-item">'
 					. $thumbHtml
 					. '<span class="obbywiki-featured__aside-month-name">' . $mpTitle . '</span>'
 					. '</a>';
@@ -735,7 +735,7 @@ SVG;
 		}
 
 		// build category URLs for the aside
-		$categoryUrls = [
+		$categoryURLs = [
 			'classic' => htmlspecialchars( Title::newFromText( 'Category:Classic Obby' )->getLocalURL() ),
 			'tower' => htmlspecialchars( Title::newFromText( 'Category:Tower Obby' )->getLocalURL() ),
 			'dco' => htmlspecialchars( Title::newFromText( 'Category:Difficulty Chart Obby' )->getLocalURL() ),
@@ -748,32 +748,32 @@ SVG;
 		];
 
 		// archive section html
-		$archiveHtml = '';
+		$archiveHTML = '';
 		if ( !empty( $archiveMonths ) ) {
-			$archiveCardsHtml = '';
+			$archiveCardsHTML = '';
 			foreach ( $archiveMonths as $am ) {
 				$amUrl = htmlspecialchars( $am['url'] );
 				$amLabel = htmlspecialchars( $am['label'] );
 				$amCount = (int)$am['count'];
 				$amDesc = htmlspecialchars( "View all {$amCount} obbies released in {$am['label']}" );
-				$archiveCardsHtml .= '<a href="' . $amUrl . '" class="obbywiki-archive__card">' .
+				$archiveCardsHTML .= '<a href="' . $amUrl . '" class="obbywiki-archive__card">' .
 					'<span class="obbywiki-archive__card-title">' . $amLabel . '</span>' .
 					'<span class="obbywiki-archive__card-desc">' . $amDesc . '</span>' .
 					'</a>';
 			}
-			$archiveHtml = '<section class="obbywiki-archive" aria-label="Monthly archive">' .
+			$archiveHTML = '<section class="obbywiki-archive" aria-label="Monthly archive">' .
 				// '<div class="obbywiki-archive__header">' .
 				// 	'<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg>' .
 				// 	'<h3 class="obbywiki-archive__title">Archive</h3>' .
 				// '</div>' .
-				'<div class="obbywiki-archive__grid">' . $archiveCardsHtml . '</div>' .
+				'<div class="obbywiki-archive__grid">' . $archiveCardsHTML . '</div>' .
 			'</section>';
 		}
 
 		// recent changes html
-		$recentChangesHtml = '';
+		$recentChangesHTML = '';
 		if ( !empty( $recentChanges ) ) {
-			$rcCardsHtml = '';
+			$rcCardsHTML = '';
 			foreach ( $recentChanges as $rc ) {
 				$diff = $rc['newlen'] - $rc['oldlen'];
 				if ( $diff > 0 ) {
@@ -787,47 +787,47 @@ SVG;
 					$diffText = '0';
 				}
 
-				$rcArticleUrl = htmlspecialchars( $rc['url'] );
-				$rcDiffUrl = htmlspecialchars( $rc['url'] . ( $rc['revid'] ? '?diff=' . $rc['revid'] . '&oldid=' . $rc['old_revid'] : '' ) );
-				$rcHistUrl = htmlspecialchars( $rc['url'] . '?action=history' );
+				$rcArticleURL = htmlspecialchars( $rc['url'] );
+				$rcDiffURL = htmlspecialchars( $rc['url'] . ( $rc['revid'] ? '?diff=' . $rc['revid'] . '&oldid=' . $rc['old_revid'] : '' ) );
+				$rcHistURL = htmlspecialchars( $rc['url'] . '?action=history' );
 
 				$rcTitle = htmlspecialchars( $rc['title'] );
 				$rcUser = htmlspecialchars( $rc['user'] );
 				$rcTime = htmlspecialchars( self::getRelativeTime( $rc['timestamp'] ) );
 				$rcComment = htmlspecialchars( $rc['comment'] );
 
-				$commentHtml = $rcComment ? '<div class="obbywiki-recent__card-comment">' . $rcComment . '</div>' : '';
+				$commentHTML = $rcComment ? '<div class="obbywiki-recent__card-comment">' . $rcComment . '</div>' : '';
 
-				$rcCardsHtml .= '<div class="obbywiki-recent__card">' .
+				$rcCardsHTML .= '<div class="obbywiki-recent__card">' .
 					'<div class="obbywiki-recent__card-top">' .
-						'<a href="' . $rcArticleUrl . '" class="obbywiki-recent__card-title">' . $rcTitle . '</a>' .
+						'<a href="' . $rcArticleURL . '" class="obbywiki-recent__card-title">' . $rcTitle . '</a>' .
 						'<span class="obbywiki-recent__card-diff ' . $diffClass . '">' . $diffText . '</span>' .
 					'</div>' .
 					'<div class="obbywiki-recent__card-meta">' .
 						'<span class="obbywiki-recent__card-user"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-32q0-34 17.5-62.5T224-294q62-31 126-46.5T480-356q66 0 130 15.5T736-294q29 15 46.5 43.5T800-192v32H160Z"/></svg>' . $rcUser . '</span>' .
 						'<span class="obbywiki-recent__card-time"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm112-232L440-464v-216h80v184l128 128-56 56ZM480-480Z"/></svg>' . $rcTime . '</span>' .
 						'<div class="obbywiki-recent__card-actions">' .
-							'<a href="' . $rcDiffUrl . '" class="obbywiki-recent__card-action" title="View diff" rel="nofollow"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M500-520h80v-80h80v-80h-80v-80h-80v80h-80v80h80v80Zm-80 160h240v-80H420v80ZM320-200q-33 0-56.5-23.5T240-280v-560q0-33 23.5-56.5T320-920h280l240 240v400q0 33-23.5 56.5T760-200H320ZM160-40q-33 0-56.5-23.5T80-120v-560h80v560h440v80H160Z"/></svg></a>' .
-							'<a href="' . $rcHistUrl . '" class="obbywiki-recent__card-action" title="View history" rel="nofollow"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M478-86q-152 0-264.5-101T87-440h127q15 99 89.5 163.5T478-212q112 0 190-78t78-190q0-112-78-190t-190-78q-57 0-109 23.5T279-657h82v97H94v-265h95v79q56-62 130.5-95T478-874q81 0 153 31t125.5 84.5Q810-705 841-633t31 153q0 81-31 153t-84.5 125.5Q703-148 631-117T478-86Zm107-218L433-456v-224h95v184l125 124-68 68Z"/></svg></a>' .
+							'<a href="' . $rcDiffURL . '" class="obbywiki-recent__card-action" title="View diff" rel="nofollow"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M500-520h80v-80h80v-80h-80v-80h-80v80h-80v80h80v80Zm-80 160h240v-80H420v80ZM320-200q-33 0-56.5-23.5T240-280v-560q0-33 23.5-56.5T320-920h280l240 240v400q0 33-23.5 56.5T760-200H320ZM160-40q-33 0-56.5-23.5T80-120v-560h80v560h440v80H160Z"/></svg></a>' .
+							'<a href="' . $rcHistURL . '" class="obbywiki-recent__card-action" title="View history" rel="nofollow"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M478-86q-152 0-264.5-101T87-440h127q15 99 89.5 163.5T478-212q112 0 190-78t78-190q0-112-78-190t-190-78q-57 0-109 23.5T279-657h82v97H94v-265h95v79q56-62 130.5-95T478-874q81 0 153 31t125.5 84.5Q810-705 841-633t31 153q0 81-31 153t-84.5 125.5Q703-148 631-117T478-86Zm107-218L433-456v-224h95v184l125 124-68 68Z"/></svg></a>' .
 						'</div>' .
 					'</div>' .
-					$commentHtml .
+					$commentHTML .
 				'</div>';
 			}
 
-			$recentChangesHtml = '<section class="obbywiki-recent" aria-label="Recent Changes">' .
+			$recentChangesHTML = '<section class="obbywiki-recent" aria-label="Recent Changes">' .
 				'<div class="obbywiki-recent__header">' .
 					'<span class="obbywiki-recent__icon"><svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="currentColor"><path d="M478-86q-152 0-264.5-101T87-440h127q15 99 89.5 163.5T478-212q112 0 190-78t78-190q0-112-78-190t-190-78q-57 0-109 23.5T279-657h82v97H94v-265h95v79q56-62 130.5-95T478-874q81 0 153 31t125.5 84.5Q810-705 841-633t31 153q0 81-31 153t-84.5 125.5Q703-148 631-117T478-86Zm107-218L433-456v-224h95v184l125 124-68 68Z"/></svg></span>' .
 					'<h3 class="obbywiki-recent__title">Recently Changed</h3>' .
 				'</div>' .
-				'<div class="obbywiki-recent__grid">' . $rcCardsHtml . '</div>' .
+				'<div class="obbywiki-recent__grid">' . $rcCardsHTML . '</div>' .
 			'</section>';
 		}
 
 		// about section html
-		$aboutUrl = htmlspecialchars( Title::newFromText( 'OW:About' )->getLocalURL() );
-		$obbyUrl = htmlspecialchars( Title::newFromText( 'Obby' )->getLocalURL() );
-		$aboutHtml = '<section class="obbywiki-about" aria-label="About the Wiki">' .
+		$aboutURL = htmlspecialchars( Title::newFromText( 'OW:About' )->getLocalURL() );
+		$obbyURL = htmlspecialchars( Title::newFromText( 'Obby' )->getLocalURL() );
+		$aboutHTML = '<section class="obbywiki-about" aria-label="About the Wiki">' .
 			'<div class="obbywiki-about__header">' .
 				'<span class="obbywiki-about__icon">' .
 					'<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M425-265h110v-255H425v255Zm97.5-332.25Q540-614.5 540-640t-17.25-42.75Q505.5-700 480-700t-42.75 17.25Q420-665.5 420-640t17.5 42.75Q455-580 480-580t42.5-17.25ZM480-46q-91 0-169.99-34.08-78.98-34.09-137.41-92.52-58.43-58.43-92.52-137.41Q46-389 46-480q0-91 34.08-169.99 34.09-78.98 92.52-137.41 58.43-58.43 137.41-92.52Q389-914 480-914q91 0 169.99 34.08 78.98 34.09 137.41 92.52 58.43 58.43 92.52 137.41Q914-571 914-480q0 91-34.08 169.99-34.09 78.98-92.52 137.41-58.43 58.43-137.41 92.52Q571-46 480-46Z"/></svg>' .
@@ -835,11 +835,11 @@ SVG;
 				'<h3 class="obbywiki-about__title">About The Obby Wiki</h3>' .
 			'</div>' .
 			'<div class="obbywiki-about__content">' .
-				'<p class="obbywiki-about__text">The Obby Wiki is an independent and community-run wiki/encyclopedia dedicated to documenting <a href="' . $obbyUrl . '">Roblox obby</a> games (obbies), their creators, mechanics, conventions, terminology, etc. Our goal is to provide the most comprehensive, accurate, and complete information about as many obbies as possible.</p>' .
+				'<p class="obbywiki-about__text">The Obby Wiki is an independent and community-run wiki/encyclopedia dedicated to documenting <a href="' . $obbyURL . '">Roblox obby</a> games (obbies), their creators, mechanics, conventions, terminology, etc. Our goal is to provide the most comprehensive, accurate, and complete information about as many obbies as possible.</p>' .
 				'<p class="obbywiki-about__text">Whether you want detailed information about a certain obby, or you want to search our database for a new obby to play, information about a certain mechanic or glitch, or just anything related to obbies, you can find it here.</p>' .
 				'<br />' .
 				'<p class="obbywiki-about__text">Anyone can contribute by editing articles, adding new information, or participating in discussions on the <a href="https://forum.wou.gg">Obby Forum</a>.</p>' .
-				'<p class="obbywiki-about__text">Learn more <a href="' . $aboutUrl . '">about our project</a> and our advantages as well as how you can help or why you should use us over existing platforms.</p>' .
+				'<p class="obbywiki-about__text">Learn more <a href="' . $aboutURL . '">about our project</a> and our advantages as well as how you can help or why you should use us over existing platforms.</p>' .
 			'</div>' .
 		'</section>';
 
@@ -856,7 +856,7 @@ SVG;
 			<p class="obbywiki-home__tagline">The leading community-run and independent wiki for information and archives on Roblox obbies that anyone can contribute to.</p>
 		</div>
 		<div class="obbywiki-home__actions">
-			<nav class="obbywiki-home__nav">{$navHtml}</nav>
+			<nav class="obbywiki-home__nav">{$navHTML}</nav>
 			<div class="obbywiki-home__search">
 				<form action="{$scriptPath}" method="get" class="obbywiki-home__search-form" role="search" aria-label="Search the wiki">
 					<input type="hidden" name="title" value="Special:Search">
@@ -870,7 +870,7 @@ SVG;
 	</header>
 
 	<nav class="obbywiki-content-links" aria-label="Content categories">
-		{$contentLinksHtml}
+		{$contentLinksHTML}
 	</nav>
 
 	<section class="obbywiki-featured">
@@ -878,14 +878,14 @@ SVG;
 			<div class="obbywiki-spotlight__viewport">
 				<span class="obbywiki-spotlight__chip">OBBY WIKI 	HIGHLIGHTS</span>
 				<div class="obbywiki-spotlight__track">
-					{$slidesHtml}
+					{$slidesHTML}
 				</div>
 				{$emptyState}
 				<nav class="obbywiki-spotlight__nav">
 					<button class="obbywiki-spotlight__arrow obbywiki-spotlight__arrow--prev" aria-label="Previous">
 						<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/></svg>
 					</button>
-					<div class="obbywiki-spotlight__bars">{$dotsHtml}</div>
+					<div class="obbywiki-spotlight__bars">{$dotsHTML}</div>
 					<button class="obbywiki-spotlight__arrow obbywiki-spotlight__arrow--next" aria-label="Next">
 						<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
 					</button>
@@ -900,12 +900,12 @@ SVG;
 				<h3 class="obbywiki-month__title">This Month</h3>
 			</div>
 			<div class="obbywiki-month__list">
-				{$thisMonthHtml}
+				{$thisMonthHTML}
 			</div>
 		</div>
 	</section>
 
-	{$archiveHtml}
+	{$archiveHTML}
 
 	<aside class="obbywiki-aside">
 		<div class="obbywiki-aside__card">
@@ -914,13 +914,13 @@ SVG;
 				<h3 class="obbywiki-aside__title">Browse by Type</h3>
 			</div>
 			<div class="obbywiki-featured__aside-tags">
-				<a href="{$categoryUrls['classic']}" class="obbywiki-featured__aside-tag">Classic Obby</a>
-				<a href="{$categoryUrls['tower']}" class="obbywiki-featured__aside-tag">Tower Obby</a>
-				<a href="{$categoryUrls['dco']}" class="obbywiki-featured__aside-tag">Difficulty Chart Obby</a>
-				<a href="{$categoryUrls['gimmick']}" class="obbywiki-featured__aside-tag">Gimmick Obby</a>
-				<a href="{$categoryUrls['tier']}" class="obbywiki-featured__aside-tag">Tiered Obby</a>
-				<a href="{$categoryUrls['troll']}" class="obbywiki-featured__aside-tag">Troll Obby</a>
-				<a href="{$categoryUrls['coop']}" class="obbywiki-featured__aside-tag">Co-Op Obby</a>
+				<a href="{$categoryURLs['classic']}" class="obbywiki-featured__aside-tag">Classic Obby</a>
+				<a href="{$categoryURLs['tower']}" class="obbywiki-featured__aside-tag">Tower Obby</a>
+				<a href="{$categoryURLs['dco']}" class="obbywiki-featured__aside-tag">Difficulty Chart Obby</a>
+				<a href="{$categoryURLs['gimmick']}" class="obbywiki-featured__aside-tag">Gimmick Obby</a>
+				<a href="{$categoryURLs['tier']}" class="obbywiki-featured__aside-tag">Tiered Obby</a>
+				<a href="{$categoryURLs['troll']}" class="obbywiki-featured__aside-tag">Troll Obby</a>
+				<a href="{$categoryURLs['coop']}" class="obbywiki-featured__aside-tag">Co-Op Obby</a>
 			</div>
 		</div>
 		<div class="obbywiki-aside__card">
@@ -930,11 +930,11 @@ SVG;
 			</div>
 			<p class="obbywiki-aside__text">Whether you're a casual obby player, a content creator, or a developer, there's a place for you here. Learn more below.</p>
 			<div class="obbywiki-featured__aside-cta-links">
-				<a href="{$categoryUrls['contributing']}" class="obbywiki-featured__aside-cta-link">
+				<a href="{$categoryURLs['contributing']}" class="obbywiki-featured__aside-cta-link">
 					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M10 1a9 9 0 109 9 9 9 0 00-9-9m1 14H9v-2h2zm0-4H9V5h2z"/></svg>
 					How to Contribute
 				</a>
-				<a href="{$categoryUrls['stubs']}" class="obbywiki-featured__aside-cta-link">
+				<a href="{$categoryURLs['stubs']}" class="obbywiki-featured__aside-cta-link">
 					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
 					View Stubs
 				</a>
@@ -947,9 +947,9 @@ SVG;
 		</div>
 	</aside>
 
-	{$recentChangesHtml}
+	{$recentChangesHTML}
 
-	{$aboutHtml}
+	{$aboutHTML}
 
 	<section class="obbywiki-rules" aria-label="Wiki Rules">
 		<div class="obbywiki-rules__header">
