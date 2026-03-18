@@ -148,6 +148,13 @@
 	min-width: 0;
 }
 
+div.obbywiki-home__search-input.citizen-search-trigger {
+	color: var(--color-placeholder, var(--color-subtle, #72777d));
+	display: flex;
+	align-items: center;
+	cursor: text;
+}
+
 .obbywiki-home__search-input::placeholder {
 	color: var(--color-placeholder, var(--color-subtle, #72777d));
 }
