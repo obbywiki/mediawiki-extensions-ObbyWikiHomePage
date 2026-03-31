@@ -708,6 +708,7 @@ SVG;
 
 		// this month
 		$thisMonthHTML = '';
+		$monthName = date( 'F' );
 		if ( empty( $thisMonthPages ) ) {
 			$thisMonthHTML = '<p class="obbywiki-featured__aside-month-empty">No new releases this month yet.</p>';
 		} else {
@@ -897,7 +898,7 @@ SVG;
 				<span class="obbywiki-month__icon">
 					<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg>
 				</span>
-				<h3 class="obbywiki-month__title">This Month</h3>
+				<h3 class="obbywiki-month__title">This Month - {$monthName}</h3>
 			</div>
 			<div class="obbywiki-month__list">
 				{$thisMonthHTML}
