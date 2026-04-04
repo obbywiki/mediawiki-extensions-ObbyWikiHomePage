@@ -976,8 +976,11 @@ SVG;
 	// MAIN
 	// builds the full html
 	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $announcements = [] ): string {
+		global $wgExtensionAssetsPath;
 		$scriptPath = wfScript();
 		$announcementsHTML = self::buildAnnouncementsHTML( $announcements );
+
+		$clAssetBase = ( $wgExtensionAssetsPath ?? '/extensions' ) . '/ObbyWikiHomePage/resources/images/cl/';
 
 		// mini nav links
 		$navLinks = [
@@ -1101,49 +1104,49 @@ SVG;
 			[
 				'url' => Title::newFromText( 'Category:Obby' )->getLocalURL(),
 				'label' => 'All Obbies',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fIl5MUAMPWrH12SVDENKiCGARJyhbM7uqsxkj',
+				'image' => $clAssetBase . 'ow_cl_1_1x.webp',
 				'priority' => 1, // always shown
 			],
 			[
 				'url' => Title::newFromText( 'New' )->getLocalURL(),
 				'label' => 'New Releases',
-				'image' => 'https://ss1-legacy.content.wolfite.dev/ss1/backgrounds/wlftgbg/v1/collections/default-1/XDCOV3Medium1.png',
+				'image' => $clAssetBase . 'ow_cl_2_1x.webp',
 				'priority' => 2,
 			],
 			[
 				'url' => Title::newFromText( 'Category:Studio' )->getLocalURL(),
 				'label' => 'Studios',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5f2Fjbht9Xth87gDveuM46VKbLTBUms3wzar0R',
+				'image' => $clAssetBase . 'ow_cl_3_1x.webp',
 				'priority' => 3,
 			],
 			[
 				'url' => Title::newFromText( 'Tiers' )->getLocalURL(),
 				'label' => 'Tiers',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
+				'image' => $clAssetBase . 'ow_cl_4_1x.webp',
 				'priority' => 4,
 			],
 			[
 				'url' => Title::newFromText( 'Category:Above_1,000,000_visits' )->getLocalURL(),
 				'label' => 'Popular',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5f7ePEGwOOntYUprVfPL5QewmX0HB6817iTsgZ',
+				'image' => $clAssetBase . 'ow_cl_5_1x.webp',
 				'priority' => 5,
 			],
 			[
 				'url' => Title::newFromText( 'Category:Tower_Obby' )->getLocalURL(),
 				'label' => 'Towers',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5flUQfxQLpZrscuk9qf6C2dJMYN7gzeR5StUl4',
+				'image' => $clAssetBase . 'ow_cl_6_1x.webp',
 				'priority' => 6,
 			],
 			[
 				'url' => 'https://forum.wou.gg/c/game-talk/17/none',
 				'label' => 'Game Talk',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fsvH5QAGpGc1wOjz6rKJi2mePRkHaVgbxpIul',
+				'image' => $clAssetBase . 'ow_cl_7_1x.webp',
 				'priority' => 7,
 			],
 			[
 				'url' => Title::newFromText( 'Obby' )->getLocalURL(),
 				'label' => 'About Obbies',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fU2e9LUdURNovuLnpYkFcsJjidqeMPryQfXa5',
+				'image' => $clAssetBase . 'ow_cl_8_1x.webp',
 				'priority' => 8,
 			],
 			// [
@@ -1155,7 +1158,7 @@ SVG;
 			[
 				'url' => Title::newFromText( 'Development:Get Started' )->getLocalURL(),
 				'label' => 'Get Started',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fsjIRGCpGc1wOjz6rKJi2mePRkHaVgbxpIulC',
+				'image' => $clAssetBase . 'ow_cl_9_1x.webp',
 				'priority' => 9,
 			],
 			// [
