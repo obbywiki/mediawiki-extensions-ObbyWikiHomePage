@@ -1454,6 +1454,10 @@ SVG;
 					<h4 class="obbywiki-rules__item-title">10. Use US English</h4>
 					<p class="obbywiki-rules__item-text">Use US English for all content on the wiki. This includes spelling, grammar, and vocabulary. Content can be translated into English International later. This does not apply to user comments.</p>
 				</li>
+				<li class="obbywiki-rules__item">
+					<h4 class="obbywiki-rules__item-title">11. Do not plagiarize</h4>
+					<p class="obbywiki-rules__item-text">Do not plagiarize content from other sources. This includes copying and pasting content from other wikis or websites without proper attribution. If another source is already covering a certain topic, consider its signficance and consider mentioning it in your page.</p>
+				</li>
 			</ul>
 		</div>
 	</section>
