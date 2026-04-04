@@ -40,6 +40,8 @@
 .obbywiki-homepage .citizen-footer-tagline,
 .obbywiki-homepage .citizen-footer-info,
 .obbywiki-homepage #footer-info,
+.obbywiki-homepage #t-cargopagevalueslink,
+.obbywiki-homepage #t-recentchangeslinked,
 .obbywiki-homepage #catlinks {
 	display: none !important;
 }
@@ -326,6 +328,317 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
+}
+
+/* ANNOUNCEMENTS (Discourse meta) */
+.obbywiki-announce {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.obbywiki-announce__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem 0.75rem;
+	flex-wrap: wrap;
+	margin: 0;
+}
+
+.obbywiki-announce__header-main {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	min-width: 0;
+}
+
+.obbywiki-announce__icon {
+	color: var(--color-subtle, #54595d);
+	display: flex;
+	flex-shrink: 0;
+}
+
+.obbywiki-announce__title {
+	font-size: 0.75rem;
+	font-weight: 700;
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--color-subtle, #54595d);
+}
+
+.obbywiki-announce__all,
+.obbywiki-announce__all:visited {
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--color-primary, #3366cc);
+	text-decoration: none;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.obbywiki-announce__all:hover,
+.obbywiki-announce__all:visited:hover {
+	text-decoration: underline;
+	color: var(--color-primary--hover, #447ff5);
+}
+
+.obbywiki-announce__body {
+	display: flex;
+	flex-direction: column;
+	border-radius: var(--border-radius-medium, 12px);
+	background: var(--color-surface-1, #f8f9fa);
+	border: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.08));
+	overflow: hidden;
+}
+
+.obbywiki-announce__body--split {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(220px, 32%);
+	align-items: stretch;
+}
+
+.obbywiki-announce__avatar {
+	display: block;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	object-fit: cover;
+	flex-shrink: 0;
+	border: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.08));
+	background: var(--color-surface-0, #fff);
+}
+
+.obbywiki-announce__featured-top .obbywiki-announce__avatar {
+	width: 48px;
+	height: 48px;
+}
+
+.obbywiki-announce__avatar--placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.9375rem;
+	font-weight: 700;
+	color: rgba(255, 255, 255, 0.92);
+	background: linear-gradient(
+		135deg,
+		hsl(var(--announce-hue, 210), 55%, 48%),
+		hsl(calc(var(--announce-hue, 210) + 36), 45%, 38%)
+	);
+}
+
+.obbywiki-announce__poster-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 0.05rem;
+	min-width: 0;
+}
+
+.obbywiki-announce__poster-display {
+	font-size: 0.8125rem;
+	font-weight: 600;
+	line-height: 1.2;
+	color: var(--color-base, #202122);
+}
+
+.obbywiki-announce__poster-user {
+	font-size: 0.6875rem;
+	font-weight: 500;
+	line-height: 1.2;
+	color: var(--color-subtle, #72777d);
+}
+
+.obbywiki-announce__featured-top {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.65rem;
+	min-width: 0;
+}
+
+.obbywiki-announce__featured-head {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	min-width: 0;
+	flex: 1 1 0;
+}
+
+.obbywiki-announce__featured-head .obbywiki-announce__poster-meta {
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: baseline;
+	column-gap: 0.4rem;
+	row-gap: 0;
+}
+
+.obbywiki-announce__featured-head .obbywiki-announce__poster-display {
+	font-size: 0.8125rem;
+}
+
+.obbywiki-announce__featured-head .obbywiki-announce__poster-user {
+	font-size: 0.75rem;
+}
+
+.obbywiki-announce__date {
+	display: block;
+	font-size: 0.6875rem;
+	font-weight: 500;
+	line-height: 1.2;
+	color: var(--color-subtle, #72777d);
+}
+
+.obbywiki-announce__featured,
+.obbywiki-announce__featured:visited {
+	display: flex;
+	flex-direction: column;
+	gap: 0.45rem;
+	padding: 0.75rem 0.9rem;
+	text-decoration: none;
+	color: var(--color-base, #202122);
+	transition: background 0.15s ease;
+	min-width: 0;
+}
+
+.obbywiki-announce__body--split .obbywiki-announce__featured {
+	border-bottom: none;
+	border-right: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.08));
+}
+
+.obbywiki-announce__featured:hover,
+.obbywiki-announce__featured:visited:hover {
+	background: var(--color-surface-2, #eaecf0);
+	text-decoration: none;
+	color: var(--color-base, #202122);
+}
+
+.obbywiki-announce__featured:focus-visible {
+	outline: 2px solid var(--color-primary, #3366cc);
+	outline-offset: -2px;
+}
+
+.obbywiki-announce__featured-title {
+	font-weight: 700;
+	line-height: 1.28;
+	margin: 0;
+	color: var(--color-emphasized, var(--color-base, #202122));
+}
+
+.obbywiki-announce__featured-blurb {
+	line-height: 1.65;
+	margin: 0;
+	color: var(--color-base, #202122);
+	max-width: 68ch;
+	display: -webkit-box;
+	-webkit-line-clamp: 6;
+	line-clamp: 6;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.obbywiki-announce__list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	padding: 0.45rem;
+	min-height: 0;
+	background: var(--color-surface-2, #eaecf0);
+}
+
+.obbywiki-announce__compact,
+.obbywiki-announce__compact:visited {
+	display: block;
+	padding: 0.45rem 0.5rem;
+	text-decoration: none;
+	color: var(--color-base, #202122);
+	border-radius: var(--border-radius-base, 8px);
+	border: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.1));
+	background: var(--color-surface-0, #fff);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+	min-width: 0;
+}
+
+.obbywiki-announce__compact:hover,
+.obbywiki-announce__compact:visited:hover {
+	background: var(--color-surface-1, #f8f9fa);
+	border-color: var(--border-color-interactive, rgba(0, 0, 0, 0.12));
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+	text-decoration: none;
+	color: var(--color-base, #202122);
+}
+
+.obbywiki-announce__compact:focus-visible {
+	outline: 2px solid var(--color-primary, #3366cc);
+	outline-offset: 1px;
+}
+
+.obbywiki-announce__compact-inner {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	min-width: 0;
+}
+
+.obbywiki-announce__compact-avatar {
+	flex-shrink: 0;
+	line-height: 0;
+}
+
+.obbywiki-announce__compact-main {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	min-width: 0;
+	flex: 1 1 0;
+}
+
+.obbywiki-announce__compact-main .obbywiki-announce__poster-meta {
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.25rem 0.4rem;
+	margin-top: 0.05rem;
+}
+
+.obbywiki-announce__compact-title {
+	font-size: 0.8125rem;
+	font-weight: 700;
+	line-height: 1.28;
+	color: var(--color-emphasized, var(--color-base, #202122));
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.obbywiki-announce__compact-blurb {
+	font-size: 0.8125rem;
+	line-height: 1.45;
+	margin: 0;
+	color: var(--color-subtle, #54595d);
+	display: -webkit-box;
+	-webkit-line-clamp: 4;
+	line-clamp: 4;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+@media (max-width: 720px) {
+	.obbywiki-announce__body--split {
+		grid-template-columns: 1fr;
+	}
+
+	.obbywiki-announce__body--split .obbywiki-announce__featured {
+		border-right: none;
+		border-bottom: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.08));
+	}
+
+	.obbywiki-announce__list {
+		padding: 0.4rem 0.45rem 0.5rem;
+	}
 }
 
 

@@ -56,6 +56,14 @@
 		"ObbyWikiHomePageFeaturedPages": {
 			"value": [],
 			"description": "An array of specific page titles to feature in the highlight carousel instead of automatically fetching them."
+		},
+		"ObbyWikiHomePageDiscourseAnnouncementsJsonUrl": {
+			"value": "https://forum.wou.gg/tags/c/obby-wiki/obby-wiki-meta/13/announcement.json",
+			"description": "Discourse JSON URL for tagged announcements (category + tag). Leave empty to hide the announcements section."
+		},
+		"ObbyWikiHomePageDiscourseFetchPrimaryTopic": {
+			"value": true,
+			"description": "If true, perform one extra GET /t/{id}.json for the featured announcement only (first post text + author). Other topics use list excerpts only. Set false if the forum is slow or unreachable so the home page depends only on the tag list request."
 		}
 	}
 }
