@@ -510,17 +510,19 @@ SVG;
 
 	private static function normalizeDiscourseExcerpt( string $excerpt ): string {
 		$t = html_entity_decode( $excerpt, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		$t = preg_replace( '/\[\/?(quote|img|video|audio)[^\]]*\]/i', '', $t );
 		$t = preg_replace( '/\s+/u', ' ', $t );
 		return trim( $t );
 	}
 
 	private static function truncateAnnouncementPlaintext( string $text, int $max_chars = 8000 ): string {
+		$text = trim( $text );
 		if ( mb_strlen( $text ) <= $max_chars ) {
 			return $text;
 		}
 		$chunk = mb_substr( $text, 0, $max_chars );
 		$pos = mb_strrpos( $chunk, ' ' );
-		if ( $pos !== false && $pos > $max_chars - 400 ) {
+		if ( $pos !== false && $pos > (int)( $max_chars * 0.85 ) ) {
 			$chunk = mb_substr( $chunk, 0, $pos );
 		}
 		return rtrim( $chunk ) . '…';
@@ -607,11 +609,6 @@ SVG;
 		return $forum_base . $path;
 	}
 
-	/**
-	 * @param array $topic Raw topic from Discourse topic_list.topics
-	 * @param array<int,array> $user_by_id
-	 * @return array{display_name:string,username:string,avatar_url:string}
-	 */
 	private static function discourseTopicOriginalPoster( array $topic, array $user_by_id ): array {
 		$posters = $topic['posters'] ?? [];
 		$op_id = 0;
@@ -902,7 +899,7 @@ SVG;
 		$featured_date = self::formatAnnouncementDateHtml( (string)( $featured['created_at'] ?? '' ) );
 
 		$featured_top = '<div class="obbywiki-announce__featured-top">'
-			. self::buildAnnouncementAvatarHtml( $featured, 48 )
+			. self::buildAnnouncementAvatarHtml( $featured, 52 )
 			. '<div class="obbywiki-announce__featured-head">'
 			. '<h4 class="obbywiki-announce__featured-title">' . $featured_title . '</h4>'
 			. self::buildAnnouncementPosterMetaHtml( $featured )
@@ -913,6 +910,13 @@ SVG;
 		$icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="currentColor"><path d="M720-440v-80h160v80H720Zm48 280-128-96 48-64 128 96-48 64Zm-80-480-48-64 128-96 48 64-128 96ZM200-200v-160h-40q-33 0-56.5-23.5T80-440v-80q0-33 23.5-56.5T160-600h160l200-120v480L320-360h-40v160h-80Zm360-146v-268q27 24 43.5 58.5T620-480q0 41-16.5 75.5T560-346Z"/></svg>';
 
 		$body_class = $rest !== [] ? ' obbywiki-announce__body--split' : '';
+
+
+		
+		$community_links = [
+			[ 'label' => 'Discussions', 'url' => 'https://forum.wou.gg/c/obby-wiki/12' ],
+			[ 'label' => 'Page Feedback', 'url' => 'https://forum.wou.gg/c/obby-wiki/obby-wiki-page-feedback/14' ],
+		];
 
 		$html = '<section class="obbywiki-announce" aria-label="Announcements">'
 			. '<div class="obbywiki-announce__header">'
@@ -929,7 +933,18 @@ SVG;
 			. '</a>';
 
 		if ( $rest !== [] ) {
-			$html .= '<div class="obbywiki-announce__list">';
+			$html .= '<div class="obbywiki-announce__list">'
+				. '<div class="obbywiki-announce__community-nav">';
+			
+			foreach ( $community_links as $link ) {
+				$html .= '<a href="' . htmlspecialchars( $link['url'], ENT_QUOTES ) . '" class="obbywiki-announce__community-link">'
+					. htmlspecialchars( $link['label'], ENT_QUOTES )
+					. '</a>';
+			}
+
+			$html .= '</div>'
+				. '<div class="obbywiki-announce__compact-list">';
+
 			foreach ( $rest as $item ) {
 				$title_esc = htmlspecialchars( $item['title'], ENT_QUOTES );
 				$url_esc = htmlspecialchars( $item['url'], ENT_QUOTES );
@@ -943,13 +958,14 @@ SVG;
 					. '<div class="obbywiki-announce__compact-main">'
 					. '<span class="obbywiki-announce__compact-title">' . $title_esc . '</span>'
 					. '<p class="obbywiki-announce__compact-blurb">' . $blurb_esc . '</p>'
-					. $meta
+					. '<div class="obbywiki-announce__compact-meta">'
 					. $compact_date
+					. '</div>'
 					. '</div>'
 					. '</div>'
 					. '</a>';
 			}
-			$html .= '</div>';
+			$html .= '</div></div>';
 		}
 
 		$html .= '</div></section>';
