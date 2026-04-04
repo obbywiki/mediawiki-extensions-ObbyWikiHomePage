@@ -1122,6 +1122,30 @@ SVG;
 				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
 				'priority' => 4,
 			],
+			[
+				'url' => Title::newFromText( 'Category:Above_1,000,000_visits' )->getLocalURL(),
+				'label' => 'Popular',
+				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
+				'priority' => 5,
+			],
+			[
+				'url' => Title::newFromText( 'Category:Tower_Obby' )->getLocalURL(),
+				'label' => 'Towers',
+				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
+				'priority' => 6,
+			],
+			[
+				'url' => 'https://forum.wou.gg/c/game-talk/17/none',
+				'label' => 'Game Talk',
+				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
+				'priority' => 7,
+			],
+			[
+				'url' => Title::newFromText( 'Obby' )->getLocalURL(),
+				'label' => 'About Obbies',
+				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
+				'priority' => 8,
+			],
 			// [
 			// 	'url' => Title::newFromText( 'Category:Developers' )->getLocalURL(),
 			// 	'label' => 'Developers',
@@ -1148,8 +1172,12 @@ SVG;
 			$clLabel = htmlspecialchars( $cl['label'] );
 			$clImage = htmlspecialchars( $cl['image'] );
 			$clPriority = (int)$cl['priority'];
+			$clClass = 'obbywiki-content-link';
+			if ( $clPriority > 5 ) {
+				$clClass .= ' obbywiki-content-link--low-priority';
+			}
 			$contentLinksHTML .= '<a href="' . $clUrl
-				. '" class="obbywiki-content-link" data-priority="' . $clPriority
+				. '" class="' . $clClass . '" data-priority="' . $clPriority
 				. '" style="background-image: url(' . $clImage . ')"'
 				. '>'
 				. '<span class="obbywiki-content-link__label">' . $clLabel . '</span>'

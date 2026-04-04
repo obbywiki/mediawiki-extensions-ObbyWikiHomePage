@@ -247,6 +247,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 	padding: 0 0 0.25rem;
+	container-type: inline-size;
 }
 
 .obbywiki-content-links::-webkit-scrollbar {
@@ -312,6 +313,12 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 .obbywiki-content-link:focus-visible {
 	outline: 2px solid var(--color-primary, #3366cc);
 	outline-offset: 2px;
+}
+
+@container (max-width: 1080px) {
+	.obbywiki-content-link--low-priority {
+		display: none;
+	}
 }
 
 .obbywiki-content-link__label {
