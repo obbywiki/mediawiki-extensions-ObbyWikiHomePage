@@ -658,7 +658,7 @@ SVG;
 			return [];
 		}
 
-		$parsed = wfParseUrl( $url );
+		$parsed = wfParseUrl( $url ); // TODO replace deprecated
 		if ( !$parsed || ( $parsed['scheme'] ?? '' ) !== 'https' || empty( $parsed['host'] ) ) {
 			return [];
 		}
@@ -882,7 +882,7 @@ SVG;
 
 		global $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl;
 		$view_all_url = 'https://forum.wou.gg/c/obby-wiki/obby-wiki-meta/13';
-		$p = wfParseUrl( trim( (string)( $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl ?? '' ) ) );
+		$p = wfParseUrl( trim( (string)( $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl ?? '' ) ) ); // TODO replace deprecated
 		if ( $p && !empty( $p['host'] ) ) {
 			$scheme = ( $p['scheme'] ?? '' ) === 'http' ? 'http' : 'https';
 			$view_all_url = $scheme . '://' . $p['host'] . '/c/obby-wiki/obby-wiki-meta/13';
@@ -1125,25 +1125,25 @@ SVG;
 			[
 				'url' => Title::newFromText( 'Category:Above_1,000,000_visits' )->getLocalURL(),
 				'label' => 'Popular',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
+				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5f7ePEGwOOntYUprVfPL5QewmX0HB6817iTsgZ',
 				'priority' => 5,
 			],
 			[
 				'url' => Title::newFromText( 'Category:Tower_Obby' )->getLocalURL(),
 				'label' => 'Towers',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
+				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5flUQfxQLpZrscuk9qf6C2dJMYN7gzeR5StUl4',
 				'priority' => 6,
 			],
 			[
 				'url' => 'https://forum.wou.gg/c/game-talk/17/none',
 				'label' => 'Game Talk',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
+				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fsvH5QAGpGc1wOjz6rKJi2mePRkHaVgbxpIul',
 				'priority' => 7,
 			],
 			[
 				'url' => Title::newFromText( 'Obby' )->getLocalURL(),
 				'label' => 'About Obbies',
-				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fkTObkuNkYhSuFOPtb54ULfXz8ICG1yjvgxcM',
+				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fU2e9LUdURNovuLnpYkFcsJjidqeMPryQfXa5',
 				'priority' => 8,
 			],
 			// [
@@ -1152,12 +1152,12 @@ SVG;
 			// 	'image' => 'https://dummyimage.com/400x200/dc2626/ffffff&text=Developers',
 			// 	'priority' => 4,
 			// ],
-			// [
-			// 	'url' => Title::newFromText( 'Development:Get Started' )->getLocalURL(),
-			// 	'label' => 'Get Started',
-			// 	'image' => 'https://dummyimage.com/400x200/ea580c/ffffff&text=Get+Started',
-			// 	'priority' => 5,
-			// ],
+			[
+				'url' => Title::newFromText( 'Development:Get Started' )->getLocalURL(),
+				'label' => 'Get Started',
+				'image' => 'https://2q2bp9cu5u.ufs.sh/f/jHfjIa1SBA5fsjIRGCpGc1wOjz6rKJi2mePRkHaVgbxpIulC',
+				'priority' => 9,
+			],
 			// [
 			// 	'url' => Title::newFromText( 'Difficulties' )->getLocalURL(),
 			// 	'label' => 'Difficulties',
