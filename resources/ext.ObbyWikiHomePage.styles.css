@@ -523,10 +523,6 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	color: var(--color-base, #202122);
 }
 
-.obbywiki-announce__featured:active {
-	transform: scale(0.995);
-}
-
 .obbywiki-announce__featured:focus-visible {
 	outline: 2px solid var(--color-primary, #3366cc);
 	outline-offset: -4px;
