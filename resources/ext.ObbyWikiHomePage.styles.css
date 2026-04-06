@@ -516,9 +516,8 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	border-right: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.08));
 }
 
-.obbywiki-announce__featured:hover,
-.obbywiki-announce__featured:visited:hover {
-	background: var(--color-surface-0, #fff);
+.obbywiki-announce__featured:hover {
+	background: var(--color-surface-2);
 	text-decoration: none;
 	color: var(--color-base, #202122);
 }
@@ -563,8 +562,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	border-bottom: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.08));
 }
 
-.obbywiki-announce__community-link,
-.obbywiki-announce__community-link:visited {
+.obbywiki-announce__community-link {
 	flex: 1;
 	display: flex;
 	align-items: center;
@@ -583,7 +581,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 
 .obbywiki-announce__community-link:hover,
 .obbywiki-announce__community-link:visited:hover {
-	background: var(--color-surface-0, #fff);
+	background: var(--color-surface-2);
 	color: var(--color-primary, #3366cc);
 	text-decoration: none;
 }
@@ -602,7 +600,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	padding: 0.45rem 0.5rem;
 	text-decoration: none;
 	color: var(--color-base, #202122);
-	border-radius: var(--border-radius-base, 8px);
+	border-radius: var(--border-radius-medium);
 	border: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.1));
 	background: var(--color-surface-0, #fff);
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -610,9 +608,8 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	min-width: 0;
 }
 
-.obbywiki-announce__compact:hover,
-.obbywiki-announce__compact:visited:hover {
-	background: var(--color-surface-1, #f8f9fa);
+.obbywiki-announce__compact:hover {
+	background: var(--color-surface-2);
 	border-color: var(--border-color-interactive, rgba(0, 0, 0, 0.12));
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 	text-decoration: none;

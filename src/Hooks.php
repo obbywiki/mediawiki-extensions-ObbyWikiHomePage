@@ -1309,6 +1309,8 @@ SVG;
 		// about section html
 		$aboutURL = htmlspecialchars( Title::newFromText( 'OW:About' )->getLocalURL() );
 		$obbyURL = htmlspecialchars( Title::newFromText( 'Obby' )->getLocalURL() );
+		$rulesURL = htmlspecialchars( Title::newFromText( 'OW:Rules' )->getLocalURL() );
+		$contributingURL = htmlspecialchars( Title::newFromText( 'Help:Contributing' )->getLocalURL() );
 		$aboutHTML = '<section class="obbywiki-about" aria-label="About the Wiki">' .
 			'<div class="obbywiki-about__header">' .
 				'<span class="obbywiki-about__icon">' .
@@ -1321,7 +1323,7 @@ SVG;
 				'<p class="obbywiki-about__text">Whether you want detailed information about a certain obby, or you want to search our database for a new obby to play, information about a certain mechanic or glitch, or just anything related to obbies, you can find it here.</p>' .
 				'<br />' .
 				'<p class="obbywiki-about__text">Anyone can contribute by editing articles, adding new information, or participating in discussions on the <a href="https://forum.wou.gg">Obby Forum</a>.</p>' .
-				'<p class="obbywiki-about__text">Learn more <a href="' . $aboutURL . '">about our project</a> and our advantages as well as how you can help or why you should use us over existing platforms.</p>' .
+				'<p class="obbywiki-about__text">Learn more <a href="' . $aboutURL . '">about our project</a> and our advantages as well as how you can help or why you should use us over existing platforms. Read our <a href="' . $rulesURL . '">rules for contributing</a> and our <a href="' . $contributingURL . '">guide for new contributors</a>.</p>' .
 			'</div>' .
 		'</section>';
 
@@ -1435,63 +1437,6 @@ SVG;
 	{$recentChangesHTML}
 
 	{$aboutHTML}
-
-	<section class="obbywiki-rules" aria-label="Wiki Rules">
-		<div class="obbywiki-rules__header">
-			<span class="obbywiki-rules__icon">
-				<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M270-80q-45 0-77.5-30.5T160-186v-558q0-38 23.5-68t61.5-38l395-78v640l-379 76q-9 2-15 9.5t-6 16.5q0 11 9 18.5t21 7.5h450v-640h80v720H270Zm10-217 80-16v-478l-80 16v478Z"/></svg>
-			</span>
-			<h3 class="obbywiki-rules__title">Wiki Rules</h3>
-		</div>
-		<div class="obbywiki-rules__content">
-			<ul class="obbywiki-rules__list">
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">1. Respect other contributors</h4>
-					<p class="obbywiki-rules__item-text">The bare minimum on the Obby Wiki is that you respect other's time and effort. Do not insult, harass, or demean other contributors. Please do not remove existing contributions without a good reason stated in your edit summary.</p>
-				</li>
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">2. Provide accurate information</h4>
-					<p class="obbywiki-rules__item-text">Use sources/references when available. Do not spread misinformation or rumors, especially without a disclaimer.</p>
-				</li>
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">3. Do not vandalize</h4>
-					<p class="obbywiki-rules__item-text">Vandalism is the act of intentionally damaging or defacing the wiki or a page. This includes, but is not limited to, deleting or modifying existing content without a good reason, creating pages that are not relevant to the wiki, or making claims that you know cannot be backed up by sources.</p>
-				</li>
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">4. Do not move pages without a good reason</h4>
-					<p class="obbywiki-rules__item-text">If you want to delete a page, first mark it with the <a href="/wiki/Template:Candidate_for_deletion">{{Candidate for deletion}}</a> template. Only move player pages when their @username changes, not their display name and always leave a redirect.</p>
-				</li>
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">5. Make sure a topic meets the eligibility requirements and criteria before making a new page</h4>
-					<p class="obbywiki-rules__item-text">Before making a page, always consult the <a href="/wiki/OW:Eligibility_requirements">eligibility requirements</a> and ensure the topic has enough content about it before making an entirely new page. If you're not sure if a topic meets the eligibility requirements, ask an admin.</p>
-				</li>
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">6. Only upload relevant files</h4>
-					<p class="obbywiki-rules__item-text">Only upload files that are relevant to the topic you are uploading them to. If a file is relevant to no page or topic on the wiki, please note that it may be deleted without notice or warning. Please use all media you upload in articles before 7 days after uploading them.</p>
-				</li>
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">7. Make sure a similar page doesn't already exist</h4>
-					<p class="obbywiki-rules__item-text">Before making a page, always check if a similar page already exists. If it does, please edit the existing page instead of creating a new one.</p>
-				</li>
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">8. Use proper headings</h4>
-					<p class="obbywiki-rules__item-text">Organize your content using proper heading levels. Clear structure helps both readers and search engines understand what the page is about.</p>
-				</li>
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">9. Link to other relevant wiki pages</h4>
-					<p class="obbywiki-rules__item-text">When mentioning another obby, person, or term that has a page or should have a page, add an internal link to it, even if the page doesn't exist yet. This significantly improves site navigation for everyone.</p>
-				</li>
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">10. Use US English</h4>
-					<p class="obbywiki-rules__item-text">Use US English for all content on the wiki. This includes spelling, grammar, and vocabulary. Content can be translated into English International later. This does not apply to user comments.</p>
-				</li>
-				<li class="obbywiki-rules__item">
-					<h4 class="obbywiki-rules__item-title">11. Do not plagiarize</h4>
-					<p class="obbywiki-rules__item-text">Do not plagiarize content from other sources. This includes copying and pasting content from other wikis or websites without proper attribution. If another source is already covering a certain topic, consider its signficance and consider mentioning it in your page.</p>
-				</li>
-			</ul>
-		</div>
-	</section>
 </div>
 HTML;
 	}
@@ -1504,3 +1449,60 @@ HTML;
 		return $bytes . ' B';
 	}
 }
+
+// <section class="obbywiki-rules" aria-label="Wiki Rules">
+// 		<div class="obbywiki-rules__header">
+// 			<span class="obbywiki-rules__icon">
+// 				<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M270-80q-45 0-77.5-30.5T160-186v-558q0-38 23.5-68t61.5-38l395-78v640l-379 76q-9 2-15 9.5t-6 16.5q0 11 9 18.5t21 7.5h450v-640h80v720H270Zm10-217 80-16v-478l-80 16v478Z"/></svg>
+// 			</span>
+// 			<h3 class="obbywiki-rules__title">Wiki Rules</h3>
+// 		</div>
+// 		<div class="obbywiki-rules__content">
+// 			<ul class="obbywiki-rules__list">
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">1. Respect other contributors</h4>
+// 					<p class="obbywiki-rules__item-text">The bare minimum on the Obby Wiki is that you respect other's time and effort. Do not insult, harass, or demean other contributors. Please do not remove existing contributions without a good reason stated in your edit summary.</p>
+// 				</li>
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">2. Provide accurate information</h4>
+// 					<p class="obbywiki-rules__item-text">Use sources/references when available. Do not spread misinformation or rumors, especially without a disclaimer.</p>
+// 				</li>
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">3. Do not vandalize</h4>
+// 					<p class="obbywiki-rules__item-text">Vandalism is the act of intentionally damaging or defacing the wiki or a page. This includes, but is not limited to, deleting or modifying existing content without a good reason, creating pages that are not relevant to the wiki, or making claims that you know cannot be backed up by sources.</p>
+// 				</li>
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">4. Do not move pages without a good reason</h4>
+// 					<p class="obbywiki-rules__item-text">If you want to delete a page, first mark it with the <a href="/wiki/Template:Candidate_for_deletion">{{Candidate for deletion}}</a> template. Only move player pages when their @username changes, not their display name and always leave a redirect.</p>
+// 				</li>
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">5. Make sure a topic meets the eligibility requirements and criteria before making a new page</h4>
+// 					<p class="obbywiki-rules__item-text">Before making a page, always consult the <a href="/wiki/OW:Eligibility_requirements">eligibility requirements</a> and ensure the topic has enough content about it before making an entirely new page. If you're not sure if a topic meets the eligibility requirements, ask an admin.</p>
+// 				</li>
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">6. Only upload relevant files</h4>
+// 					<p class="obbywiki-rules__item-text">Only upload files that are relevant to the topic you are uploading them to. If a file is relevant to no page or topic on the wiki, please note that it may be deleted without notice or warning. Please use all media you upload in articles before 7 days after uploading them.</p>
+// 				</li>
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">7. Make sure a similar page doesn't already exist</h4>
+// 					<p class="obbywiki-rules__item-text">Before making a page, always check if a similar page already exists. If it does, please edit the existing page instead of creating a new one.</p>
+// 				</li>
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">8. Use proper headings</h4>
+// 					<p class="obbywiki-rules__item-text">Organize your content using proper heading levels. Clear structure helps both readers and search engines understand what the page is about.</p>
+// 				</li>
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">9. Link to other relevant wiki pages</h4>
+// 					<p class="obbywiki-rules__item-text">When mentioning another obby, person, or term that has a page or should have a page, add an internal link to it, even if the page doesn't exist yet. This significantly improves site navigation for everyone.</p>
+// 				</li>
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">10. Use US English</h4>
+// 					<p class="obbywiki-rules__item-text">Use US English for all content on the wiki. This includes spelling, grammar, and vocabulary. Content can be translated into English International later. This does not apply to user comments.</p>
+// 				</li>
+// 				<li class="obbywiki-rules__item">
+// 					<h4 class="obbywiki-rules__item-title">11. Do not plagiarize</h4>
+// 					<p class="obbywiki-rules__item-text">Do not plagiarize content from other sources. This includes copying and pasting content from other wikis or websites without proper attribution. If another source is already covering a certain topic, consider its signficance and consider mentioning it in your page.</p>
+// 				</li>
+// 			</ul>
+// 		</div>
+// 	</section>
