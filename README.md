@@ -13,6 +13,7 @@ Add an ObbyWiki-specific custom home page, overwriting `Home` by default with cu
 * "On this day..." releases (potentialy better with a template and cargo)
 * Cache poorly updates $wgObbyWikiHomePageFeaturedPages on featured carousel, maybe use a job queue or something to update it every 10 minutes?
 * Backfill recent/this month section with sub-section "last month" if there's not enough games released so far in the month or its empty
+* Remove or replace the user-defined edit summary/blurb/description in each recent change card
 
 ### UX
 * **Mobile Layout**: Refine stacking for "Spotlight" and "Archive" sections on small screens.
