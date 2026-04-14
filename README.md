@@ -17,6 +17,7 @@ Add an ObbyWiki-specific custom home page, overwriting `Home` by default with cu
 
 ### UX
 * **Mobile Layout**: Refine stacking for "Spotlight" and "Archive" sections on small screens.
+  * Additionally, probably just refind the entire layout
 * **Dark Mode**: Improve dark mode styling
 
 ### Technical
