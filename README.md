@@ -1,6 +1,6 @@
 # ObbyWikiHomePage
 
-Add an ObbyWiki-specific custom home page, overwriting `Home` by default with custom HTML. Intended for use on obbywiki.com. Supports MW 1.45-1.46.
+Add an ObbyWiki-specific custom home page, overwriting `Home` by default with custom HTML. Intended for use on obbywiki.com. Supports MW 1.45-1.46. Minimum version is locked to 1.45.1, but the extension is mostly compatible with MW 1.43.
 
 ## TODO
 
@@ -17,7 +17,7 @@ Add an ObbyWiki-specific custom home page, overwriting `Home` by default with cu
 
 ### UX
 * **Mobile Layout**: Refine stacking for "Spotlight" and "Archive" sections on small screens.
-  * Additionally, probably just refind the entire layout
+  * Additionally, probably just refine the entire layout
 * **Dark Mode**: Improve dark mode styling
 
 ### Technical
