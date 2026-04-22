@@ -349,7 +349,34 @@ SVG;
 	}
 
 	private static function getThisMonthPages(): array {
-		$monthName = date( 'F Y' ); // e.g. "February 2026"
+		$groups = [];
+		$thisMonthTimestamp = time();
+		$thisMonthStr = date( 'F Y', $thisMonthTimestamp );
+		$pages = self::fetchCategoryPages( $thisMonthStr, 8 );
+
+		if ( count( $pages ) > 0 ) {
+			$groups[] = [
+				'month' => date( 'F', $thisMonthTimestamp ),
+				'pages' => $pages,
+			];
+		}
+
+		if ( count( $pages ) < 5 ) {
+			$lastMonthTimestamp = strtotime( '-1 month' );
+			$lastMonthStr = date( 'F Y', $lastMonthTimestamp );
+			$lastMonthPages = self::fetchCategoryPages( $lastMonthStr, 8 - count( $pages ) );
+			if ( count( $lastMonthPages ) > 0 ) {
+				$groups[] = [
+					'month' => date( 'F', $lastMonthTimestamp ),
+					'pages' => $lastMonthPages,
+				];
+			}
+		}
+
+		return $groups;
+	}
+
+	private static function fetchCategoryPages( string $monthName, int $limit ): array {
 		$catTitle = 'Category:' . $monthName;
 
 		$request = new FauxRequest( [
@@ -404,7 +431,7 @@ SVG;
 					'thumbnail' => $thumb,
 				];
 
-				if ( count( $pages ) >= 8 ) {
+				if ( count( $pages ) >= $limit ) {
 					break;
 				}
 			}
@@ -1191,28 +1218,33 @@ SVG;
 		$thisMonthHTML = '';
 		$monthName = date( 'F' );
 		if ( empty( $thisMonthPages ) ) {
-			$thisMonthHTML = '<p class="obbywiki-featured__aside-month-empty">No new releases this month yet.</p>';
+			$thisMonthHTML = '<p class="obbywiki-featured__aside-month-empty">No new releases recently.</p>';
 		} else {
-			foreach ( $thisMonthPages as $mp ) {
-				$mpUrl = htmlspecialchars( $mp['url'] );
-				$mpTitle = htmlspecialchars( $mp['title'] );
+			foreach ( $thisMonthPages as $group ) {
+				$monthLabel = htmlspecialchars( $group['month'] );
+				$thisMonthHTML .= '<h4 class="obbywiki-month__label">' . $monthLabel . '</h4>';
+				
+				foreach ( $group['pages'] as $mp ) {
+					$mpUrl = htmlspecialchars( $mp['url'] );
+					$mpTitle = htmlspecialchars( $mp['title'] );
 
-				if ( $mp['thumbnail'] ) {
-					$mpThumb = htmlspecialchars( $mp['thumbnail'] );
-					$thumbHtml = '<img class="obbywiki-featured__aside-month-thumb" src="'
-						. $mpThumb . '" alt="' . $mpTitle . '" loading="lazy">';
-				} else {
-					$hash = crc32( $mp['title'] );
-					$hue = abs( $hash ) % 360;
-					$initial = mb_substr( $mp['title'], 0, 1 );
-					$thumbHtml = '<span class="obbywiki-featured__aside-month-thumb obbywiki-featured__aside-month-thumb--placeholder" style="--thumb-hue: '
-						. $hue . '">' . htmlspecialchars( $initial ) . '</span>';
+					if ( $mp['thumbnail'] ) {
+						$mpThumb = htmlspecialchars( $mp['thumbnail'] );
+						$thumbHtml = '<img class="obbywiki-featured__aside-month-thumb" src="'
+							. $mpThumb . '" alt="' . $mpTitle . '" loading="lazy">';
+					} else {
+						$hash = crc32( $mp['title'] );
+						$hue = abs( $hash ) % 360;
+						$initial = mb_substr( $mp['title'], 0, 1 );
+						$thumbHtml = '<span class="obbywiki-featured__aside-month-thumb obbywiki-featured__aside-month-thumb--placeholder" style="--thumb-hue: '
+							. $hue . '">' . htmlspecialchars( $initial ) . '</span>';
+					}
+
+					$thisMonthHTML .= '<a href="' . $mpUrl . '" class="obbywiki-featured__aside-month-item">'
+						. $thumbHtml
+						. '<span class="obbywiki-featured__aside-month-name">' . $mpTitle . '</span>'
+						. '</a>';
 				}
-
-				$thisMonthHTML .= '<a href="' . $mpUrl . '" class="obbywiki-featured__aside-month-item">'
-					. $thumbHtml
-					. '<span class="obbywiki-featured__aside-month-name">' . $mpTitle . '</span>'
-					. '</a>';
 			}
 		}
 
@@ -1381,7 +1413,7 @@ SVG;
 				<span class="obbywiki-month__icon">
 					<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg>
 				</span>
-				<h3 class="obbywiki-month__title">This Month — {$monthName}</h3>
+				<h3 class="obbywiki-month__title">Recent Releases</h3>
 			</div>
 			<div class="obbywiki-month__list">
 				{$thisMonthHTML}

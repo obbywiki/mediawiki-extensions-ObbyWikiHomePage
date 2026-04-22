@@ -1008,6 +1008,20 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	scrollbar-width: thin;
 }
 
+.obbywiki-month__label {
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--color-subtle, #54595d);
+	margin: 0.625rem 0 0.25rem;
+	padding: 0 0.375rem;
+}
+
+.obbywiki-month__label:first-child {
+	margin-top: 0;
+}
+
 .obbywiki-featured__aside-month-item,
 .obbywiki-featured__aside-month-item:visited {
 	display: flex;
