@@ -15,6 +15,7 @@ Add an ObbyWiki-specific custom home page, overwriting `Home` by default with cu
 * Remove or replace the user-defined edit summary/blurb/description in each recent change card
 * **FAQ**: hardest roblox obbies, how do i find new obbies to play, best obbies for beginners, how do i make an obby, etc.
 * add alt text to thumbnails
+* "find obby games to play" sort/feature
 
 ### UX
 * **Mobile Layout**: Refine stacking for "Spotlight" and "Archive" sections on small screens.
