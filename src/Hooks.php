@@ -39,7 +39,7 @@ class Hooks {
 		$ttl = (int)( $wgObbyWikiHomePageCacheTTL ?? 900 );
 
 		if ( $ttl > 0 ) {
-			$cacheKey = $cache->makeKey( 'obbywikihomepage', 'html', 'v7' );
+			$cacheKey = $cache->makeKey( 'obbywikihomepage', 'html', 'v8' );
 			$html = $cache->getWithSetCallback(
 				$cacheKey,
 				$ttl,
@@ -348,28 +348,43 @@ SVG;
 		];
 	}
 
+	private static function getMonthAnchorInUTC(): \DateTimeImmutable {
+		$now = new \DateTimeImmutable( 'now', new \DateTimeZone( 'UTC' ) );
+		return $now->modify( 'first day of this month' )->setTime( 0, 0 );
+	}
+
+	private static function formatMonthCategory( \DateTimeImmutable $month ): string {
+		return $month->format( 'F Y' );
+	}
+
+	private static function formatMonthLabel( \DateTimeImmutable $month ): string {
+		return $month->format( 'F' );
+	}
+
 	private static function getThisMonthPages(): array {
 		$groups = [];
-		$thisMonthTimestamp = time();
-		$thisMonthStr = date( 'F Y', $thisMonthTimestamp );
+		$thisMonth = self::getMonthAnchorInUTC();
+		$thisMonthStr = self::formatMonthCategory( $thisMonth );
 		$pages = self::fetchCategoryPages( $thisMonthStr, 8 );
 
 		if ( count( $pages ) > 0 ) {
 			$groups[] = [
-				'month' => date( 'F', $thisMonthTimestamp ),
+				'month' => self::formatMonthLabel( $thisMonth ),
 				'pages' => $pages,
 			];
 		}
 
 		if ( count( $pages ) < 5 ) {
-			$lastMonthTimestamp = strtotime( '-1 month' );
-			$lastMonthStr = date( 'F Y', $lastMonthTimestamp );
-			$lastMonthPages = self::fetchCategoryPages( $lastMonthStr, 8 - count( $pages ) );
-			if ( count( $lastMonthPages ) > 0 ) {
-				$groups[] = [
-					'month' => date( 'F', $lastMonthTimestamp ),
-					'pages' => $lastMonthPages,
-				];
+			$lastMonth = $thisMonth->modify( '-1 month' );
+			$lastMonthStr = self::formatMonthCategory( $lastMonth );
+			if ( $lastMonthStr !== $thisMonthStr ) {
+				$lastMonthPages = self::fetchCategoryPages( $lastMonthStr, 8 - count( $pages ) );
+				if ( count( $lastMonthPages ) > 0 ) {
+					$groups[] = [
+						'month' => self::formatMonthLabel( $lastMonth ),
+						'pages' => $lastMonthPages,
+					];
+				}
 			}
 		}
 
@@ -442,10 +457,16 @@ SVG;
 
 	private static function getArchiveMonths(): array {
 		$months = [];
-		// start from last month and go back up to 8 months
+		$seen = [];
+		$thisMonth = self::getMonthAnchorInUTC();
+		// start from last month and go back up to 12 months (UTC month boundaries)
 		for ( $i = 1; $i <= 12; $i++ ) {
-			$timestamp = strtotime( "-{$i} months" );
-			$monthName = date( 'F Y', $timestamp ); // e.g. "February 2026"
+			$archiveMonth = $thisMonth->modify( "-{$i} months" );
+			$monthName = self::formatMonthCategory( $archiveMonth );
+			if ( isset( $seen[$monthName] ) ) {
+				continue;
+			}
+			$seen[$monthName] = true;
 			$catTitle = 'Category:' . $monthName;
 
 			$request = new FauxRequest( [
