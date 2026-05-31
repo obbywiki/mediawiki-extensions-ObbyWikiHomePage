@@ -517,8 +517,8 @@ SVG;
 			'list' => 'recentchanges',
 			'rcnamespace' => 0,
 			'rcshow' => '!bot',
-			'rcprop' => 'title|timestamp|user|sizes|comment|ids',
-			'rclimit' => 6,
+			'rcprop' => 'title|timestamp|user',
+			'rclimit' => 50,
 		] );
 
 		$api = new ApiMain( $request, false );
@@ -534,22 +534,30 @@ SVG;
 		] );
 
 		$changes = [];
+		$seen_titles = [];
 		if ( isset( $data['query']['recentchanges'] ) ) {
 			foreach ( $data['query']['recentchanges'] as $rc ) {
-				$title = Title::newFromText( $rc['title'] );
-				if ( !$title ) continue;
+				$page_title = $rc['title'] ?? '';
+				if ( $page_title === '' || isset( $seen_titles[$page_title] ) ) {
+					continue;
+				}
 
+				$title = Title::newFromText( $page_title );
+				if ( !$title ) {
+					continue;
+				}
+
+				$seen_titles[$page_title] = true;
 				$changes[] = [
 					'title' => $title->getPrefixedText(),
 					'url' => $title->getLocalURL(),
 					'user' => $rc['user'] ?? '',
 					'timestamp' => $rc['timestamp'] ?? '',
-					'comment' => $rc['comment'] ?? '',
-					'oldlen' => $rc['oldlen'] ?? 0,
-					'newlen' => $rc['newlen'] ?? 0,
-					'revid' => $rc['revid'] ?? 0,
-					'old_revid' => $rc['old_revid'] ?? 0,
 				];
+
+				if ( count( $changes ) >= 8 ) {
+					break;
+				}
 			}
 		}
 
@@ -1308,46 +1316,17 @@ SVG;
 		// recent changes html
 		$recentChangesHTML = '';
 		if ( !empty( $recentChanges ) ) {
-			$rcCardsHTML = '';
+			$rcListHTML = '';
 			foreach ( $recentChanges as $rc ) {
-				$diff = $rc['newlen'] - $rc['oldlen'];
-				if ( $diff > 0 ) {
-					$diffClass = 'obbywiki-recent__card-diff--pos';
-					$diffText = '+' . $diff;
-				} elseif ( $diff < 0 ) {
-					$diffClass = 'obbywiki-recent__card-diff--neg';
-					$diffText = $diff;
-				} else {
-					$diffClass = 'obbywiki-recent__card-diff--zero';
-					$diffText = '0';
-				}
-
 				$rcArticleURL = htmlspecialchars( $rc['url'] );
-				$rcDiffURL = htmlspecialchars( $rc['url'] . ( $rc['revid'] ? '?diff=' . $rc['revid'] . '&oldid=' . $rc['old_revid'] : '' ) );
-				$rcHistURL = htmlspecialchars( $rc['url'] . '?action=history' );
-
 				$rcTitle = htmlspecialchars( $rc['title'] );
 				$rcUser = htmlspecialchars( $rc['user'] );
 				$rcTime = htmlspecialchars( self::getRelativeTime( $rc['timestamp'] ) );
-				$rcComment = htmlspecialchars( $rc['comment'] );
 
-				$commentHTML = $rcComment ? '<div class="obbywiki-recent__card-comment">' . $rcComment . '</div>' : '';
-
-				$rcCardsHTML .= '<div class="obbywiki-recent__card">' .
-					'<div class="obbywiki-recent__card-top">' .
-						'<a href="' . $rcArticleURL . '" class="obbywiki-recent__card-title">' . $rcTitle . '</a>' .
-						'<span class="obbywiki-recent__card-diff ' . $diffClass . '">' . $diffText . '</span>' .
-					'</div>' .
-					'<div class="obbywiki-recent__card-meta">' .
-						'<span class="obbywiki-recent__card-user"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-32q0-34 17.5-62.5T224-294q62-31 126-46.5T480-356q66 0 130 15.5T736-294q29 15 46.5 43.5T800-192v32H160Z"/></svg>' . $rcUser . '</span>' .
-						'<span class="obbywiki-recent__card-time"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm112-232L440-464v-216h80v184l128 128-56 56ZM480-480Z"/></svg>' . $rcTime . '</span>' .
-						'<div class="obbywiki-recent__card-actions">' .
-							'<a href="' . $rcDiffURL . '" class="obbywiki-recent__card-action" title="View diff" rel="nofollow"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M500-520h80v-80h80v-80h-80v-80h-80v80h-80v80h80v80Zm-80 160h240v-80H420v80ZM320-200q-33 0-56.5-23.5T240-280v-560q0-33 23.5-56.5T320-920h280l240 240v400q0 33-23.5 56.5T760-200H320ZM160-40q-33 0-56.5-23.5T80-120v-560h80v560h440v80H160Z"/></svg></a>' .
-							'<a href="' . $rcHistURL . '" class="obbywiki-recent__card-action" title="View history" rel="nofollow"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M478-86q-152 0-264.5-101T87-440h127q15 99 89.5 163.5T478-212q112 0 190-78t78-190q0-112-78-190t-190-78q-57 0-109 23.5T279-657h82v97H94v-265h95v79q56-62 130.5-95T478-874q81 0 153 31t125.5 84.5Q810-705 841-633t31 153q0 81-31 153t-84.5 125.5Q703-148 631-117T478-86Zm107-218L433-456v-224h95v184l125 124-68 68Z"/></svg></a>' .
-						'</div>' .
-					'</div>' .
-					$commentHTML .
-				'</div>';
+				$rcListHTML .= '<a href="' . $rcArticleURL . '" class="obbywiki-recent__item">' .
+					'<span class="obbywiki-recent__item-title">' . $rcTitle . '</span>' .
+					'<span class="obbywiki-recent__item-meta">' . $rcUser . ' · ' . $rcTime . '</span>' .
+				'</a>';
 			}
 
 			$recentChangesHTML = '<section class="obbywiki-recent" aria-label="Recent Changes">' .
@@ -1355,7 +1334,7 @@ SVG;
 					'<span class="obbywiki-recent__icon"><svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="currentColor"><path d="M478-86q-152 0-264.5-101T87-440h127q15 99 89.5 163.5T478-212q112 0 190-78t78-190q0-112-78-190t-190-78q-57 0-109 23.5T279-657h82v97H94v-265h95v79q56-62 130.5-95T478-874q81 0 153 31t125.5 84.5Q810-705 841-633t31 153q0 81-31 153t-84.5 125.5Q703-148 631-117T478-86Zm107-218L433-456v-224h95v184l125 124-68 68Z"/></svg></span>' .
 					'<h3 class="obbywiki-recent__title">Recently Changed</h3>' .
 				'</div>' .
-				'<div class="obbywiki-recent__grid">' . $rcCardsHTML . '</div>' .
+				'<div class="obbywiki-recent__list">' . $rcListHTML . '</div>' .
 			'</section>';
 		}
 
