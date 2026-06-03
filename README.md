@@ -29,3 +29,4 @@ Add an ObbyWiki-specific custom home page, overwriting `Home` by default with cu
 
 ### Misc
 * Make the H1 'Roblox Obby Wiki' for search enginges (i.e., Googlebot, etc.)
+* Replace deprecated usage of wfParseUrl
