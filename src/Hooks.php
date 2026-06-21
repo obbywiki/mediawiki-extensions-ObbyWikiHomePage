@@ -1034,7 +1034,7 @@ SVG;
 	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $announcements = [] ): string {
 		global $wgExtensionAssetsPath;
 		$scriptPath = wfScript();
-		$announcementsHTML = self::buildAnnouncementsHTML( $announcements );
+		// $announcementsHTML = self::buildAnnouncementsHTML( $announcements );
 
 		$clAssetBase = ( $wgExtensionAssetsPath ?? '/extensions' ) . '/ObbyWikiHomePage/resources/images/cl/';
 
@@ -1424,7 +1424,11 @@ SVG;
 	
 	{$archiveHTML}
 	
-	{$announcementsHTML}
+	<!-- {$announcementsHTML} -->
+
+	<div style="text-align: center; padding: 1rem; background-color: var(--color-surface-1,#f8f9fa); border-radius: 0.5rem; border: 1px solid var(--border-color-base,rgba(0,0,0,0.06));">
+		<p style="margin: 0;">Obby Wiki announcements and meta posts will return shortly. In the meantime, you can browse the wiki and contribute to the community.</p>
+	</div>
 
 	<aside class="obbywiki-aside">
 		<div class="obbywiki-aside__card">
