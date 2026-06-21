@@ -1281,11 +1281,13 @@ SVG;
 		$categoryURLs = [
 			'classic' => htmlspecialchars( Title::newFromText( 'Category:Classic Obby' )->getLocalURL() ),
 			'tower' => htmlspecialchars( Title::newFromText( 'Category:Tower Obby' )->getLocalURL() ),
+			'towerstage' => htmlspecialchars( Title::newFromText( 'Category:Tower Stage Obby' )->getLocalURL() ),
 			'dco' => htmlspecialchars( Title::newFromText( 'Category:Difficulty Chart Obby' )->getLocalURL() ),
 			'gimmick' => htmlspecialchars( Title::newFromText( 'Category:Gimmick Obby' )->getLocalURL() ),
 			'tier' => htmlspecialchars( Title::newFromText( 'Category:Tier Obby' )->getLocalURL() ),
 			'troll' => htmlspecialchars( Title::newFromText( 'Category:Troll Obby' )->getLocalURL() ),
 			'coop' => htmlspecialchars( Title::newFromText( 'Category:Co-Op Obby' )->getLocalURL() ),
+			'obby' => htmlspecialchars( Title::newFromText( 'Category:Obby' )->getLocalURL() ),
 			'stubs' => htmlspecialchars( Title::newFromText( 'Category:Stubs' )->getLocalURL() ),
 			'contributing' => htmlspecialchars( Title::newFromText( 'Help:Contributing' )->getLocalURL() ),
 		];
@@ -1423,33 +1425,37 @@ SVG;
 
 	
 	{$archiveHTML}
-	
-	<!-- {$announcementsHTML} -->
 
 	<div style="text-align: center; padding: 1rem; background-color: var(--color-surface-1,#f8f9fa); border-radius: 0.5rem; border: 1px solid var(--border-color-base,rgba(0,0,0,0.06));">
-		<p style="margin: 0;">Obby Wiki announcements and meta posts will return shortly. In the meantime, you can browse the wiki and contribute to the community.</p>
+		<p style="margin: 0;">Obby Wiki announcements and meta posts will return shortly. In the meantime, you can browse the wiki and contribute as usual.</p>
 	</div>
 
 	<aside class="obbywiki-aside">
 		<div class="obbywiki-aside__card">
 			<div class="obbywiki-aside__header">
-				<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="m240-160 40-160H120l20-80h160l40-160H180l20-80h160l40-160h80l-40 160h160l40-160h80l-40 160h160l-20 80H660l-40 160h160l-20 80H600l-40 160h-80l40-160H360l-40 160h-80Zm140-240h160l40-160H420l-40 160Z"/></svg></span>
-				<h3 class="obbywiki-aside__title">Browse by Type</h3>
+				<div class="obbywiki-aside__header-main">
+					<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="m240-160 40-160H120l20-80h160l40-160H180l20-80h160l40-160h80l-40 160h160l40-160h80l-40 160h160l-20 80H660l-40 160h160l-20 80H600l-40 160h-80l40-160H360l-40 160h-80Zm140-240h160l40-160H420l-40 160Z"/></svg></span>
+					<h3 class="obbywiki-aside__title">Obby Sub-genres</h3>
+				</div>
+				<a href="{$categoryURLs['obby']}" class="obbywiki-aside__all">View all</a>
 			</div>
-			<div class="obbywiki-featured__aside-tags">
-				<a href="{$categoryURLs['classic']}" class="obbywiki-featured__aside-tag">Classic Obby</a>
-				<a href="{$categoryURLs['tower']}" class="obbywiki-featured__aside-tag">Tower Obby</a>
-				<a href="{$categoryURLs['dco']}" class="obbywiki-featured__aside-tag">Difficulty Chart Obby</a>
-				<a href="{$categoryURLs['gimmick']}" class="obbywiki-featured__aside-tag">Gimmick Obby</a>
-				<a href="{$categoryURLs['tier']}" class="obbywiki-featured__aside-tag">Tiered Obby</a>
-				<a href="{$categoryURLs['troll']}" class="obbywiki-featured__aside-tag">Troll Obby</a>
-				<a href="{$categoryURLs['coop']}" class="obbywiki-featured__aside-tag">Co-Op Obby</a>
+			<div class="obbywiki-aside__type-grid">
+				<a href="{$categoryURLs['classic']}" class="obbywiki-aside__type-card" style="--type-hue: 210">Classic Obby</a>
+				<a href="{$categoryURLs['tower']}" class="obbywiki-aside__type-card" style="--type-hue: 275">Tower Obby</a>
+				<a href="{$categoryURLs['towerstage']}" class="obbywiki-aside__type-card" style="--type-hue: 320">Tower Stage Obby</a>
+				<a href="{$categoryURLs['dco']}" class="obbywiki-aside__type-card" style="--type-hue: 28">Difficulty Chart Obby</a>
+				<a href="{$categoryURLs['gimmick']}" class="obbywiki-aside__type-card" style="--type-hue: 160">Gimmick Obby</a>
+				<a href="{$categoryURLs['tier']}" class="obbywiki-aside__type-card" style="--type-hue: 45">Tiered Obby</a>
+				<a href="{$categoryURLs['troll']}" class="obbywiki-aside__type-card" style="--type-hue: 350">Troll Obby</a>
+				<a href="{$categoryURLs['coop']}" class="obbywiki-aside__type-card" style="--type-hue: 195">Co-Op Obby</a>
 			</div>
 		</div>
 		<div class="obbywiki-aside__card">
 			<div class="obbywiki-aside__header">
-				<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"><title>edit</title><g fill="currentColor"><path d="m16.77 8 1.94-2a1 1 0 0 0 0-1.41l-3.34-3.3a1 1 0 0 0-1.41 0L12 3.23zM1 14.25V19h4.75l9.96-9.96-4.75-4.75z"/></g></svg></span>
-				<h3 class="obbywiki-aside__title">Start Contributing</h3>
+				<div class="obbywiki-aside__header-main">
+					<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"><title>edit</title><g fill="currentColor"><path d="m16.77 8 1.94-2a1 1 0 0 0 0-1.41l-3.34-3.3a1 1 0 0 0-1.41 0L12 3.23zM1 14.25V19h4.75l9.96-9.96-4.75-4.75z"/></g></svg></span>
+					<h3 class="obbywiki-aside__title">Start Contributing</h3>
+				</div>
 			</div>
 			<p class="obbywiki-aside__text">Whether you're a casual obby player, a content creator, or a developer, there's a place for you here. Learn more below.</p>
 			<div class="obbywiki-featured__aside-cta-links">
