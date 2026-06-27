@@ -25,6 +25,7 @@ Add an ObbyWiki-specific custom home page, overwriting `Home` by default with cu
 ### Technical
 * **Localization (i18n)**: Move hardcoded strings to system messages.
 * **Granular Caching**: Optimize cache TTL for different sections.
+** caching needs improvements in general, like deferring the cache reset a background task and using the old cache until its ready, so users don't have to wait on cache refreshes
 * **Image Optimization**: Ensure efficient thumbnail sizes are used.
 
 ### Misc
