@@ -2,6 +2,8 @@
 
 Add an ObbyWiki-specific custom home page, overwriting `Home` by default with custom HTML. Intended for use on obbywiki.com. Supports MW 1.45-1.46. Minimum version is locked to 1.45.1, but the extension is mostly compatible with MW 1.43.
 
+Automated pulling for the highlights carousel is currently disabled because it does not work correctly.
+
 ## TODO
 
 ### Functionality
