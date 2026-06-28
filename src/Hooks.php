@@ -1234,8 +1234,8 @@ SVG;
 				'priority' => 6,
 			],
 			[
-				'url' => 'https://forum.wou.gg/c/game-talk/17/none',
-				'label' => 'Game Talk',
+				'url' => Title::newFromText( 'List_of_all_known_obby-related_wikis' )->getLocalURL(),
+				'label' => 'Wikis',
 				'image' => $clAssetBase . 'ow_cl_7_1x.webp',
 				'priority' => 7,
 			],
