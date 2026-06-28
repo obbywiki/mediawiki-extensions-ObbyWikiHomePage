@@ -9,9 +9,13 @@ use MediaWiki\Request\FauxRequest;
 use MediaWiki\Title\Title;
 use MediaWiki\MediaWikiServices;
 use Skin;
+use Wikimedia\ObjectCache\WANObjectCache;
 
 class Hooks {
 	private const DISCOURSE_FEATURED_EXCERPT_MAX_CHARS = 360;
+	private const HOME_PAGE_CACHE_VERSION = 'v8'; // only reset for large changes
+	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
+	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 
 	private static function isTargetPage( Title $title ): bool {
 		global $wgObbyWikiHomePageTitle;
@@ -39,13 +43,44 @@ class Hooks {
 		$ttl = (int)( $wgObbyWikiHomePageCacheTTL ?? 900 );
 
 		if ( $ttl > 0 ) {
-			$cacheKey = $cache->makeKey( 'obbywikihomepage', 'html', 'v8' );
+			$cacheKey = $cache->makeKey(
+				'obbywikihomepage',
+				'html',
+				self::HOME_PAGE_CACHE_VERSION
+			);
+			$backupKey = $cache->makeKey(
+				'obbywikihomepage',
+				'html',
+				self::HOME_PAGE_CACHE_VERSION,
+				'backup'
+			);
 			$html = $cache->getWithSetCallback(
 				$cacheKey,
 				$ttl,
-				function () {
-					return self::buildHomePage();
-				}
+				static function ( $oldValue, &$callbackTtl, array &$setOpts, $oldAsOf ) use ( $cache, $backupKey ) {
+					unset( $oldValue, $callbackTtl, $setOpts, $oldAsOf );
+					$html = self::buildHomePage();
+
+					if ( $html !== '' ) {
+						$cache->set( $backupKey, $html, WANObjectCache::TTL_DAY );
+					}
+
+					return $html;
+				},
+				[
+					'lockTSE' => self::HOME_PAGE_CACHE_LOCK_TSE,
+					'staleTTL' => self::HOME_PAGE_CACHE_STALE_TTL,
+					'busyValue' => static function () use ( $cache, $backupKey ) {
+						$backup = $cache->get( $backupKey );
+
+						if ( is_string( $backup ) && $backup !== '' ) {
+							return $backup;
+						}
+
+						return self::buildHomePageBusyFallback();
+					},
+					'pcTTL' => WANObjectCache::TTL_PROC_SHORT,
+				]
 			);
 		} else {
 			$html = self::buildHomePage();
@@ -72,6 +107,11 @@ class Hooks {
 			'og-description',
 			'<meta property="og:description" content="' . htmlspecialchars( $description ) . '"/>'
 		);
+	}
+
+	private static function buildHomePageBusyFallback(): string {
+		return '<div class="obbywiki-home obbywiki-home--loading">'
+			. '<p>The home page is currently being refreshed. Please refresh the page in 6-12 seconds.</p></div>';
 	}
 
 	private static function buildHomePage(): string {
