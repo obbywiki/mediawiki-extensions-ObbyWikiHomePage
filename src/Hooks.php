@@ -13,7 +13,7 @@ use Wikimedia\ObjectCache\WANObjectCache;
 
 class Hooks {
 	private const DISCOURSE_FEATURED_EXCERPT_MAX_CHARS = 360;
-	private const HOME_PAGE_CACHE_VERSION = 'v8'; // only reset for large changes
+	private const HOME_PAGE_CACHE_VERSION = 'v10'; // only reset for large changes
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 
@@ -371,7 +371,7 @@ SVG;
 		try {
 			$api->execute();
 		} catch ( \Throwable $e ) {
-			return [ 'articles' => 0, 'pages' => 0, 'edits' => 0, 'images' => 0 ];
+			return [ 'articles' => 0, 'pages' => 0, 'edits' => 0, 'images' => 0, 'users' => 0 ];
 		}
 
 		$data = $api->getResult()->getResultData( null, [
@@ -385,6 +385,7 @@ SVG;
 			'pages' => (int)( $stats['pages'] ?? 0 ),
 			'edits' => (int)( $stats['edits'] ?? 0 ),
 			'images' => (int)( $stats['images'] ?? 0 ),
+			'users' => (int)( $stats['users'] ?? 0 ),
 		];
 	}
 
@@ -1382,22 +1383,55 @@ SVG;
 
 		// about section html
 		$aboutURL = htmlspecialchars( Title::newFromText( 'OW:About' )->getLocalURL() );
+		$aboutProjectsURL = htmlspecialchars( Title::newFromText( 'OW:About/Projects' )->getLocalURL() );
+		$aboutWhyURL = htmlspecialchars( Title::newFromText( 'OW:About/Why' )->getLocalURL() );
 		$obbyURL = htmlspecialchars( Title::newFromText( 'Obby' )->getLocalURL() );
-		$rulesURL = htmlspecialchars( Title::newFromText( 'OW:Rules' )->getLocalURL() );
+		$allObbiesURL = htmlspecialchars( Title::newFromText( 'Category:Obby' )->getLocalURL() );
+		$studiosURL = htmlspecialchars( Title::newFromText( 'Category:Studio' )->getLocalURL() );
+		$tiersURL = htmlspecialchars( Title::newFromText( 'Tiers' )->getLocalURL() );
 		$contributingURL = htmlspecialchars( Title::newFromText( 'Help:Contributing' )->getLocalURL() );
+		$classicURL = htmlspecialchars( Title::newFromText( 'Category:Classic Obby' )->getLocalURL() );
+		$towerURL = htmlspecialchars( Title::newFromText( 'Category:Tower Obby' )->getLocalURL() );
+		$dcoURL = htmlspecialchars( Title::newFromText( 'Category:Difficulty Chart Obby' )->getLocalURL() );
+		$gimmickURL = htmlspecialchars( Title::newFromText( 'Category:Gimmick Obby' )->getLocalURL() );
+		$articlesCount = number_format( $siteStats['articles'] );
+		$userCount = number_format( $siteStats['users'] );
+		$editsCount = number_format( $siteStats['edits'] );
 		$aboutHTML = '<section class="obbywiki-about" aria-label="About the Wiki">' .
 			'<div class="obbywiki-about__header">' .
-				'<span class="obbywiki-about__icon">' .
-					'<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M425-265h110v-255H425v255Zm97.5-332.25Q540-614.5 540-640t-17.25-42.75Q505.5-700 480-700t-42.75 17.25Q420-665.5 420-640t17.5 42.75Q455-580 480-580t42.5-17.25ZM480-46q-91 0-169.99-34.08-78.98-34.09-137.41-92.52-58.43-58.43-92.52-137.41Q46-389 46-480q0-91 34.08-169.99 34.09-78.98 92.52-137.41 58.43-58.43 137.41-92.52Q389-914 480-914q91 0 169.99 34.08 78.98 34.09 137.41 92.52 58.43 58.43 92.52 137.41Q914-571 914-480q0 91-34.08 169.99-34.09 78.98-92.52 137.41-58.43 58.43-137.41 92.52Q571-46 480-46Z"/></svg>' .
-				'</span>' .
-				'<h3 class="obbywiki-about__title">About The Obby Wiki</h3>' .
+				'<div class="obbywiki-about__header-main">' .
+					'<span class="obbywiki-about__icon">' .
+						'<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M425-265h110v-255H425v255Zm97.5-332.25Q540-614.5 540-640t-17.25-42.75Q505.5-700 480-700t-42.75 17.25Q420-665.5 420-640t17.5 42.75Q455-580 480-580t42.5-17.25ZM480-46q-91 0-169.99-34.08-78.98-34.09-137.41-92.52-58.43-58.43-92.52-137.41Q46-389 46-480q0-91 34.08-169.99 34.09-78.98 92.52-137.41 58.43-58.43 137.41-92.52Q389-914 480-914q91 0 169.99 34.08 78.98 34.09 137.41 92.52 58.43 58.43 92.52 137.41Q914-571 914-480q0 91-34.08 169.99-34.09 78.98-92.52 137.41-58.43 58.43-137.41 92.52Q571-46 480-46Z"/></svg>' .
+					'</span>' .
+					'<h3 class="obbywiki-about__title">About The Obby Wiki</h3>' .
+				'</div>' .
+				'<div class="obbywiki-about__links">' .
+					'<a href="' . $aboutURL . '" class="obbywiki-about__link">About</a>' .
+					'<a href="' . $aboutProjectsURL . '" class="obbywiki-about__link">Projects</a>' .
+					'<a href="' . $aboutWhyURL . '" class="obbywiki-about__link">Why the Obby Wiki?</a>' .
+				'</div>' .
 			'</div>' .
 			'<div class="obbywiki-about__content">' .
-				'<p class="obbywiki-about__text">The Obby Wiki is an independent and community-run wiki/encyclopedia dedicated to documenting <a href="' . $obbyURL . '">Roblox obby</a> games (obbies), their creators, mechanics, conventions, terminology, etc. Our goal is to provide the most comprehensive, accurate, and complete information about as many obbies as possible.</p>' .
-				'<p class="obbywiki-about__text">Whether you want detailed information about a certain obby, or you want to search our database for a new obby to play, information about a certain mechanic or glitch, or just anything related to obbies, you can find it here.</p>' .
-				'<br />' .
-				'<p class="obbywiki-about__text">Anyone can contribute by editing articles, adding new information, or participating in discussions on the <a href="https://forum.wou.gg">Obby Forum</a>.</p>' .
-				'<p class="obbywiki-about__text">Learn more <a href="' . $aboutURL . '">about our project</a> and our advantages as well as how you can help or why you should use us over existing platforms. Read our <a href="' . $rulesURL . '">rules for contributing</a> and our <a href="' . $contributingURL . '">guide for new contributors</a>.</p>' .
+				'<div class="obbywiki-about__stats">' .
+					'<div class="obbywiki-about__stat">' .
+						'<span class="obbywiki-about__stat-value">' . $articlesCount . '</span>' .
+						'<span class="obbywiki-about__stat-label">Articles</span>' .
+					'</div>' .
+					'<div class="obbywiki-about__stat">' .
+						'<span class="obbywiki-about__stat-value">' . $editsCount . '</span>' .
+						'<span class="obbywiki-about__stat-label">Edits</span>' .
+					'</div>' .
+					'<div class="obbywiki-about__stat">' .
+						'<span class="obbywiki-about__stat-value">' . $userCount . '</span>' .
+						'<span class="obbywiki-about__stat-label">Total Users</span>' .
+					'</div>' .
+					'<div class="obbywiki-about__since">Since April 2025</div>' .
+				'</div>' .
+				'<p class="obbywiki-about__text">An <a href="' . $obbyURL . '">obby</a> is a genre of game on Roblox that is essentially an obstacle course or 3D platformer. Players complete levels that gradually ascend in difficulty until the end of the game, with countless variations from <a href="' . $classicURL . '">classic platformers</a> to <a href="' . $towerURL . '">towers</a>, <a href="' . $dcoURL . '">difficulty chart obbies</a>, and <a href="' . $gimmickURL . '">unique spins on the genre</a>. It has been one of the platform\'s most popular genres since the mid-2010s, spanning hundreds of thousands of unique games.</p>' .
+				'<p class="obbywiki-about__text">The Obby Wiki (also referred to as the Roblox Obby Wiki) is an independent, community-run encyclopedia dedicated to documenting Roblox obbies and everything surrounding them. From individual games, their creators, studios, mechanics, glitches, terminology, their communities, and more. Our goal is to provide the most comprehensive, accurate, and complete information about as many obbies as possible. The genre is consistently undocumented, with many games being forgotten entirely. This is <a href="'. $aboutWhyURL . '">why the Obby Wiki</a>  exists.</p>' .
+				'<p class="obbywiki-about__text">Help contribute to the largest database and collection of Roblox obbies ever created, with over <a href="' . $allObbiesURL . '">' . $articlesCount . '</a> articles and counting.</p>' .
+				
+				
 			'</div>' .
 		'</section>';
 
