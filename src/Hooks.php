@@ -13,7 +13,7 @@ use Wikimedia\ObjectCache\WANObjectCache;
 
 class Hooks {
 	private const DISCOURSE_FEATURED_EXCERPT_MAX_CHARS = 360;
-	private const HOME_PAGE_CACHE_VERSION = 'v11'; // only reset for large changes
+	private const HOME_PAGE_CACHE_VERSION = 'v9'; // only reset for large changes
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 
