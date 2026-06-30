@@ -11,6 +11,7 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * **Dynamic Browse**: Move hardcoded categories to extension configuration.
 * **Site Statistics**: Create a visual "At a Glance" section for wiki-wide stats. Somewhere below the area, maybe split the contributing section and put this as the other half.
 * **Trending Section**: Feature pages with high recent growth or view counts. (NEEDS EXTENSION SUPPORT FIRST)
+* **Spotlight carousel**: Fix automatic featured-page selection (displaytitle parsing is finicky) and re-enable when stable; support rotation/diversity so the same pages are not always shown.
 * Add dynamic site events like seasonal obby highlights and other events like sales in games
 * "On this day..." releases (potentialy better with a template and cargo)
 * Cache poorly updates $wgObbyWikiHomePageFeaturedPages on featured carousel, maybe use a job queue or something to update it every 10 minutes?
@@ -18,11 +19,14 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * **FAQ**: hardest roblox obbies, how do i find new obbies to play, best obbies for beginners, how do i make an obby, etc.
 * add alt text to thumbnails
 * "find obby games to play" sort/feature
+* add JSON-LD (`WebSite` + `SearchAction`), `og:image`, and canonical URL for the home page
 
 ### UX
 * **Mobile Layout**: Refine stacking for "Spotlight" and "Archive" sections on small screens.
   * Additionally, probably just refine the entire layout
 * **Dark Mode**: Improve dark mode styling
+* respect `prefers-reduced-motion` for carousel autoplay; improve keyboard/focus on spotlight slides (clones are not focusable)
+* move remaining inline styles (announcements stub, etc.) into the stylesheet
 
 ### Technical
 * **Localization (i18n)**: Move hardcoded strings to system messages.
