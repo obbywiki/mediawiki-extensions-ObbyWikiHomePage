@@ -6,14 +6,20 @@ use Article;
 use MediaWiki\Api\ApiMain;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Request\FauxRequest;
-use MediaWiki\Title\Title;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Revision\SlotRecord;
+use MediaWiki\Title\Title;
 use Skin;
 use Wikimedia\ObjectCache\WANObjectCache;
 
 class Hooks {
 	private const DISCOURSE_FEATURED_EXCERPT_MAX_CHARS = 360;
-	private const HOME_PAGE_CACHE_VERSION = 'v9'; // only reset for large changes
+	private const BLOG_FEATURED_EXCERPT_MAX_CHARS = 360;
+	private const BLOG_PROP_DATE = 'modernblog-date';
+	private const BLOG_PROP_TITLE = 'modernblog-title';
+	private const BLOG_PROP_AUTHOR = 'modernblog-author';
+	private const BLOG_PROP_SUBTITLE = 'modernblog-subtitle';
+	private const HOME_PAGE_CACHE_VERSION = 'v10'; // only reset for large changes
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 
@@ -121,8 +127,8 @@ class Hooks {
 		$thisMonthPages = self::getThisMonthPages();
 		$archiveMonths = self::getArchiveMonths();
 		$recentChanges = self::getRecentChanges();
-		$announcements = self::getDiscourseAnnouncements();
-		return self::buildHomePageHTML( $logoSVG, $carouselItems, $siteStats, $thisMonthPages, $archiveMonths, $recentChanges, $announcements );
+		$blogPosts = self::getBlogPosts();
+		return self::buildHomePageHTML( $logoSVG, $carouselItems, $siteStats, $thisMonthPages, $archiveMonths, $recentChanges, $blogPosts );
 	}
 
 	private static function getObbyPages(): array {
@@ -605,12 +611,12 @@ SVG;
 		return $changes;
 	}
 
-	private static function normalizeDiscourseExcerpt( string $excerpt ): string {
-		$t = html_entity_decode( $excerpt, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
-		$t = preg_replace( '/\[\/?(quote|img|video|audio)[^\]]*\]/i', '', $t );
-		$t = preg_replace( '/\s+/u', ' ', $t );
-		return trim( $t );
-	}
+	// private static function normalizeDiscourseExcerpt( string $excerpt ): string {
+	// 	$t = html_entity_decode( $excerpt, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	// 	$t = preg_replace( '/\[\/?(quote|img|video|audio)[^\]]*\]/i', '', $t );
+	// 	$t = preg_replace( '/\s+/u', ' ', $t );
+	// 	return trim( $t );
+	// }
 
 	private static function truncateAnnouncementPlaintext( string $text, int $max_chars = 8000 ): string {
 		$text = trim( $text );
@@ -625,297 +631,297 @@ SVG;
 		return rtrim( $chunk ) . '…';
 	}
 	
-	private static function discourseFetchPrimaryTopicEnrichment( string $forum_base, int $topic_id ): ?array {
-		if ( $topic_id <= 0 ) {
-			return null;
-		}
+	// private static function discourseFetchPrimaryTopicEnrichment( string $forum_base, int $topic_id ): ?array {
+	// 	if ( $topic_id <= 0 ) {
+	// 		return null;
+	// 	}
 
-		$url = $forum_base . '/t/' . $topic_id . '.json';
-		$http = MediaWikiServices::getInstance()->getHttpRequestFactory();
-		$req = $http->create(
-			$url,
-			[
-				'method' => 'GET',
-				'timeout' => 6,
-				'userAgent' => 'ObbyWikiHomePage/0.1 (MediaWiki; +https://obbywiki.com)',
-			],
-			__METHOD__
-		);
+	// 	$url = $forum_base . '/t/' . $topic_id . '.json';
+	// 	$http = MediaWikiServices::getInstance()->getHttpRequestFactory();
+	// 	$req = $http->create(
+	// 		$url,
+	// 		[
+	// 			'method' => 'GET',
+	// 			'timeout' => 6,
+	// 			'userAgent' => 'ObbyWikiHomePage/0.1 (MediaWiki; +https://obbywiki.com)',
+	// 		],
+	// 		__METHOD__
+	// 	);
 
-		$status = $req->execute();
-		if ( !$status->isOK() ) {
-			return null;
-		}
+	// 	$status = $req->execute();
+	// 	if ( !$status->isOK() ) {
+	// 		return null;
+	// 	}
 
-		$body = $req->getContent();
-		if ( $body === '' ) {
-			return null;
-		}
+	// 	$body = $req->getContent();
+	// 	if ( $body === '' ) {
+	// 		return null;
+	// 	}
 
-		$data = json_decode( $body, true );
-		if ( !is_array( $data ) ) {
-			return null;
-		}
+	// 	$data = json_decode( $body, true );
+	// 	if ( !is_array( $data ) ) {
+	// 		return null;
+	// 	}
 
-		$plain = '';
-		$posts = $data['post_stream']['posts'] ?? null;
-		if ( is_array( $posts ) && $posts !== [] && is_array( $posts[0] ) ) {
-			$cooked = $posts[0]['cooked'] ?? '';
-			if ( is_string( $cooked ) && $cooked !== '' ) {
-				$plain = self::normalizeDiscourseExcerpt(
-					html_entity_decode( strip_tags( $cooked ), ENT_QUOTES | ENT_HTML5, 'UTF-8' )
-				);
-			}
-		}
+	// 	$plain = '';
+	// 	$posts = $data['post_stream']['posts'] ?? null;
+	// 	if ( is_array( $posts ) && $posts !== [] && is_array( $posts[0] ) ) {
+	// 		$cooked = $posts[0]['cooked'] ?? '';
+	// 		if ( is_string( $cooked ) && $cooked !== '' ) {
+	// 			$plain = self::normalizeDiscourseExcerpt(
+	// 				html_entity_decode( strip_tags( $cooked ), ENT_QUOTES | ENT_HTML5, 'UTF-8' )
+	// 			);
+	// 		}
+	// 	}
 
-		$display_name = '';
-		$username = '';
-		$avatar_template = '';
-		$created_by = $data['details']['created_by'] ?? null;
-		if ( is_array( $created_by ) ) {
-			$username = isset( $created_by['username'] ) && is_string( $created_by['username'] )
-				? $created_by['username']
-				: '';
-			$display_name = isset( $created_by['name'] ) && is_string( $created_by['name'] )
-				? $created_by['name']
-				: '';
-			if ( $display_name === '' ) {
-				$display_name = $username;
-			}
-			$avatar_template = isset( $created_by['avatar_template'] ) && is_string( $created_by['avatar_template'] )
-				? $created_by['avatar_template']
-				: '';
-		}
+	// 	$display_name = '';
+	// 	$username = '';
+	// 	$avatar_template = '';
+	// 	$created_by = $data['details']['created_by'] ?? null;
+	// 	if ( is_array( $created_by ) ) {
+	// 		$username = isset( $created_by['username'] ) && is_string( $created_by['username'] )
+	// 			? $created_by['username']
+	// 			: '';
+	// 		$display_name = isset( $created_by['name'] ) && is_string( $created_by['name'] )
+	// 			? $created_by['name']
+	// 			: '';
+	// 		if ( $display_name === '' ) {
+	// 			$display_name = $username;
+	// 		}
+	// 		$avatar_template = isset( $created_by['avatar_template'] ) && is_string( $created_by['avatar_template'] )
+	// 			? $created_by['avatar_template']
+	// 			: '';
+	// 	}
 
-		return [
-			'plain' => $plain,
-			'display_name' => $display_name,
-			'username' => $username,
-			'avatar_template' => $avatar_template,
-		];
-	}
+	// 	return [
+	// 		'plain' => $plain,
+	// 		'display_name' => $display_name,
+	// 		'username' => $username,
+	// 		'avatar_template' => $avatar_template,
+	// 	];
+	// }
 
-	private static function discourseAvatarSrc( string $forum_base, string $avatar_template, int $size = 48 ): string {
-		if ( $avatar_template === '' ) {
-			return '';
-		}
-		$path = str_replace( '{size}', (string)$size, $avatar_template );
-		if ( str_starts_with( $path, 'http://' ) || str_starts_with( $path, 'https://' ) ) {
-			return $path;
-		}
-		return $forum_base . $path;
-	}
+	// private static function discourseAvatarSrc( string $forum_base, string $avatar_template, int $size = 48 ): string {
+	// 	if ( $avatar_template === '' ) {
+	// 		return '';
+	// 	}
+	// 	$path = str_replace( '{size}', (string)$size, $avatar_template );
+	// 	if ( str_starts_with( $path, 'http://' ) || str_starts_with( $path, 'https://' ) ) {
+	// 		return $path;
+	// 	}
+	// 	return $forum_base . $path;
+	// }
 
-	private static function discourseTopicOriginalPoster( array $topic, array $user_by_id ): array {
-		$posters = $topic['posters'] ?? [];
-		$op_id = 0;
-		if ( is_array( $posters ) ) {
-			foreach ( $posters as $poster ) {
-				if ( !is_array( $poster ) ) {
-					continue;
-				}
-				$desc = $poster['description'] ?? '';
-				if ( is_string( $desc ) && str_contains( $desc, 'Original Poster' ) ) {
-					$op_id = (int)( $poster['user_id'] ?? 0 );
-					break;
-				}
-			}
-			if ( !$op_id && isset( $posters[0]['user_id'] ) ) {
-				$op_id = (int)$posters[0]['user_id'];
-			}
-		}
+	// private static function discourseTopicOriginalPoster( array $topic, array $user_by_id ): array {
+	// 	$posters = $topic['posters'] ?? [];
+	// 	$op_id = 0;
+	// 	if ( is_array( $posters ) ) {
+	// 		foreach ( $posters as $poster ) {
+	// 			if ( !is_array( $poster ) ) {
+	// 				continue;
+	// 			}
+	// 			$desc = $poster['description'] ?? '';
+	// 			if ( is_string( $desc ) && str_contains( $desc, 'Original Poster' ) ) {
+	// 				$op_id = (int)( $poster['user_id'] ?? 0 );
+	// 				break;
+	// 			}
+	// 		}
+	// 		if ( !$op_id && isset( $posters[0]['user_id'] ) ) {
+	// 			$op_id = (int)$posters[0]['user_id'];
+	// 		}
+	// 	}
 
-		$u = $user_by_id[$op_id] ?? [];
-		$username = is_array( $u ) && isset( $u['username'] ) && is_string( $u['username'] )
-			? $u['username']
-			: '';
-		$display = '';
-		if ( is_array( $u ) && isset( $u['name'] ) && is_string( $u['name'] ) && $u['name'] !== '' ) {
-			$display = $u['name'];
-		} else {
-			$display = $username;
-		}
+	// 	$u = $user_by_id[$op_id] ?? [];
+	// 	$username = is_array( $u ) && isset( $u['username'] ) && is_string( $u['username'] )
+	// 		? $u['username']
+	// 		: '';
+	// 	$display = '';
+	// 	if ( is_array( $u ) && isset( $u['name'] ) && is_string( $u['name'] ) && $u['name'] !== '' ) {
+	// 		$display = $u['name'];
+	// 	} else {
+	// 		$display = $username;
+	// 	}
 
-		$tpl = is_array( $u ) && isset( $u['avatar_template'] ) && is_string( $u['avatar_template'] )
-			? $u['avatar_template']
-			: '';
+	// 	$tpl = is_array( $u ) && isset( $u['avatar_template'] ) && is_string( $u['avatar_template'] )
+	// 		? $u['avatar_template']
+	// 		: '';
 
-		return [
-			'display_name' => $display,
-			'username' => $username,
-			'avatar_template' => $tpl,
-		];
-	}
+	// 	return [
+	// 		'display_name' => $display,
+	// 		'username' => $username,
+	// 		'avatar_template' => $tpl,
+	// 	];
+	// }
 
-	private static function getDiscourseAnnouncements(): array {
-		global $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl;
-		global $wgObbyWikiHomePageDiscourseFetchPrimaryTopic;
-		$url = trim( (string)( $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl ?? '' ) );
-		if ( $url === '' ) {
-			return [];
-		}
+	// private static function getDiscourseAnnouncements(): array {
+	// 	global $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl;
+	// 	global $wgObbyWikiHomePageDiscourseFetchPrimaryTopic;
+	// 	$url = trim( (string)( $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl ?? '' ) );
+	// 	if ( $url === '' ) {
+	// 		return [];
+	// 	}
 
-		$parsed = wfParseUrl( $url ); // TODO replace deprecated
-		if ( !$parsed || ( $parsed['scheme'] ?? '' ) !== 'https' || empty( $parsed['host'] ) ) {
-			return [];
-		}
+	// 	$parsed = wfParseUrl( $url ); // TODO replace deprecated
+	// 	if ( !$parsed || ( $parsed['scheme'] ?? '' ) !== 'https' || empty( $parsed['host'] ) ) {
+	// 		return [];
+	// 	}
 
-		$forum_base = 'https://' . $parsed['host'];
+	// 	$forum_base = 'https://' . $parsed['host'];
 
-		$fetch_url = wfAppendQuery( $url, [ 'per_page' => 30 ] );
+	// 	$fetch_url = wfAppendQuery( $url, [ 'per_page' => 30 ] );
 
-		$http = MediaWikiServices::getInstance()->getHttpRequestFactory();
-		$req = $http->create(
-			$fetch_url,
-			[
-				'method' => 'GET',
-				'timeout' => 8,
-				'userAgent' => 'ObbyWikiHomePage/0.1 (MediaWiki; +https://obbywiki.com)',
-			],
-			__METHOD__
-		);
+	// 	$http = MediaWikiServices::getInstance()->getHttpRequestFactory();
+	// 	$req = $http->create(
+	// 		$fetch_url,
+	// 		[
+	// 			'method' => 'GET',
+	// 			'timeout' => 8,
+	// 			'userAgent' => 'ObbyWikiHomePage/0.1 (MediaWiki; +https://obbywiki.com)',
+	// 		],
+	// 		__METHOD__
+	// 	);
 
-		$status = $req->execute();
-		if ( !$status->isOK() ) {
-			return [];
-		}
+	// 	$status = $req->execute();
+	// 	if ( !$status->isOK() ) {
+	// 		return [];
+	// 	}
 
-		$body = $req->getContent();
-		if ( $body === '' ) {
-			return [];
-		}
+	// 	$body = $req->getContent();
+	// 	if ( $body === '' ) {
+	// 		return [];
+	// 	}
 
-		$data = json_decode( $body, true );
-		if ( !is_array( $data ) || !isset( $data['topic_list']['topics'] ) || !is_array( $data['topic_list']['topics'] ) ) {
-			return [];
-		}
+	// 	$data = json_decode( $body, true );
+	// 	if ( !is_array( $data ) || !isset( $data['topic_list']['topics'] ) || !is_array( $data['topic_list']['topics'] ) ) {
+	// 		return [];
+	// 	}
 
-		$user_by_id = [];
-		if ( isset( $data['users'] ) && is_array( $data['users'] ) ) {
-			foreach ( $data['users'] as $u ) {
-				if ( is_array( $u ) && isset( $u['id'] ) ) {
-					$user_by_id[(int)$u['id']] = $u;
-				}
-			}
-		}
+	// 	$user_by_id = [];
+	// 	if ( isset( $data['users'] ) && is_array( $data['users'] ) ) {
+	// 		foreach ( $data['users'] as $u ) {
+	// 			if ( is_array( $u ) && isset( $u['id'] ) ) {
+	// 				$user_by_id[(int)$u['id']] = $u;
+	// 			}
+	// 		}
+	// 	}
 
-		$topics = [];
-		foreach ( $data['topic_list']['topics'] as $t ) {
-			if ( !is_array( $t ) ) {
-				continue;
-			}
+	// 	$topics = [];
+	// 	foreach ( $data['topic_list']['topics'] as $t ) {
+	// 		if ( !is_array( $t ) ) {
+	// 			continue;
+	// 		}
 
-			$id = $t['id'] ?? null;
-			$slug = $t['slug'] ?? '';
-			if ( $id === null || $slug === '' || !is_string( $slug ) ) {
-				continue;
-			}
+	// 		$id = $t['id'] ?? null;
+	// 		$slug = $t['slug'] ?? '';
+	// 		if ( $id === null || $slug === '' || !is_string( $slug ) ) {
+	// 			continue;
+	// 		}
 
-			$title = $t['fancy_title'] ?? null;
-			if ( !is_string( $title ) || $title === '' ) {
-				$title = $t['title'] ?? '';
-			}
-			if ( !is_string( $title ) || $title === '' ) {
-				continue;
-			}
+	// 		$title = $t['fancy_title'] ?? null;
+	// 		if ( !is_string( $title ) || $title === '' ) {
+	// 			$title = $t['title'] ?? '';
+	// 		}
+	// 		if ( !is_string( $title ) || $title === '' ) {
+	// 			continue;
+	// 		}
 
-			$created_at = $t['created_at'] ?? '';
-			if ( !is_string( $created_at ) ) {
-				$created_at = '';
-			}
+	// 		$created_at = $t['created_at'] ?? '';
+	// 		if ( !is_string( $created_at ) ) {
+	// 			$created_at = '';
+	// 		}
 
-			$excerpt = $t['excerpt'] ?? '';
-			if ( !is_string( $excerpt ) ) {
-				$excerpt = '';
-			}
+	// 		$excerpt = $t['excerpt'] ?? '';
+	// 		if ( !is_string( $excerpt ) ) {
+	// 			$excerpt = '';
+	// 		}
 
-			$excerpt_plain = self::normalizeDiscourseExcerpt( $excerpt );
+	// 		$excerpt_plain = self::normalizeDiscourseExcerpt( $excerpt );
 
-			$poster = self::discourseTopicOriginalPoster( $t, $user_by_id );
-			$avatar_url = self::discourseAvatarSrc( $forum_base, $poster['avatar_template'], 48 );
+	// 		$poster = self::discourseTopicOriginalPoster( $t, $user_by_id );
+	// 		$avatar_url = self::discourseAvatarSrc( $forum_base, $poster['avatar_template'], 48 );
 
-			$topics[] = [
-				'topic_id' => (int)$id,
-				'title' => $title,
-				'url' => $forum_base . '/t/' . $slug . '/' . (int)$id,
-				'excerpt_plain' => $excerpt_plain,
-				'created_at' => $created_at,
-				'poster_display_name' => $poster['display_name'],
-				'poster_username' => $poster['username'],
-				'poster_avatar_url' => $avatar_url,
-			];
-		}
+	// 		$topics[] = [
+	// 			'topic_id' => (int)$id,
+	// 			'title' => $title,
+	// 			'url' => $forum_base . '/t/' . $slug . '/' . (int)$id,
+	// 			'excerpt_plain' => $excerpt_plain,
+	// 			'created_at' => $created_at,
+	// 			'poster_display_name' => $poster['display_name'],
+	// 			'poster_username' => $poster['username'],
+	// 			'poster_avatar_url' => $avatar_url,
+	// 		];
+	// 	}
 
-		usort(
-			$topics,
-			static function ( array $a, array $b ): int {
-				return strcmp( $b['created_at'], $a['created_at'] );
-			}
-		);
+	// 	usort(
+	// 		$topics,
+	// 		static function ( array $a, array $b ): int {
+	// 			return strcmp( $b['created_at'], $a['created_at'] );
+	// 		}
+	// 	);
 
-		$topics = array_slice( $topics, 0, 6 );
+	// 	$topics = array_slice( $topics, 0, 6 );
 
-		$fetch_primary = (bool)( $wgObbyWikiHomePageDiscourseFetchPrimaryTopic ?? true );
-		if ( $fetch_primary && $topics !== [] ) {
-			$primary_id = (int)$topics[0]['topic_id'];
-			$enriched = self::discourseFetchPrimaryTopicEnrichment( $forum_base, $primary_id );
-			if ( $enriched !== null ) {
-				if ( $enriched['plain'] !== '' ) {
-					$topics[0]['excerpt_plain'] = self::truncateAnnouncementPlaintext(
-						$enriched['plain'],
-						self::DISCOURSE_FEATURED_EXCERPT_MAX_CHARS
-					);
-				}
-				if ( $enriched['username'] !== '' ) {
-					$topics[0]['poster_username'] = $enriched['username'];
-					$topics[0]['poster_display_name'] = $enriched['display_name'] !== ''
-						? $enriched['display_name']
-						: $enriched['username'];
-				}
-				if ( $enriched['avatar_template'] !== '' ) {
-					$topics[0]['poster_avatar_url'] = self::discourseAvatarSrc(
-						$forum_base,
-						$enriched['avatar_template'],
-						48
-					);
-				}
-			}
-		}
+	// 	$fetch_primary = (bool)( $wgObbyWikiHomePageDiscourseFetchPrimaryTopic ?? true );
+	// 	if ( $fetch_primary && $topics !== [] ) {
+	// 		$primary_id = (int)$topics[0]['topic_id'];
+	// 		$enriched = self::discourseFetchPrimaryTopicEnrichment( $forum_base, $primary_id );
+	// 		if ( $enriched !== null ) {
+	// 			if ( $enriched['plain'] !== '' ) {
+	// 				$topics[0]['excerpt_plain'] = self::truncateAnnouncementPlaintext(
+	// 					$enriched['plain'],
+	// 					self::DISCOURSE_FEATURED_EXCERPT_MAX_CHARS
+	// 				);
+	// 			}
+	// 			if ( $enriched['username'] !== '' ) {
+	// 				$topics[0]['poster_username'] = $enriched['username'];
+	// 				$topics[0]['poster_display_name'] = $enriched['display_name'] !== ''
+	// 					? $enriched['display_name']
+	// 					: $enriched['username'];
+	// 			}
+	// 			if ( $enriched['avatar_template'] !== '' ) {
+	// 				$topics[0]['poster_avatar_url'] = self::discourseAvatarSrc(
+	// 					$forum_base,
+	// 					$enriched['avatar_template'],
+	// 					48
+	// 				);
+	// 			}
+	// 		}
+	// 	}
 
-		if ( $topics !== [] && $topics[0]['excerpt_plain'] === '' ) {
-			$topics[0]['excerpt_plain'] = 'Read the full announcement on the forum.';
-		}
+	// 	if ( $topics !== [] && $topics[0]['excerpt_plain'] === '' ) {
+	// 		$topics[0]['excerpt_plain'] = 'Read the full announcement on the forum.';
+	// 	}
 
-		$topic_count = count( $topics );
-		for ( $i = 1; $i < $topic_count; $i++ ) {
-			if ( $topics[$i]['excerpt_plain'] === '' ) {
-				$topics[$i]['excerpt_plain'] = 'Read more on the forum.';
-			}
-		}
+	// 	$topic_count = count( $topics );
+	// 	for ( $i = 1; $i < $topic_count; $i++ ) {
+	// 		if ( $topics[$i]['excerpt_plain'] === '' ) {
+	// 			$topics[$i]['excerpt_plain'] = 'Read more on the forum.';
+	// 		}
+	// 	}
 
-		foreach ( $topics as $i => $_ ) {
-			unset( $topics[$i]['topic_id'] );
-		}
+	// 	foreach ( $topics as $i => $_ ) {
+	// 		unset( $topics[$i]['topic_id'] );
+	// 	}
 
-		return $topics;
-	}
+	// 	return $topics;
+	// }
 
-	private static function formatAnnouncementDateHtml( string $created_at ): string {
-		if ( $created_at === '' ) {
-			return '';
-		}
-		$unix = wfTimestamp( TS_UNIX, $created_at );
-		if ( !is_numeric( $unix ) ) {
-			return '';
-		}
-		if ( (int)$unix <= 0 ) {
-			return '';
-		}
-		$label = self::getRelativeTime( $created_at );
-		return '<time class="obbywiki-announce__date" datetime="'
-			. htmlspecialchars( $created_at, ENT_QUOTES ) . '">'
-			. htmlspecialchars( $label, ENT_QUOTES ) . '</time>';
-	}
+	// private static function formatAnnouncementDateHtml( string $created_at ): string {
+	// 	if ( $created_at === '' ) {
+	// 		return '';
+	// 	}
+	// 	$unix = wfTimestamp( TS_UNIX, $created_at );
+	// 	if ( !is_numeric( $unix ) ) {
+	// 		return '';
+	// 	}
+	// 	if ( (int)$unix <= 0 ) {
+	// 		return '';
+	// 	}
+	// 	$label = self::getRelativeTime( $created_at );
+	// 	return '<time class="obbywiki-announce__date" datetime="'
+	// 		. htmlspecialchars( $created_at, ENT_QUOTES ) . '">'
+	// 		. htmlspecialchars( $label, ENT_QUOTES ) . '</time>';
+	// }
 
 	private static function getRelativeTime( string $timestamp ): string {
 		$ts = wfTimestamp( TS_UNIX, $timestamp );
@@ -936,146 +942,505 @@ SVG;
 		}
 	}
 
-	private static function buildAnnouncementAvatarHtml( array $item, int $size ): string {
-		$avatar_url = (string)( $item['poster_avatar_url'] ?? '' );
-		$username = (string)( $item['poster_username'] ?? '' );
-		$display = (string)( $item['poster_display_name'] ?? '' );
-		$initial_src = $username !== '' ? $username : ( $display !== '' ? $display : '?' );
-		$initial = mb_substr( $initial_src, 0, 1 );
-		$hue = abs( crc32( $initial_src ) ) % 360;
-		$size_attr = (string)$size;
-
-		if ( $avatar_url !== '' ) {
-			return '<img class="obbywiki-announce__avatar" src="' . htmlspecialchars( $avatar_url, ENT_QUOTES )
-				. '" alt="" width="' . $size_attr . '" height="' . $size_attr . '" loading="lazy" decoding="async">';
+	private static function getBlogNamespaceId(): ?int {
+		global $wgObbyWikiHomePageBlogNamespaceName;
+		$expectedName = trim( (string)( $wgObbyWikiHomePageBlogNamespaceName ?? 'Blog' ) );
+		if ( $expectedName === '' ) {
+			return null;
 		}
 
-		return '<span class="obbywiki-announce__avatar obbywiki-announce__avatar--placeholder" style="--announce-hue: '
-			. $hue . '">' . htmlspecialchars( $initial, ENT_QUOTES ) . '</span>';
+		if ( class_exists( \MediaWiki\Extension\ModernBlog\BlogNamespace::class ) ) {
+			return \MediaWiki\Extension\ModernBlog\BlogNamespace::getSubjectNamespaceId();
+		}
+
+		$namespaces = MediaWikiServices::getInstance()->getNamespaceInfo()->getCanonicalNamespaces();
+		foreach ( $namespaces as $id => $name ) {
+			if ( $id === NS_MAIN ) {
+				continue;
+			}
+			if ( strcasecmp( $name, $expectedName ) === 0 ) {
+				return $id;
+			}
+		}
+
+		if ( defined( 'NS_MODERNBLOG' ) && NS_MODERNBLOG !== NS_MAIN ) {
+			$name = $namespaces[NS_MODERNBLOG] ?? null;
+			if ( is_string( $name ) && strcasecmp( $name, $expectedName ) === 0 ) {
+				return NS_MODERNBLOG;
+			}
+		}
+
+		return null;
 	}
 
-	private static function buildAnnouncementPosterMetaHtml( array $item ): string {
-		$display = (string)( $item['poster_display_name'] ?? '' );
-		$username = (string)( $item['poster_username'] ?? '' );
+	private static function getBlogTimelineDbKey(): string {
+		global $wgObbyWikiHomePageBlogTimelinePage;
+		global $wgModernBlogTimelinePage;
+		$name = trim( (string)( $wgObbyWikiHomePageBlogTimelinePage ?? $wgModernBlogTimelinePage ?? 'Timeline' ) );
 
-		$html = '<div class="obbywiki-announce__poster-meta">';
-		if ( $display !== '' && ( $username === '' || strcasecmp( $display, $username ) !== 0 ) ) {
-			$html .= '<span class="obbywiki-announce__poster-display">' . htmlspecialchars( $display, ENT_QUOTES ) . '</span>';
-		}
-		if ( $username !== '' ) {
-			$html .= '<span class="obbywiki-announce__poster-user">@' . htmlspecialchars( $username, ENT_QUOTES ) . '</span>';
-		} elseif ( $display !== '' ) {
-			$html .= '<span class="obbywiki-announce__poster-user">' . htmlspecialchars( $display, ENT_QUOTES ) . '</span>';
-		}
-		$html .= '</div>';
-
-		return $html;
+		return str_replace( ' ', '_', $name !== '' ? $name : 'Timeline' );
 	}
 
-	private static function buildAnnouncementsHTML( array $announcements ): string {
-		if ( $announcements === [] ) {
+	private static function getBlogTimelineTitle(): ?Title {
+		$nsId = self::getBlogNamespaceId();
+		if ( $nsId === null ) {
+			return null;
+		}
+
+		return Title::makeTitle( $nsId, self::getBlogTimelineDbKey() );
+	}
+
+	private static function isUsableBlogMetadata( string $value ): bool {
+		$value = trim( $value );
+		if ( $value === '' || preg_match( '/^frame(\{\})?$/i', $value ) ) {
+			return false;
+		}
+
+		return !preg_match( '/[{}|<>]/', $value );
+	}
+
+	private static function normalizeBlogTimestamp( string $dateRaw ): ?string {
+		$dateRaw = trim( $dateRaw );
+		if ( $dateRaw === '' ) {
+			return null;
+		}
+
+		if ( wfTimestamp( TS_MW, $dateRaw ) !== false ) {
+			return wfTimestamp( TS_MW, $dateRaw );
+		}
+
+		$parsed = strtotime( $dateRaw );
+		if ( $parsed !== false ) {
+			return wfTimestamp( TS_MW, $parsed );
+		}
+
+		return null;
+	}
+
+	private static function normalizeBlogPlaintext( string $text ): string {
+		$t = html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		$t = preg_replace( '/\[\[(?:[^\]|]*\|)?([^\]]*)\]\]/u', '$1', $t );
+		$t = preg_replace( '/{{[^}]*}}/u', '', $t );
+		$t = preg_replace( "/'{2,5}/u", '', $t );
+		$t = strip_tags( $t );
+		$t = preg_replace( '/\s+/u', ' ', $t );
+
+		return trim( $t );
+	}
+
+	/**
+	 * @param list<int> $pageIds
+	 * @return array<int, array<string, string>>
+	 */
+	private static function loadBlogPageProps( $dbr, array $pageIds ): array {
+		if ( $pageIds === [] ) {
+			return [];
+		}
+
+		$propNames = [
+			self::BLOG_PROP_DATE,
+			self::BLOG_PROP_TITLE,
+			self::BLOG_PROP_AUTHOR,
+			self::BLOG_PROP_SUBTITLE,
+			'displaytitle',
+		];
+
+		$res = $dbr->newSelectQueryBuilder()
+			->select( [ 'pp_page', 'pp_propname', 'pp_value' ] )
+			->from( 'page_props' )
+			->where( [
+				'pp_page' => $pageIds,
+				'pp_propname' => $propNames,
+			] )
+			->caller( __METHOD__ )
+			->fetchResultSet();
+
+		$propsByPage = [];
+		foreach ( $res as $row ) {
+			$pageId = (int)$row->pp_page;
+			$propsByPage[$pageId][$row->pp_propname] = $row->pp_value;
+		}
+
+		return $propsByPage;
+	}
+
+	private static function resolveBlogPostTimestamp( ?string $dateProp, Title $title ): ?string {
+		if ( is_string( $dateProp ) && $dateProp !== '' ) {
+			$normalized = self::normalizeBlogTimestamp( $dateProp );
+			if ( $normalized !== null ) {
+				return $normalized;
+			}
+		}
+
+		$firstRevision = MediaWikiServices::getInstance()->getRevisionLookup()->getFirstRevision( $title );
+		if ( $firstRevision !== null ) {
+			return $firstRevision->getTimestamp();
+		}
+
+		return null;
+	}
+
+	private static function resolveBlogPostDisplayTitle(
+		Title $title,
+		?string $blogTitleProp,
+		?string $displayTitleProp
+	): string {
+		if ( is_string( $blogTitleProp ) && self::isUsableBlogMetadata( $blogTitleProp ) ) {
+			return trim( $blogTitleProp );
+		}
+
+		if ( is_string( $displayTitleProp ) && $displayTitleProp !== '' ) {
+			return str_replace( '_', ' ', $displayTitleProp );
+		}
+
+		return str_replace( '_', ' ', $title->getText() );
+	}
+
+	private static function getBlogPostRevisionPlaintext( Title $title ): string {
+		$revisionLookup = MediaWikiServices::getInstance()->getRevisionLookup();
+		$rev = $revisionLookup->getRevisionByTitle( $title );
+		if ( $rev === null ) {
 			return '';
 		}
 
-		global $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl;
-		$view_all_url = 'https://forum.wou.gg/c/obby-wiki/obby-wiki-meta/13';
-		$p = wfParseUrl( trim( (string)( $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl ?? '' ) ) ); // TODO replace deprecated
-		if ( $p && !empty( $p['host'] ) ) {
-			$scheme = ( $p['scheme'] ?? '' ) === 'http' ? 'http' : 'https';
-			$view_all_url = $scheme . '://' . $p['host'] . '/c/obby-wiki/obby-wiki-meta/13';
+		$content = $rev->getContent( SlotRecord::MAIN );
+		if ( $content === null ) {
+			return '';
 		}
 
-		$featured = $announcements[0];
-		$rest = array_slice( $announcements, 1 );
+		$text = $content->getText();
+		$parts = preg_split( '/^---\s*$/m', $text );
+		$lead = is_array( $parts ) ? (string)( $parts[0] ?? $text ) : $text;
 
+		return self::normalizeBlogPlaintext( $lead );
+	}
+
+	private static function resolveBlogPostExcerpt(
+		Title $title,
+		array $pageProps,
+		bool $allowRevisionFallback
+	): string {
+		$subtitle = $pageProps[self::BLOG_PROP_SUBTITLE] ?? null;
+		if ( is_string( $subtitle ) && self::isUsableBlogMetadata( $subtitle ) ) {
+			return trim( $subtitle );
+		}
+
+		if ( !$allowRevisionFallback ) {
+			return '';
+		}
+
+		return self::getBlogPostRevisionPlaintext( $title );
+	}
+
+	private static function getBlogPosts(): array {
+		global $wgObbyWikiHomePageBlogPostLimit;
+
+		$limit = max( 1, (int)( $wgObbyWikiHomePageBlogPostLimit ?? 4 ) );
+		$nsId = self::getBlogNamespaceId();
+		if ( $nsId === null ) {
+			return [];
+		}
+
+		$services = MediaWikiServices::getInstance();
+		$dbr = $services->getConnectionProvider()->getReplicaDatabase();
+		$timelineDbKey = self::getBlogTimelineDbKey();
+
+		$res = $dbr->newSelectQueryBuilder()
+			->select( [ 'page_id', 'page_title' ] )
+			->from( 'page' )
+			->where( [
+				'page_namespace' => $nsId,
+				'page_is_redirect' => 0,
+				$dbr->expr( 'page_title', '!=', $timelineDbKey ),
+			] )
+			->caller( __METHOD__ )
+			->fetchResultSet();
+
+		$pageIds = [];
+		$titlesById = [];
+		foreach ( $res as $row ) {
+			$pageId = (int)$row->page_id;
+			$pageIds[] = $pageId;
+			$titlesById[$pageId] = Title::makeTitle( $nsId, $row->page_title );
+		}
+
+		if ( $pageIds === [] ) {
+			return [];
+		}
+
+		$propsByPage = self::loadBlogPageProps( $dbr, $pageIds );
+		$posts = [];
+
+		foreach ( $pageIds as $pageId ) {
+			$title = $titlesById[$pageId];
+			$pageProps = $propsByPage[$pageId] ?? [];
+			$timestamp = self::resolveBlogPostTimestamp( $pageProps[self::BLOG_PROP_DATE] ?? null, $title );
+			if ( $timestamp === null ) {
+				continue;
+			}
+
+			$author = '';
+			$authorProp = $pageProps[self::BLOG_PROP_AUTHOR] ?? null;
+			if ( is_string( $authorProp ) && self::isUsableBlogMetadata( $authorProp ) ) {
+				$author = trim( $authorProp );
+			}
+
+			$posts[] = [
+				'title' => self::resolveBlogPostDisplayTitle(
+					$title,
+					$pageProps[self::BLOG_PROP_TITLE] ?? null,
+					$pageProps['displaytitle'] ?? null
+				),
+				'url' => $title->getLocalURL(),
+				'excerpt_plain' => '',
+				'created_at' => $timestamp,
+				'poster_display_name' => $author,
+				'poster_username' => '',
+				'poster_avatar_url' => '',
+				'_title' => $title,
+				'_page_props' => $pageProps,
+			];
+		}
+
+		usort(
+			$posts,
+			static function ( array $a, array $b ): int {
+				return strcmp( $b['created_at'], $a['created_at'] );
+			}
+		);
+
+		$posts = array_slice( $posts, 0, $limit );
+
+		$postCount = count( $posts );
+		for ( $i = 0; $i < $postCount; $i++ ) {
+			$title = $posts[$i]['_title'];
+			$pageProps = $posts[$i]['_page_props'];
+			$allowRevisionFallback = $i === 0;
+			$excerpt = self::resolveBlogPostExcerpt( $title, $pageProps, $allowRevisionFallback );
+
+			if ( $excerpt !== '' ) {
+				$maxChars = $i === 0 ? self::BLOG_FEATURED_EXCERPT_MAX_CHARS : 180;
+				$posts[$i]['excerpt_plain'] = self::truncateAnnouncementPlaintext( $excerpt, $maxChars );
+			} elseif ( $i === 0 ) {
+				$posts[$i]['excerpt_plain'] = 'Read the full post on the wiki.';
+			} else {
+				$posts[$i]['excerpt_plain'] = 'Read more on the wiki.';
+			}
+
+			unset( $posts[$i]['_title'], $posts[$i]['_page_props'] );
+		}
+
+		return $posts;
+	}
+
+	private static function formatBlogPostDateHTML( string $timestamp ): string {
+		if ( $timestamp === '' ) {
+			return '';
+		}
+
+		$unix = wfTimestamp( TS_UNIX, $timestamp );
+		if ( !is_numeric( $unix ) || (int)$unix <= 0 ) {
+			return '';
+		}
+
+		$label = self::getRelativeTime( $timestamp );
+
+		return '<time class="obbywiki-blog-card__date" datetime="'
+			. htmlspecialchars( $timestamp, ENT_QUOTES ) . '">'
+			. htmlspecialchars( $label, ENT_QUOTES ) . '</time>';
+	}
+
+	private static function buildBlogPostLogoHTML( string $logoSVG ): string {
+		return '<div class="obbywiki-blog-card__logo" aria-hidden="true">' . $logoSVG . '</div>';
+	}
+
+	private static function buildBlogPostsHTML( array $blogPosts, string $logoSVG ): string {
+		if ( $blogPosts === [] ) {
+			return '';
+		}
+
+		$timelineTitle = self::getBlogTimelineTitle();
+		$view_all_url = $timelineTitle !== null ? $timelineTitle->getLocalURL() : Title::newFromText( 'Blog:Timeline' )->getLocalURL();
 		$view_all_esc = htmlspecialchars( $view_all_url, ENT_QUOTES );
-		$featured_title = htmlspecialchars( $featured['title'], ENT_QUOTES );
-		$featured_url = htmlspecialchars( $featured['url'], ENT_QUOTES );
-		$featured_blurb = htmlspecialchars( $featured['excerpt_plain'], ENT_QUOTES );
-
-		$featured_date = self::formatAnnouncementDateHtml( (string)( $featured['created_at'] ?? '' ) );
-
-		$featured_top = '<div class="obbywiki-announce__featured-top">'
-			. self::buildAnnouncementAvatarHtml( $featured, 52 )
-			. '<div class="obbywiki-announce__featured-head">'
-			. '<h4 class="obbywiki-announce__featured-title">' . $featured_title . '</h4>'
-			. self::buildAnnouncementPosterMetaHtml( $featured )
-			. $featured_date
-			. '</div>'
-			. '</div>';
 
 		$icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="currentColor"><path d="M720-440v-80h160v80H720Zm48 280-128-96 48-64 128 96-48 64Zm-80-480-48-64 128-96 48 64-128 96ZM200-200v-160h-40q-33 0-56.5-23.5T80-440v-80q0-33 23.5-56.5T160-600h160l200-120v480L320-360h-40v160h-80Zm360-146v-268q27 24 43.5 58.5T620-480q0 41-16.5 75.5T560-346Z"/></svg>';
 
-		$body_class = $rest !== [] ? ' obbywiki-announce__body--split' : '';
+		$cardsHTML = '';
+		foreach ( $blogPosts as $post ) {
+			$title_esc = htmlspecialchars( $post['title'], ENT_QUOTES );
+			$url_esc = htmlspecialchars( $post['url'], ENT_QUOTES );
+			$blurb_esc = htmlspecialchars( $post['excerpt_plain'], ENT_QUOTES );
+			$date_html = self::formatBlogPostDateHTML( (string)( $post['created_at'] ?? '' ) );
+			$author = trim( (string)( $post['poster_display_name'] ?? '' ) );
+			$author_html = $author !== ''
+				? '<span class="obbywiki-blog-card__author">' . htmlspecialchars( $author, ENT_QUOTES ) . '</span>'
+				: '';
+
+			$cardsHTML .= '<a href="' . $url_esc . '" class="obbywiki-blog-card">'
+				. self::buildBlogPostLogoHTML( $logoSVG )
+				. '<div class="obbywiki-blog-card__body">'
+				. '<h4 class="obbywiki-blog-card__title">' . $title_esc . '</h4>'
+				. '<p class="obbywiki-blog-card__excerpt">' . $blurb_esc . '</p>'
+				. '<div class="obbywiki-blog-card__meta">'
+				. $date_html
+				. $author_html
+				. '</div>'
+				. '</div>'
+				. '</a>';
+		}
+
+		return '<section class="obbywiki-blog" aria-label="Announcements">'
+			. '<div class="obbywiki-blog__header">'
+			. '<div class="obbywiki-blog__header-main">'
+			. '<span class="obbywiki-blog__icon">' . $icon_svg . '</span>'
+			. '<h3 class="obbywiki-blog__title">Announcements</h3>'
+			. '</div>'
+			. '<a href="' . $view_all_esc . '" class="obbywiki-blog__all">View all</a>'
+			. '</div>'
+			. '<div class="obbywiki-blog__cards">' . $cardsHTML . '</div>'
+			. '</section>';
+	}
+
+	// private static function buildAnnouncementAvatarHtml( array $item, int $size ): string {
+	// 	$avatar_url = (string)( $item['poster_avatar_url'] ?? '' );
+	// 	$username = (string)( $item['poster_username'] ?? '' );
+	// 	$display = (string)( $item['poster_display_name'] ?? '' );
+	// 	$initial_src = $username !== '' ? $username : ( $display !== '' ? $display : '?' );
+	// 	$initial = mb_substr( $initial_src, 0, 1 );
+	// 	$hue = abs( crc32( $initial_src ) ) % 360;
+	// 	$size_attr = (string)$size;
+
+	// 	if ( $avatar_url !== '' ) {
+	// 		return '<img class="obbywiki-announce__avatar" src="' . htmlspecialchars( $avatar_url, ENT_QUOTES )
+	// 			. '" alt="" width="' . $size_attr . '" height="' . $size_attr . '" loading="lazy" decoding="async">';
+	// 	}
+
+	// 	return '<span class="obbywiki-announce__avatar obbywiki-announce__avatar--placeholder" style="--announce-hue: '
+	// 		. $hue . '">' . htmlspecialchars( $initial, ENT_QUOTES ) . '</span>';
+	// }
+
+	// private static function buildAnnouncementPosterMetaHtml( array $item ): string {
+	// 	$display = (string)( $item['poster_display_name'] ?? '' );
+	// 	$username = (string)( $item['poster_username'] ?? '' );
+
+	// 	$html = '<div class="obbywiki-announce__poster-meta">';
+	// 	if ( $display !== '' && ( $username === '' || strcasecmp( $display, $username ) !== 0 ) ) {
+	// 		$html .= '<span class="obbywiki-announce__poster-display">' . htmlspecialchars( $display, ENT_QUOTES ) . '</span>';
+	// 	}
+	// 	if ( $username !== '' ) {
+	// 		$html .= '<span class="obbywiki-announce__poster-user">@' . htmlspecialchars( $username, ENT_QUOTES ) . '</span>';
+	// 	} elseif ( $display !== '' ) {
+	// 		$html .= '<span class="obbywiki-announce__poster-user">' . htmlspecialchars( $display, ENT_QUOTES ) . '</span>';
+	// 	}
+	// 	$html .= '</div>';
+
+	// 	return $html;
+	// }
+
+	// private static function buildAnnouncementsHTML( array $announcements ): string {
+	// 	if ( $announcements === [] ) {
+	// 		return '';
+	// 	}
+
+	// 	global $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl;
+	// 	$view_all_url = 'https://forum.wou.gg/c/obby-wiki/obby-wiki-meta/13';
+	// 	$p = wfParseUrl( trim( (string)( $wgObbyWikiHomePageDiscourseAnnouncementsJsonUrl ?? '' ) ) ); // TODO replace deprecated
+	// 	if ( $p && !empty( $p['host'] ) ) {
+	// 		$scheme = ( $p['scheme'] ?? '' ) === 'http' ? 'http' : 'https';
+	// 		$view_all_url = $scheme . '://' . $p['host'] . '/c/obby-wiki/obby-wiki-meta/13';
+	// 	}
+
+	// 	$featured = $announcements[0];
+	// 	$rest = array_slice( $announcements, 1 );
+
+	// 	$view_all_esc = htmlspecialchars( $view_all_url, ENT_QUOTES );
+	// 	$featured_title = htmlspecialchars( $featured['title'], ENT_QUOTES );
+	// 	$featured_url = htmlspecialchars( $featured['url'], ENT_QUOTES );
+	// 	$featured_blurb = htmlspecialchars( $featured['excerpt_plain'], ENT_QUOTES );
+
+	// 	$featured_date = self::formatAnnouncementDateHtml( (string)( $featured['created_at'] ?? '' ) );
+
+	// 	$featured_top = '<div class="obbywiki-announce__featured-top">'
+	// 		. self::buildAnnouncementAvatarHtml( $featured, 52 )
+	// 		. '<div class="obbywiki-announce__featured-head">'
+	// 		. '<h4 class="obbywiki-announce__featured-title">' . $featured_title . '</h4>'
+	// 		. self::buildAnnouncementPosterMetaHtml( $featured )
+	// 		. $featured_date
+	// 		. '</div>'
+	// 		. '</div>';
+
+	// 	$icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="currentColor"><path d="M720-440v-80h160v80H720Zm48 280-128-96 48-64 128 96-48 64Zm-80-480-48-64 128-96 48 64-128 96ZM200-200v-160h-40q-33 0-56.5-23.5T80-440v-80q0-33 23.5-56.5T160-600h160l200-120v480L320-360h-40v160h-80Zm360-146v-268q27 24 43.5 58.5T620-480q0 41-16.5 75.5T560-346Z"/></svg>';
+
+	// 	$body_class = $rest !== [] ? ' obbywiki-announce__body--split' : '';
 
 
 		
-		$community_links = [
-			[ 'label' => 'Discussions', 'url' => 'https://forum.wou.gg/c/obby-wiki/12' ],
-			[ 'label' => 'Page Feedback', 'url' => 'https://forum.wou.gg/c/obby-wiki/obby-wiki-page-feedback/14' ],
-		];
+	// 	$community_links = [
+	// 		[ 'label' => 'Discussions', 'url' => 'https://forum.wou.gg/c/obby-wiki/12' ],
+	// 		[ 'label' => 'Page Feedback', 'url' => 'https://forum.wou.gg/c/obby-wiki/obby-wiki-page-feedback/14' ],
+	// 	];
 
-		$html = '<section class="obbywiki-announce" aria-label="Announcements">'
-			. '<div class="obbywiki-announce__header">'
-			. '<div class="obbywiki-announce__header-main">'
-			. '<span class="obbywiki-announce__icon">' . $icon_svg . '</span>'
-			. '<h3 class="obbywiki-announce__title">Announcements</h3>'
-			. '</div>'
-			. '<a href="' . $view_all_esc . '" class="obbywiki-announce__all">View all</a>'
-			. '</div>'
-			. '<div class="obbywiki-announce__body' . $body_class . '">'
-			. '<a href="' . $featured_url . '" class="obbywiki-announce__featured">'
-			. $featured_top
-			. '<p class="obbywiki-announce__featured-blurb">' . $featured_blurb . '</p>'
-			. '</a>';
+	// 	$html = '<section class="obbywiki-announce" aria-label="Announcements">'
+	// 		. '<div class="obbywiki-announce__header">'
+	// 		. '<div class="obbywiki-announce__header-main">'
+	// 		. '<span class="obbywiki-announce__icon">' . $icon_svg . '</span>'
+	// 		. '<h3 class="obbywiki-announce__title">Announcements</h3>'
+	// 		. '</div>'
+	// 		. '<a href="' . $view_all_esc . '" class="obbywiki-announce__all">View all</a>'
+	// 		. '</div>'
+	// 		. '<div class="obbywiki-announce__body' . $body_class . '">'
+	// 		. '<a href="' . $featured_url . '" class="obbywiki-announce__featured">'
+	// 		. $featured_top
+	// 		. '<p class="obbywiki-announce__featured-blurb">' . $featured_blurb . '</p>'
+	// 		. '</a>';
 
-		if ( $rest !== [] ) {
-			$html .= '<div class="obbywiki-announce__list">'
-				. '<div class="obbywiki-announce__community-nav">';
+	// 	if ( $rest !== [] ) {
+	// 		$html .= '<div class="obbywiki-announce__list">'
+	// 			. '<div class="obbywiki-announce__community-nav">';
 			
-			foreach ( $community_links as $link ) {
-				$html .= '<a href="' . htmlspecialchars( $link['url'], ENT_QUOTES ) . '" class="obbywiki-announce__community-link">'
-					. htmlspecialchars( $link['label'], ENT_QUOTES )
-					. '</a>';
-			}
+	// 		foreach ( $community_links as $link ) {
+	// 			$html .= '<a href="' . htmlspecialchars( $link['url'], ENT_QUOTES ) . '" class="obbywiki-announce__community-link">'
+	// 				. htmlspecialchars( $link['label'], ENT_QUOTES )
+	// 				. '</a>';
+	// 		}
 
-			$html .= '</div>'
-				. '<div class="obbywiki-announce__compact-list">';
+	// 		$html .= '</div>'
+	// 			. '<div class="obbywiki-announce__compact-list">';
 
-			foreach ( $rest as $item ) {
-				$title_esc = htmlspecialchars( $item['title'], ENT_QUOTES );
-				$url_esc = htmlspecialchars( $item['url'], ENT_QUOTES );
-				$blurb_esc = htmlspecialchars( $item['excerpt_plain'], ENT_QUOTES );
-				$avatar = self::buildAnnouncementAvatarHtml( $item, 36 );
-				$meta = self::buildAnnouncementPosterMetaHtml( $item );
-				$compact_date = self::formatAnnouncementDateHtml( (string)( $item['created_at'] ?? '' ) );
-				$html .= '<a href="' . $url_esc . '" class="obbywiki-announce__compact">'
-					. '<div class="obbywiki-announce__compact-inner">'
-					. '<div class="obbywiki-announce__compact-avatar">' . $avatar . '</div>'
-					. '<div class="obbywiki-announce__compact-main">'
-					. '<span class="obbywiki-announce__compact-title">' . $title_esc . '</span>'
-					. '<p class="obbywiki-announce__compact-blurb">' . $blurb_esc . '</p>'
-					. '<div class="obbywiki-announce__compact-meta">'
-					. $compact_date
-					. '</div>'
-					. '</div>'
-					. '</div>'
-					. '</a>';
-			}
-			$html .= '</div></div>';
-		}
+	// 		foreach ( $rest as $item ) {
+	// 			$title_esc = htmlspecialchars( $item['title'], ENT_QUOTES );
+	// 			$url_esc = htmlspecialchars( $item['url'], ENT_QUOTES );
+	// 			$blurb_esc = htmlspecialchars( $item['excerpt_plain'], ENT_QUOTES );
+	// 			$avatar = self::buildAnnouncementAvatarHtml( $item, 36 );
+	// 			$meta = self::buildAnnouncementPosterMetaHtml( $item );
+	// 			$compact_date = self::formatAnnouncementDateHtml( (string)( $item['created_at'] ?? '' ) );
+	// 			$html .= '<a href="' . $url_esc . '" class="obbywiki-announce__compact">'
+	// 				. '<div class="obbywiki-announce__compact-inner">'
+	// 				. '<div class="obbywiki-announce__compact-avatar">' . $avatar . '</div>'
+	// 				. '<div class="obbywiki-announce__compact-main">'
+	// 				. '<span class="obbywiki-announce__compact-title">' . $title_esc . '</span>'
+	// 				. '<p class="obbywiki-announce__compact-blurb">' . $blurb_esc . '</p>'
+	// 				. '<div class="obbywiki-announce__compact-meta">'
+	// 				. $compact_date
+	// 				. '</div>'
+	// 				. '</div>'
+	// 				. '</div>'
+	// 				. '</a>';
+	// 		}
+	// 		$html .= '</div></div>';
+	// 	}
 
-		$html .= '</div></section>';
+	// 	$html .= '</div></section>';
 
-		return $html;
-	}
+	// 	return $html;
+	// }
 
 	// MAIN
 	// builds the full html
-	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $announcements = [] ): string {
+	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [] ): string {
 		global $wgExtensionAssetsPath;
 		$scriptPath = wfScript();
-		// $announcementsHTML = self::buildAnnouncementsHTML( $announcements );
+		$blogPostsHTML = self::buildBlogPostsHTML( $blogPosts, $logoSVG );
 
 		$clAssetBase = ( $wgExtensionAssetsPath ?? '/extensions' ) . '/ObbyWikiHomePage/resources/images/cl/';
 
@@ -1092,8 +1457,8 @@ SVG;
 				'iconSVG' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"><g fill="currentColor"><path d="m16.77 8 1.94-2a1 1 0 0 0 0-1.41l-3.34-3.3a1 1 0 0 0-1.41 0L12 3.23zM1 14.25V19h4.75l9.96-9.96-4.75-4.75z"/></g></svg>',
 			],
 			[
-				'url' => Title::newFromText( 'OW:Forum' )->getLocalURL(),
-				'label' => 'Forums',
+				'url' => Title::newFromText( 'Blog:Timeline' )->getLocalURL(),
+				'label' => 'Blog',
 				'iconSVG' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 -960 960 960" fill="currentColor"><path d="M280-240q-17 0-28.5-11.5T240-280v-80h520v-360h80q17 0 28.5 11.5T880-680v600L720-240H280ZM80-280v-560q0-17 11.5-28.5T120-880h520q17 0 28.5 11.5T680-840v360q0 17-11.5 28.5T640-440H240L80-280Z"/></svg>',
 			],
 			[
@@ -1555,13 +1920,10 @@ SVG;
 			</div>
 		</div>
 	</aside>
-	
+
 	{$archiveHTML}
 
-	<div style="text-align: center; padding: 1rem; background-color: var(--color-surface-1,#f8f9fa); border-radius: 0.5rem; border: 1px solid var(--border-color-base,rgba(0,0,0,0.06));">
-		<p style="margin: 0;">Obby Wiki announcements and meta posts will return shortly. In the meantime, you can browse the wiki and contribute as usual.</p>
-	</div>
-
+	{$blogPostsHTML}
 
 	{$recentChangesHTML}
 
