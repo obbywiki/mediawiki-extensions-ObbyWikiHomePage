@@ -1507,9 +1507,6 @@ SVG;
 		</div>
 	</section>
 
-	
-	{$archiveHTML}
-
 	<aside class="obbywiki-aside">
 		<div class="obbywiki-aside__card">
 			<div class="obbywiki-aside__header">
@@ -1558,10 +1555,13 @@ SVG;
 			</div>
 		</div>
 	</aside>
+	
+	{$archiveHTML}
 
 	<div style="text-align: center; padding: 1rem; background-color: var(--color-surface-1,#f8f9fa); border-radius: 0.5rem; border: 1px solid var(--border-color-base,rgba(0,0,0,0.06));">
 		<p style="margin: 0;">Obby Wiki announcements and meta posts will return shortly. In the meantime, you can browse the wiki and contribute as usual.</p>
 	</div>
+
 
 	{$recentChangesHTML}
 
