@@ -502,10 +502,64 @@ SVG;
 		return $pages;
 	}
 
+	private static function fetchMonthArchiveCard( \DateTimeImmutable $month, string $label ): ?array {
+		$monthName = self::formatMonthCategory( $month );
+		$catTitle = 'Category:' . $monthName;
+
+		$request = new FauxRequest( [
+			'action' => 'query',
+			'titles' => $catTitle,
+			'prop' => 'categoryinfo',
+		] );
+
+		$api = new ApiMain( $request, false );
+
+		try {
+			$api->execute();
+		} catch ( \Throwable $e ) {
+			return null;
+		}
+
+		$data = $api->getResult()->getResultData( null, [
+			'Strip' => 'all',
+		] );
+
+		$count = 0;
+		if ( isset( $data['query']['pages'] ) ) {
+			foreach ( $data['query']['pages'] as $page ) {
+				if ( isset( $page['categoryinfo']['pages'] ) ) {
+					$count = (int)$page['categoryinfo']['pages'];
+				}
+			}
+		}
+
+		if ( $count <= 0 ) {
+			return null;
+		}
+
+		$title = Title::newFromText( $catTitle );
+		if ( !$title ) {
+			return null;
+		}
+
+		return [
+			'label' => $label,
+			'url' => $title->getLocalURL(),
+			'count' => $count,
+		];
+	}
+
 	private static function getArchiveMonths(): array {
 		$months = [];
 		$seen = [];
 		$thisMonth = self::getMonthAnchorInUTC();
+
+		$thisMonthCard = self::fetchMonthArchiveCard( $thisMonth, 'This Month' );
+		if ( $thisMonthCard ) {
+			$months[] = $thisMonthCard;
+			$seen[self::formatMonthCategory( $thisMonth )] = true;
+		}
+
 		// start from last month and go back up to 12 months (UTC month boundaries)
 		for ( $i = 1; $i <= 12; $i++ ) {
 			$archiveMonth = $thisMonth->modify( "-{$i} months" );
@@ -514,44 +568,10 @@ SVG;
 				continue;
 			}
 			$seen[$monthName] = true;
-			$catTitle = 'Category:' . $monthName;
 
-			$request = new FauxRequest( [
-				'action' => 'query',
-				'titles' => $catTitle,
-				'prop' => 'categoryinfo',
-			] );
-
-			$api = new ApiMain( $request, false );
-
-			try {
-				$api->execute();
-			} catch ( \Throwable $e ) {
-				continue;
-			}
-
-			$data = $api->getResult()->getResultData( null, [
-				'Strip' => 'all',
-			] );
-
-			$count = 0;
-			if ( isset( $data['query']['pages'] ) ) {
-				foreach ( $data['query']['pages'] as $page ) {
-					if ( isset( $page['categoryinfo']['pages'] ) ) {
-						$count = (int)$page['categoryinfo']['pages'];
-					}
-				}
-			}
-
-			if ( $count > 0 ) {
-				$title = Title::newFromText( $catTitle );
-				if ( $title ) {
-					$months[] = [
-						'label' => $monthName,
-						'url' => $title->getLocalURL(),
-						'count' => $count,
-					];
-				}
+			$archiveCard = self::fetchMonthArchiveCard( $archiveMonth, $monthName );
+			if ( $archiveCard ) {
+				$months[] = $archiveCard;
 			}
 		}
 
@@ -958,6 +978,7 @@ SVG;
 			if ( $id === NS_MAIN ) {
 				continue;
 			}
+
 			if ( strcasecmp( $name, $expectedName ) === 0 ) {
 				return $id;
 			}
@@ -965,6 +986,7 @@ SVG;
 
 		if ( defined( 'NS_MODERNBLOG' ) && NS_MODERNBLOG !== NS_MAIN ) {
 			$name = $namespaces[NS_MODERNBLOG] ?? null;
+
 			if ( is_string( $name ) && strcasecmp( $name, $expectedName ) === 0 ) {
 				return NS_MODERNBLOG;
 			}
@@ -983,6 +1005,7 @@ SVG;
 
 	private static function getBlogTimelineTitle(): ?Title {
 		$nsId = self::getBlogNamespaceId();
+
 		if ( $nsId === null ) {
 			return null;
 		}
@@ -992,6 +1015,7 @@ SVG;
 
 	private static function isUsableBlogMetadata( string $value ): bool {
 		$value = trim( $value );
+
 		if ( $value === '' || preg_match( '/^frame(\{\})?$/i', $value ) ) {
 			return false;
 		}
@@ -1001,6 +1025,7 @@ SVG;
 
 	private static function normalizeBlogTimestamp( string $dateRaw ): ?string {
 		$dateRaw = trim( $dateRaw );
+
 		if ( $dateRaw === '' ) {
 			return null;
 		}
@@ -1027,11 +1052,7 @@ SVG;
 
 		return trim( $t );
 	}
-
-	/**
-	 * @param list<int> $pageIds
-	 * @return array<int, array<string, string>>
-	 */
+	
 	private static function loadBlogPageProps( $dbr, array $pageIds ): array {
 		if ( $pageIds === [] ) {
 			return [];
@@ -1706,7 +1727,11 @@ SVG;
 				$amUrl = htmlspecialchars( $am['url'] );
 				$amLabel = htmlspecialchars( $am['label'] );
 				$amCount = (int)$am['count'];
-				$amDesc = htmlspecialchars( "View all {$amCount} obbies released in {$am['label']}" );
+				if ( $am['label'] === 'This Month' ) {
+					$amDesc = htmlspecialchars( "View all {$amCount} obbies released this month" );
+				} else {
+					$amDesc = htmlspecialchars( "View all {$amCount} obbies released in {$am['label']}" );
+				}
 				$archiveCardsHTML .= '<a href="' . $amUrl . '" class="obbywiki-archive__card">' .
 					'<span class="obbywiki-archive__card-title">' . $amLabel . '</span>' .
 					'<span class="obbywiki-archive__card-desc">' . $amDesc . '</span>' .
