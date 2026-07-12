@@ -1868,7 +1868,7 @@ SVG;
 	<section class="obbywiki-featured">
 		<div class="obbywiki-spotlight">
 			<div class="obbywiki-spotlight__viewport">
-				<span class="obbywiki-spotlight__chip">OBBY WIKI 	HIGHLIGHTS</span>
+				<!-- <span class="obbywiki-spotlight__chip">OBBY WIKI HIGHLIGHTS</span> -->
 				<div class="obbywiki-spotlight__track">
 					{$slidesHTML}
 				</div>
