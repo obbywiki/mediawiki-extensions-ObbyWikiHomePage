@@ -133,31 +133,33 @@
 			}
 		}
 
-		// ── button navigation ──
+		// ── button / bar navigation (desktop only, too small on mobile) ──
 
-		if ( prevBtn ) {
-			prevBtn.addEventListener( 'click', function () {
-				prev();
-				startAutoplay();
-			} );
-		}
+		var is_mobile_nav = window.matchMedia( '(max-width: 640px)' ).matches;
 
-		if ( nextBtn ) {
-			nextBtn.addEventListener( 'click', function () {
-				next();
-				startAutoplay();
-			} );
-		}
-
-		// ── bar click navigation ──
-
-		for ( var i = 0; i < bars.length; i++ ) {
-			( function ( idx ) {
-				bars[ idx ].addEventListener( 'click', function () {
-					goTo( idx );
+		if ( !is_mobile_nav ) {
+			if ( prevBtn ) {
+				prevBtn.addEventListener( 'click', function () {
+					prev();
 					startAutoplay();
 				} );
-			} )( i );
+			}
+
+			if ( nextBtn ) {
+				nextBtn.addEventListener( 'click', function () {
+					next();
+					startAutoplay();
+				} );
+			}
+
+			for ( var i = 0; i < bars.length; i++ ) {
+				( function ( idx ) {
+					bars[ idx ].addEventListener( 'click', function () {
+						goTo( idx );
+						startAutoplay();
+					} );
+				} )( i );
+			}
 		}
 
 		// ── touch: real-time drag with momentum snap ──
