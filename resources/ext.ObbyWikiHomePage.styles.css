@@ -732,19 +732,24 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 }
 
 .obbywiki-spotlight__bar {
+	display: block;
 	flex: 1;
 	height: 3px;
 	border-radius: 999px;
 	border: none;
 	background: rgba(255, 255, 255, 0.3);
-	cursor: pointer;
+	cursor: default;
 	padding: 0;
 	position: relative;
 	overflow: hidden;
 	transition: background 0.2s ease;
 }
 
-.obbywiki-spotlight__bar:hover {
+.obbywiki-spotlight__bar[role="button"] {
+	cursor: pointer;
+}
+
+.obbywiki-spotlight__bar[role="button"]:hover {
 	background: rgba(255, 255, 255, 0.5);
 }
 
@@ -777,14 +782,6 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 		pointer-events: none;
 		gap: 0;
 		padding: 0.375rem 0.625rem;
-	}
-
-	.obbywiki-spotlight__bar {
-		cursor: default;
-	}
-
-	.obbywiki-spotlight__bar:hover {
-		background: rgba(255, 255, 255, 0.3);
 	}
 }
 

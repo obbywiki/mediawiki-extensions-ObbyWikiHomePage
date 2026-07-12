@@ -137,7 +137,18 @@
 
 		var is_mobile_nav = window.matchMedia( '(max-width: 640px)' ).matches;
 
-		if ( !is_mobile_nav ) {
+		if ( is_mobile_nav ) {
+			if ( prevBtn ) {
+				prevBtn.hidden = true;
+				prevBtn.setAttribute( 'aria-hidden', 'true' );
+				prevBtn.tabIndex = -1;
+			}
+			if ( nextBtn ) {
+				nextBtn.hidden = true;
+				nextBtn.setAttribute( 'aria-hidden', 'true' );
+				nextBtn.tabIndex = -1;
+			}
+		} else {
 			if ( prevBtn ) {
 				prevBtn.addEventListener( 'click', function () {
 					prev();
@@ -154,9 +165,23 @@
 
 			for ( var i = 0; i < bars.length; i++ ) {
 				( function ( idx ) {
-					bars[ idx ].addEventListener( 'click', function () {
+					var bar = bars[ idx ];
+					bar.removeAttribute( 'aria-hidden' );
+					bar.setAttribute( 'role', 'button' );
+					bar.setAttribute( 'tabindex', '0' );
+					bar.setAttribute( 'aria-label', 'Slide ' + ( idx + 1 ) );
+
+					bar.addEventListener( 'click', function () {
 						goTo( idx );
 						startAutoplay();
+					} );
+
+					bar.addEventListener( 'keydown', function ( e ) {
+						if ( e.key === 'Enter' || e.key === ' ' ) {
+							e.preventDefault();
+							goTo( idx );
+							startAutoplay();
+						}
 					} );
 				} )( i );
 			}

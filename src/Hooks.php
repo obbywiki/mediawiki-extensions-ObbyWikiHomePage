@@ -1569,9 +1569,9 @@ SVG;
 				. '</a>';
 
 			$dotActive = $index === 0 ? ' obbywiki-spotlight__bar--active' : '';
-			$dotsHTML .= '<button class="obbywiki-spotlight__bar' . $dotActive
-				. '" data-index="' . $index . '" aria-label="Slide ' . ( $index + 1 ) . '">'
-				. '<span class="obbywiki-spotlight__bar-fill"></span></button>';
+			$dotsHTML .= '<span class="obbywiki-spotlight__bar' . $dotActive
+				. '" data-index="' . $index . '" aria-hidden="true">'
+				. '<span class="obbywiki-spotlight__bar-fill"></span></span>';
 
 			$index++;
 		}
