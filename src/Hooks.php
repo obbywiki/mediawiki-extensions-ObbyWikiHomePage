@@ -1850,10 +1850,9 @@ SVG;
 		<div class="obbywiki-home__actions">
 			<nav class="obbywiki-home__nav">{$navHTML}</nav>
 			<div class="obbywiki-home__search">
-				<form action="{$scriptPath}" method="get" class="obbywiki-home__search-form" role="search" aria-label="Search the wiki">
-					<input type="hidden" name="title" value="Special:Search">
+				<div class="obbywiki-home__search-form" role="search" aria-label="Search the wiki">
 					<div class="obbywiki-home__search-input citizen-search-trigger">Search the wiki…</div>
-					<button type="submit" class="obbywiki-home__search-btn" aria-label="Search">
+					<button class="obbywiki-home__search-btn citizen-search-trigger" aria-label="Search">
 						<img src="/load.php?modules=skins.citizen.icons&amp;image=search&amp;format=original&amp;lang=en&amp;skin=citizen" alt="" width="18" height="18">
 					</button>
 				</form>
