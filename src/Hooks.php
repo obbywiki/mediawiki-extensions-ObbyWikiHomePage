@@ -1561,7 +1561,7 @@ SVG;
 			$slidesHTML .= '<a href="' . $urlEsc . '" class="obbywiki-spotlight__slide' . $activeClass
 				. '" data-index="' . $index . '">'
 				. '<div class="obbywiki-spotlight__slide-info">'
-				. '<h3 class="obbywiki-spotlight__slide-title">' . $titleEsc . '</h3>'
+				. '<span class="obbywiki-spotlight__slide-title">' . $titleEsc . '</span>'
 				// . $statsHtml
 				. $descHTML
 				. '</div>'
