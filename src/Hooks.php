@@ -1300,7 +1300,7 @@ SVG;
 			$cardsHTML .= '<a href="' . $url_esc . '" class="obbywiki-blog-card">'
 				. self::buildBlogPostLogoHTML( $logoSVG )
 				. '<div class="obbywiki-blog-card__body">'
-				. '<h4 class="obbywiki-blog-card__title">' . $title_esc . '</h4>'
+				. '<h3 class="obbywiki-blog-card__title">' . $title_esc . '</h3>'
 				. '<p class="obbywiki-blog-card__excerpt">' . $blurb_esc . '</p>'
 				. '<div class="obbywiki-blog-card__meta">'
 				. $date_html
@@ -1314,7 +1314,7 @@ SVG;
 			. '<div class="obbywiki-blog__header">'
 			. '<div class="obbywiki-blog__header-main">'
 			. '<span class="obbywiki-blog__icon">' . $icon_svg . '</span>'
-			. '<h3 class="obbywiki-blog__title">Announcements</h3>'
+			. '<h2 class="obbywiki-blog__title">Announcements</h2>'
 			. '</div>'
 			. '<a href="' . $view_all_esc . '" class="obbywiki-blog__all">View all</a>'
 			. '</div>'
@@ -1561,7 +1561,7 @@ SVG;
 			$slidesHTML .= '<a href="' . $urlEsc . '" class="obbywiki-spotlight__slide' . $activeClass
 				. '" data-index="' . $index . '">'
 				. '<div class="obbywiki-spotlight__slide-info">'
-				. '<span class="obbywiki-spotlight__slide-title">' . $titleEsc . '</span>'
+				. '<h2 class="obbywiki-spotlight__slide-title">' . $titleEsc . '</h2>'
 				// . $statsHtml
 				. $descHTML
 				. '</div>'
@@ -1678,7 +1678,7 @@ SVG;
 		} else {
 			foreach ( $thisMonthPages as $group ) {
 				$monthLabel = htmlspecialchars( $group['month'] );
-				$thisMonthHTML .= '<h4 class="obbywiki-month__label">' . $monthLabel . '</h4>';
+				$thisMonthHTML .= '<h3 class="obbywiki-month__label">' . $monthLabel . '</h3>';
 				
 				foreach ( $group['pages'] as $mp ) {
 					$mpUrl = htmlspecialchars( $mp['url'] );
@@ -1765,7 +1765,7 @@ SVG;
 			$recentChangesHTML = '<section class="obbywiki-recent" aria-label="Recent Changes">' .
 				'<div class="obbywiki-recent__header">' .
 					'<span class="obbywiki-recent__icon"><svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="currentColor"><path d="M478-86q-152 0-264.5-101T87-440h127q15 99 89.5 163.5T478-212q112 0 190-78t78-190q0-112-78-190t-190-78q-57 0-109 23.5T279-657h82v97H94v-265h95v79q56-62 130.5-95T478-874q81 0 153 31t125.5 84.5Q810-705 841-633t31 153q0 81-31 153t-84.5 125.5Q703-148 631-117T478-86Zm107-218L433-456v-224h95v184l125 124-68 68Z"/></svg></span>' .
-					'<h3 class="obbywiki-recent__title">Recently Changed</h3>' .
+					'<h2 class="obbywiki-recent__title">Recently Changed</h2>' .
 				'</div>' .
 				'<div class="obbywiki-recent__list">' . $rcListHTML . '</div>' .
 			'</section>';
@@ -1794,7 +1794,7 @@ SVG;
 					'<span class="obbywiki-about__icon">' .
 						'<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M425-265h110v-255H425v255Zm97.5-332.25Q540-614.5 540-640t-17.25-42.75Q505.5-700 480-700t-42.75 17.25Q420-665.5 420-640t17.5 42.75Q455-580 480-580t42.5-17.25ZM480-46q-91 0-169.99-34.08-78.98-34.09-137.41-92.52-58.43-58.43-92.52-137.41Q46-389 46-480q0-91 34.08-169.99 34.09-78.98 92.52-137.41 58.43-58.43 137.41-92.52Q389-914 480-914q91 0 169.99 34.08 78.98 34.09 137.41 92.52 58.43 58.43 92.52 137.41Q914-571 914-480q0 91-34.08 169.99-34.09 78.98-92.52 137.41-58.43 58.43-137.41 92.52Q571-46 480-46Z"/></svg>' .
 					'</span>' .
-					'<h3 class="obbywiki-about__title">About The Obby Wiki</h3>' .
+					'<h2 class="obbywiki-about__title">About The Obby Wiki</h2>' .
 				'</div>' .
 			'</div>' .
 			'<div class="obbywiki-about__content">' .
@@ -1889,7 +1889,7 @@ SVG;
 				<span class="obbywiki-month__icon">
 					<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg>
 				</span>
-				<h3 class="obbywiki-month__title">Recent Releases</h3>
+				<h2 class="obbywiki-month__title">Recent Releases</h2>
 			</div>
 			<div class="obbywiki-month__list">
 				{$thisMonthHTML}
@@ -1902,7 +1902,7 @@ SVG;
 			<div class="obbywiki-aside__header">
 				<div class="obbywiki-aside__header-main">
 					<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="m240-160 40-160H120l20-80h160l40-160H180l20-80h160l40-160h80l-40 160h160l40-160h80l-40 160h160l-20 80H660l-40 160h160l-20 80H600l-40 160h-80l40-160H360l-40 160h-80Zm140-240h160l40-160H420l-40 160Z"/></svg></span>
-					<h3 class="obbywiki-aside__title">Obby Sub-genres</h3>
+					<h2 class="obbywiki-aside__title">Obby Sub-genres</h2>
 				</div>
 				<a href="{$categoryURLs['obby']}" class="obbywiki-aside__all">View all</a>
 			</div>
@@ -1921,7 +1921,7 @@ SVG;
 			<div class="obbywiki-aside__header">
 				<div class="obbywiki-aside__header-main">
 					<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"><title>edit</title><g fill="currentColor"><path d="m16.77 8 1.94-2a1 1 0 0 0 0-1.41l-3.34-3.3a1 1 0 0 0-1.41 0L12 3.23zM1 14.25V19h4.75l9.96-9.96-4.75-4.75z"/></g></svg></span>
-					<h3 class="obbywiki-aside__title">Start Contributing</h3>
+					<h2 class="obbywiki-aside__title">Start Contributing</h2>
 				</div>
 			</div>
 			<p class="obbywiki-aside__text">Whether you're a casual obby player, a content creator, or a developer, there's a place for you here. Learn more below.</p>
