@@ -1587,49 +1587,49 @@ SVG;
 			[
 				'url' => Title::newFromText( 'Category:Obby' )->getLocalURL(),
 				'label' => 'All Obbies',
-				'image' => $clAssetBase . 'ow_cl_1_1x.webp',
+				'image' => $clAssetBase . 'ow_cl_v2_1_1x.webp',
 				'priority' => 1, // always shown
 			],
 			[
 				'url' => Title::newFromText( 'New' )->getLocalURL(),
 				'label' => 'New Releases',
-				'image' => $clAssetBase . 'ow_cl_2_1x.webp',
+				'image' => $clAssetBase . 'ow_cl_v2_2_1x.webp',
 				'priority' => 2,
 			],
 			[
 				'url' => Title::newFromText( 'Category:Studio' )->getLocalURL(),
 				'label' => 'Studios',
-				'image' => $clAssetBase . 'ow_cl_3_1x.webp',
+				'image' => $clAssetBase . 'ow_cl_v2_3_1x.webp',
 				'priority' => 3,
 			],
 			[
 				'url' => Title::newFromText( 'Tiers' )->getLocalURL(),
 				'label' => 'Tiers',
-				'image' => $clAssetBase . 'ow_cl_4_1x.webp',
+				'image' => $clAssetBase . 'ow_cl_v2_4_1x.webp',
 				'priority' => 4,
 			],
 			[
 				'url' => Title::newFromText( 'Category:Above_1,000,000_visits' )->getLocalURL(),
 				'label' => 'Popular',
-				'image' => $clAssetBase . 'ow_cl_5_1x.webp',
+				'image' => $clAssetBase . 'ow_cl_v2_5_1x.webp',
 				'priority' => 5,
 			],
 			[
 				'url' => Title::newFromText( 'Category:Tower_Obby' )->getLocalURL(),
 				'label' => 'Towers',
-				'image' => $clAssetBase . 'ow_cl_6_1x.webp',
+				'image' => $clAssetBase . 'ow_cl_v2_6_1x.webp',
 				'priority' => 6,
 			],
 			[
 				'url' => Title::newFromText( 'List_of_all_known_obby-related_wikis' )->getLocalURL(),
 				'label' => 'Wikis',
-				'image' => $clAssetBase . 'ow_cl_7_1x.webp',
+				'image' => $clAssetBase . 'ow_cl_v2_7_1x.webp',
 				'priority' => 7,
 			],
 			[
 				'url' => Title::newFromText( 'Obby' )->getLocalURL(),
 				'label' => 'About Obbies',
-				'image' => $clAssetBase . 'ow_cl_8_1x.webp',
+				'image' => $clAssetBase . 'ow_cl_v2_8_1x.webp',
 				'priority' => 8,
 			],
 			// [
@@ -1641,7 +1641,7 @@ SVG;
 			[
 				'url' => Title::newFromText( 'Development:Get Started' )->getLocalURL(),
 				'label' => 'Get Started',
-				'image' => $clAssetBase . 'ow_cl_9_1x.webp',
+				'image' => $clAssetBase . 'ow_cl_v2_9_1x.webp',
 				'priority' => 9,
 			],
 			// [

@@ -751,7 +751,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	align-items: stretch;
 	gap: 5px;
 	width: 96px;
-	/* Stretch into nav top/bottom padding (cutout only) for larger hit targets */
+	/* stretch into nav top/bottom padding (cutout only) for larger hit targets */
 	height: calc(22px + 0.75rem);
 	margin-top: -0.375rem;
 	margin-bottom: -0.375rem;
@@ -767,7 +767,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	position: relative;
 }
 
-/* Visual 3px track — hit target is the full stretched bar height */
+/* visual 3px track. hit target is the full stretched bar height */
 .obbywiki-spotlight__bar::before {
 	content: '';
 	position: absolute;
