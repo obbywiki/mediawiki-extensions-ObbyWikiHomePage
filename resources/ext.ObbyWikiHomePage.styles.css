@@ -1629,3 +1629,13 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 		grid-template-columns: 1fr;
 	}
 }
+
+html.skin-theme-clientpref-day .obbywiki-home {
+	--color-progressive: #0050C7;
+}
+
+@media screen and (prefers-color-scheme: light) {
+	html.skin-theme-clientpref-os .obbywiki-home {
+		--color-progressive: #0050C7;
+	}
+}
