@@ -34,6 +34,13 @@
 			firstClone.tabIndex = -1;
 			lastClone.tabIndex = -1;
 
+			// dont let the off-screen first-slide clone keep LCP priority
+			var first_clone_img = firstClone.querySelector( 'img[fetchpriority]' );
+			if ( first_clone_img ) {
+				first_clone_img.removeAttribute( 'fetchpriority' );
+				first_clone_img.setAttribute( 'loading', 'lazy' );
+			}
+
 			track.appendChild( firstClone );
 			track.insertBefore( lastClone, originalSlides[ 0 ] );
 

@@ -1533,8 +1533,12 @@ SVG;
 
 			if ( $item['thumbnail'] ) {
 				$thumbEsc = htmlspecialchars( $item['thumbnail'] );
+				// prioritize first slide (LCP); lazy-load the rest
+				$imgLoadingMode = $index === 0
+					? ' fetchpriority="high"'
+					: ' loading="lazy"';
 				$mediaHtml = '<img class="obbywiki-spotlight__slide-img" src="'
-					. $thumbEsc . '" alt="' . $titleEsc . '" loading="lazy">';
+					. $thumbEsc . '" alt="' . $titleEsc . '"' . $imgLoadingMode . '>';
 			} else {
 				$hash = crc32( $item['title'] );
 				$hue = abs( $hash ) % 360;

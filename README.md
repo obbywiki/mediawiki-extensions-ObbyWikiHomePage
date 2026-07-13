@@ -20,7 +20,6 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * add alt text to thumbnails
 * "find obby games to play" sort/feature
 * add JSON-LD (`WebSite` + `SearchAction`), `og:image`, and canonical URL for the home page
-* first image on the home page should be fetchpriority=high, not loading=lazy
 
 ### UX
 * **Mobile Layout**: Refine stacking for "Spotlight" and "Archive" sections on small screens.
