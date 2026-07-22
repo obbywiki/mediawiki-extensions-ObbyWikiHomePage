@@ -1000,29 +1000,39 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 }
 
 .obbywiki-trending__grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(207px, 1fr));
-	gap: 0.75rem 0.875rem;
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 0.75rem;
 	align-items: start;
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.obbywiki-trending__grid::-webkit-scrollbar {
+	display: none;
 }
 
 .obbywiki-trending__card,
 .obbywiki-trending__card:visited {
 	display: flex;
+	flex: 1 1 0;
 	flex-direction: column;
-	min-width: 0;
-	overflow: hidden;
+	gap: 0.4375rem;
+	min-width: 148px;
+	max-width: 220px;
 	text-decoration: none;
 	color: var(--color-base, #202122);
-	background: var(--color-surface-1, #f8f9fa);
-	border-radius: var(--border-radius-medium, 8px);
-	box-shadow: var(--box-shadow-border, 0 0 0 1px var(--border-color-base, rgba(0, 0, 0, 0.08)));
-	transition: background-color 0.15s ease;
+	background: transparent;
+	border-radius: 0;
+	box-shadow: none;
+	overflow: visible;
+	transition: none;
 }
 
 .obbywiki-trending__card:hover,
 .obbywiki-trending__card:visited:hover {
-	background: var(--color-surface-2, #eaecf0);
+	background: transparent;
 	text-decoration: none;
 	color: var(--color-base, #202122);
 }
@@ -1038,6 +1048,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	flex-shrink: 0;
 	aspect-ratio: 16 / 9;
 	overflow: hidden;
+	border-radius: var(--border-radius-medium, 8px);
 	background: var(--color-surface-2, #eaecf0);
 }
 
@@ -1128,7 +1139,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	align-items: center;
 	gap: 0.5rem;
 	min-width: 0;
-	padding: 0.5rem 0.625rem 0.5625rem;
+	padding: 0 0.0625rem;
 }
 
 /* chips with the same colors as aside sub-genre cards */
@@ -1176,12 +1187,13 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 
 @media (max-width: 640px) {
 	.obbywiki-trending__grid {
-		grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-		gap: 0.625rem 0.75rem;
+		gap: 0.625rem;
 	}
 
-	.obbywiki-trending__meta {
-		padding: 0.4375rem 0.5rem 0.5rem;
+	.obbywiki-trending__card,
+	.obbywiki-trending__card:visited {
+		flex-basis: 160px;
+		max-width: 180px;
 	}
 
 	.obbywiki-trending__card .obbywiki-trending__name,
