@@ -970,7 +970,232 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	line-height: 1.4;
 }
 
-/* ASIDE SECTION — below the featured grid */
+/* TRENDING soft-dep TrendingArticles (grid) */
+.obbywiki-trending {
+	display: flex;
+	flex-direction: column;
+	gap: 0.625rem;
+}
+
+.obbywiki-trending__header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.obbywiki-trending__icon {
+	display: flex;
+	align-items: center;
+	color: var(--color-subtle, #54595d);
+	line-height: 1;
+}
+
+.obbywiki-trending__title {
+	font-size: 0.8125rem;
+	font-weight: 700;
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--color-subtle, #54595d);
+}
+
+.obbywiki-trending__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(207px, 1fr));
+	gap: 0.75rem 0.875rem;
+	align-items: start;
+}
+
+.obbywiki-trending__card,
+.obbywiki-trending__card:visited {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	overflow: hidden;
+	text-decoration: none;
+	color: var(--color-base, #202122);
+	background: var(--color-surface-1, #f8f9fa);
+	border-radius: var(--border-radius-medium, 8px);
+	box-shadow: var(--box-shadow-border, 0 0 0 1px var(--border-color-base, rgba(0, 0, 0, 0.08)));
+	transition: background-color 0.15s ease;
+}
+
+.obbywiki-trending__card:hover,
+.obbywiki-trending__card:visited:hover {
+	background: var(--color-surface-2, #eaecf0);
+	text-decoration: none;
+	color: var(--color-base, #202122);
+}
+
+.obbywiki-trending__card:focus-visible {
+	outline: 2px solid var(--color-progressive, #36c);
+	outline-offset: 2px;
+}
+
+.obbywiki-trending__media {
+	position: relative;
+	display: block;
+	flex-shrink: 0;
+	aspect-ratio: 16 / 9;
+	overflow: hidden;
+	background: var(--color-surface-2, #eaecf0);
+}
+
+.obbywiki-trending__image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.35s ease;
+}
+
+.obbywiki-trending__card:hover .obbywiki-trending__image {
+	transform: scale(1.04);
+}
+
+.obbywiki-trending__media--placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(
+		135deg,
+		hsl(var(--thumb-hue, 210), 55%, 48%),
+		hsl(calc(var(--thumb-hue, 210) + 40), 45%, 38%)
+	);
+}
+
+.obbywiki-trending__placeholder-initial {
+	color: rgba(255, 255, 255, 0.45);
+	font-size: 1.75rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	line-height: 1;
+}
+
+/* hover info overlay */
+.obbywiki-trending__info {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	padding: 0.625rem 0.75rem;
+	background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.35) 70%, transparent 100%);
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+	pointer-events: none;
+}
+
+.obbywiki-trending__card:hover .obbywiki-trending__info,
+.obbywiki-trending__card:focus-visible .obbywiki-trending__info {
+	opacity: 1;
+}
+
+.obbywiki-trending__card .obbywiki-trending__name,
+.obbywiki-trending__card:visited .obbywiki-trending__name {
+	font-size: 0.8125rem;
+	font-weight: 700;
+	margin: 0;
+	color: #fff;
+	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	line-height: 1.3;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.obbywiki-trending__card .obbywiki-trending__desc,
+.obbywiki-trending__card:visited .obbywiki-trending__desc {
+	font-size: 0.6875rem;
+	margin: 0;
+	color: rgba(255, 255, 255, 0.85);
+	line-height: 1.4;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.obbywiki-trending__meta {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 0;
+	padding: 0.5rem 0.625rem 0.5625rem;
+}
+
+/* chips with the same colors as aside sub-genre cards */
+.obbywiki-trending__card .obbywiki-trending__genre,
+.obbywiki-trending__card:visited .obbywiki-trending__genre {
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 1;
+	min-width: 0;
+	max-width: 100%;
+	padding: 0.25rem 0.5rem;
+	border-radius: var(--border-radius-base, 8px);
+	background: hsl(var(--type-hue, 210), 38%, 30%);
+	color: hsl(var(--type-hue, 210), 20%, 96%);
+	font-size: 0.625rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	line-height: 1.2;
+	text-transform: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.obbywiki-trending__card .obbywiki-trending__views,
+.obbywiki-trending__card:visited .obbywiki-trending__views {
+	flex-shrink: 0;
+	margin-left: auto;
+	font-size: 0.6875rem;
+	font-weight: 600;
+	line-height: 1.2;
+	color: var(--color-subtle, #54595d);
+	font-variant-numeric: tabular-nums;
+}
+
+@media (hover: none) {
+	.obbywiki-trending__info {
+		opacity: 1;
+	}
+
+	.obbywiki-trending__card:hover .obbywiki-trending__image {
+		transform: none;
+	}
+}
+
+@media (max-width: 640px) {
+	.obbywiki-trending__grid {
+		grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+		gap: 0.625rem 0.75rem;
+	}
+
+	.obbywiki-trending__meta {
+		padding: 0.4375rem 0.5rem 0.5rem;
+	}
+
+	.obbywiki-trending__card .obbywiki-trending__name,
+	.obbywiki-trending__card:visited .obbywiki-trending__name {
+		font-size: 0.75rem;
+	}
+
+	.obbywiki-trending__card .obbywiki-trending__desc,
+	.obbywiki-trending__card:visited .obbywiki-trending__desc {
+		font-size: 0.625rem;
+	}
+}
+
+/* ASIDE SECTION below the featured grid */
 .obbywiki-aside {
 	display: flex;
 	gap: 1rem;

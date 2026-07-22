@@ -4,9 +4,11 @@ namespace MediaWiki\Extension\ObbyWikiHomePage;
 
 use Article;
 use MediaWiki\Api\ApiMain;
-use MediaWiki\Output\OutputPage;
-use MediaWiki\Request\FauxRequest;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Output\OutputPage;
+use MediaWiki\Parser\Sanitizer;
+use MediaWiki\Registration\ExtensionRegistry;
+use MediaWiki\Request\FauxRequest;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
 use Skin;
@@ -19,7 +21,20 @@ class Hooks {
 	private const BLOG_PROP_TITLE = 'modernblog-title';
 	private const BLOG_PROP_AUTHOR = 'modernblog-author';
 	private const BLOG_PROP_SUBTITLE = 'modernblog-subtitle';
-	private const HOME_PAGE_CACHE_VERSION = 'v10'; // only reset for large changes
+	private const HOME_PAGE_CACHE_VERSION = 'v14'; // only reset for large changes
+	private const TRENDING_THUMB_SIZE = 368;
+
+	/** @var array<string,array{label:string,hue:int}> Category title => genre chip (priority order). */
+	private const TRENDING_GENRE_CATEGORIES = [
+		'Category:Tower Stage Obby' => [ 'label' => 'Tower Stage', 'hue' => 320 ],
+		'Category:Difficulty Chart Obby' => [ 'label' => 'Difficulty Chart', 'hue' => 28 ],
+		'Category:Classic Obby' => [ 'label' => 'Classic', 'hue' => 210 ],
+		'Category:Tower Obby' => [ 'label' => 'Tower', 'hue' => 275 ],
+		'Category:Gimmick Obby' => [ 'label' => 'Gimmick', 'hue' => 160 ],
+		'Category:Tier Obby' => [ 'label' => 'Tiered', 'hue' => 45 ],
+		'Category:Troll Obby' => [ 'label' => 'Troll', 'hue' => 350 ],
+		'Category:Co-Op Obby' => [ 'label' => 'Co-Op', 'hue' => 195 ],
+	];
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 
@@ -128,7 +143,17 @@ class Hooks {
 		$archiveMonths = self::getArchiveMonths();
 		$recentChanges = self::getRecentChanges();
 		$blogPosts = self::getBlogPosts();
-		return self::buildHomePageHTML( $logoSVG, $carouselItems, $siteStats, $thisMonthPages, $archiveMonths, $recentChanges, $blogPosts );
+		$trendingPages = self::getTrendingPages();
+		return self::buildHomePageHTML(
+			$logoSVG,
+			$carouselItems,
+			$siteStats,
+			$thisMonthPages,
+			$archiveMonths,
+			$recentChanges,
+			$blogPosts,
+			$trendingPages
+		);
 	}
 
 	private static function getObbyPages(): array {
@@ -629,6 +654,185 @@ SVG;
 		}
 
 		return $changes;
+	}
+
+	 // soft-dep on TrendingArticles; top pages in a category by recent/all-time views
+	// @return list<array{title:string,url:string,thumbnail:?string,description:?string,genre:?string,genre_hue:?int,views:int,views_period:string}>
+	private static function getTrendingPages(): array {
+		global $wgObbyWikiHomePageTrendingLimit, $wgObbyWikiHomePageTrendingCategory;
+
+		if ( !ExtensionRegistry::getInstance()->isLoaded( 'TrendingArticles' ) ) {
+			return [];
+		}
+
+		$trending_query = \MediaWiki\Extension\Trending\TrendingQuery::class;
+		if ( !class_exists( $trending_query ) ) {
+			return [];
+		}
+
+		$limit = (int)( $wgObbyWikiHomePageTrendingLimit ?? 6 );
+		if ( $limit <= 0 ) {
+			return [];
+		}
+
+		$category_text = trim( (string)( $wgObbyWikiHomePageTrendingCategory ?? 'Category:Obby' ) );
+		$category = Title::newFromText( $category_text );
+		if ( !$category || !$category->inNamespace( NS_CATEGORY ) ) {
+			return [];
+		}
+
+		$views_period = 'week';
+		$pages = $trending_query::getTopPagesInCategory(
+			$category,
+			$limit,
+			$trending_query::PERIOD_WEEK
+		);
+		if ( $pages === [] ) {
+			$views_period = 'all';
+			$pages = $trending_query::getTopPagesInCategory(
+				$category,
+				$limit,
+				$trending_query::PERIOD_ALL
+			);
+		}
+		if ( $pages === [] ) {
+			return [];
+		}
+
+		return self::enrichTrendingPages( $pages, $views_period );
+	}
+
+	/**
+	 * @param list<array{title:Title,count:int}> $pages
+	 * @return list<array{title:string,url:string,thumbnail:?string,description:?string,genre:?string,genre_hue:?int,views:int,views_period:string}>
+	 */
+	private static function enrichTrendingPages( array $pages, string $views_period = 'week' ): array {
+		$title_texts = [];
+		foreach ( $pages as $entry ) {
+			$title_texts[] = $entry['title']->getPrefixedText();
+		}
+
+		$genre_filter = implode( '|', array_keys( self::TRENDING_GENRE_CATEGORIES ) );
+
+		$request = new FauxRequest( [
+			'action' => 'query',
+			'titles' => implode( '|', $title_texts ),
+			'prop' => 'pageimages|pageprops|categories',
+			'piprop' => 'thumbnail',
+			'pithumbsize' => (string)self::TRENDING_THUMB_SIZE,
+			'ppprop' => 'shortdesc|displaytitle',
+			'clcategories' => $genre_filter,
+			'cllimit' => 'max',
+		] );
+
+		$api = new ApiMain( $request, false );
+		$by_prefixed = [];
+
+		try {
+			$api->execute();
+			$data = $api->getResult()->getResultData( null, [
+				'Strip' => 'all',
+			] );
+
+			if ( isset( $data['query']['pages'] ) ) {
+				foreach ( $data['query']['pages'] as $page ) {
+					if ( !isset( $page['title'] ) ) {
+						continue;
+					}
+					$page_title = Title::newFromText( $page['title'] );
+					if ( !$page_title ) {
+						continue;
+					}
+
+					$display_title = $page_title->getText();
+					if ( isset( $page['pageprops']['displaytitle'] ) ) {
+						$stripped = Sanitizer::stripAllTags( (string)$page['pageprops']['displaytitle'] );
+						if ( $stripped !== '' ) {
+							$display_title = $stripped;
+						}
+					}
+
+					$genre = self::resolveTrendingGenre( $page['categories'] ?? [] );
+					$by_prefixed[$page_title->getPrefixedText()] = [
+						'title' => $display_title,
+						'url' => $page_title->getLocalURL(),
+						'thumbnail' => $page['thumbnail']['source'] ?? null,
+						'description' => $page['pageprops']['shortdesc'] ?? null,
+						'genre' => $genre['label'] ?? null,
+						'genre_hue' => $genre['hue'] ?? null,
+					];
+				}
+			}
+		} catch ( \Throwable $e ) {
+			// fall through to title-only rows
+		}
+
+		// Prefer PageImages via TrendingPageMedia when available (same stack as category grids)
+		$trending_media = \MediaWiki\Extension\Trending\TrendingPageMedia::class;
+		$media = class_exists( $trending_media )
+			? $trending_media::getForPages( $pages, self::TRENDING_THUMB_SIZE )
+			: [];
+
+		$result = [];
+		foreach ( $pages as $entry ) {
+			/** @var Title $title */
+			$title = $entry['title'];
+			$key = $title->getPrefixedText();
+			$row = $by_prefixed[$key] ?? [
+				'title' => $title->getText(),
+				'url' => $title->getLocalURL(),
+				'thumbnail' => null,
+				'description' => null,
+				'genre' => null,
+				'genre_hue' => null,
+			];
+
+			$page_id = $title->getArticleID();
+			$page_media = $media[$page_id] ?? [];
+			if ( isset( $page_media['thumbnail']['source'] ) && is_string( $page_media['thumbnail']['source'] ) ) {
+				$row['thumbnail'] = $page_media['thumbnail']['source'];
+			}
+			if ( empty( $row['description'] ) ) {
+				$shortdesc = $page_media['shortdesc'] ?? '';
+				if ( is_string( $shortdesc ) && $shortdesc !== '' ) {
+					$row['description'] = $shortdesc;
+				}
+			}
+			if ( isset( $page_media['display_title'] ) && is_string( $page_media['display_title'] ) ) {
+				$stripped = Sanitizer::stripAllTags( $page_media['display_title'] );
+				if ( $stripped !== '' ) {
+					$row['title'] = $stripped;
+				}
+			}
+
+			$row['views'] = (int)( $entry['count'] ?? 0 );
+			$row['views_period'] = $views_period;
+			$result[] = $row;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param list<array{title?:string}> $categories
+	 * @return array{label:string,hue:int}|null
+	 */
+	private static function resolveTrendingGenre( array $categories ): ?array {
+		$present = [];
+		foreach ( $categories as $cat ) {
+			$cat_title = $cat['title'] ?? '';
+			if ( $cat_title !== '' ) {
+				$present[$cat_title] = true;
+			}
+		}
+
+		foreach ( self::TRENDING_GENRE_CATEGORIES as $cat_title => $genre ) {
+			if ( isset( $present[$cat_title] ) ) {
+				return $genre;
+			}
+		}
+
+		return null;
 	}
 
 	// private static function normalizeDiscourseExcerpt( string $excerpt ): string {
@@ -1458,7 +1662,7 @@ SVG;
 
 	// MAIN
 	// builds the full html
-	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [] ): string {
+	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [], array $trendingPages = [] ): string {
 		global $wgExtensionAssetsPath;
 		$scriptPath = wfScript();
 		$blogPostsHTML = self::buildBlogPostsHTML( $blogPosts, $logoSVG );
@@ -1708,6 +1912,74 @@ SVG;
 			}
 		}
 
+		// trending (soft-dep TrendingArticles)
+		$trendingHTML = '';
+		if ( !empty( $trendingPages ) ) {
+			$trendingListHTML = '';
+			foreach ( $trendingPages as $tp ) {
+				$tpUrl = htmlspecialchars( $tp['url'] );
+				$tpTitle = htmlspecialchars( $tp['title'] );
+				$tpGenre = !empty( $tp['genre'] ) ? htmlspecialchars( $tp['genre'] ) : '';
+				$tpDesc = !empty( $tp['description'] ) ? htmlspecialchars( $tp['description'] ) : '';
+				$tpViews = (int)( $tp['views'] ?? 0 );
+				$tpHue = isset( $tp['genre_hue'] ) ? (int)$tp['genre_hue'] : 210;
+
+				$genreHtml = $tpGenre !== ''
+					? '<span class="obbywiki-trending__genre" style="--type-hue: ' . $tpHue . '">'
+						. $tpGenre . '</span>'
+					: '';
+
+				$viewsHtml = $tpViews > 0
+					? '<span class="obbywiki-trending__views" title="views last week">'
+						. htmlspecialchars( number_format( $tpViews ) ) . '</span>'
+					: '';
+
+				$descHtml = $tpDesc !== ''
+					? '<p class="obbywiki-trending__desc">' . $tpDesc . '</p>'
+					: '';
+
+				$infoHtml = '<span class="obbywiki-trending__info">'
+					. '<span class="obbywiki-trending__name">' . $tpTitle . '</span>'
+					. $descHtml
+					. '</span>';
+
+				if ( !empty( $tp['thumbnail'] ) ) {
+					$tpThumb = htmlspecialchars( $tp['thumbnail'] );
+					$mediaHtml = '<span class="obbywiki-trending__media">'
+						. '<img class="obbywiki-trending__image" src="' . $tpThumb
+						. '" alt="" loading="lazy" decoding="async">'
+						. $infoHtml
+						. '</span>';
+				} else {
+					$hash = crc32( $tp['title'] );
+					$hue = abs( $hash ) % 360;
+					$initial = mb_substr( $tp['title'], 0, 1 );
+					$mediaHtml = '<span class="obbywiki-trending__media obbywiki-trending__media--placeholder" style="--thumb-hue: '
+						. $hue . '">'
+						. '<span class="obbywiki-trending__placeholder-initial" aria-hidden="true">' . htmlspecialchars( $initial ) . '</span>'
+						. $infoHtml
+						. '</span>';
+				}
+
+				$metaHtml = ( $genreHtml !== '' || $viewsHtml !== '' )
+					? '<span class="obbywiki-trending__meta">' . $genreHtml . $viewsHtml . '</span>'
+					: '';
+
+				$trendingListHTML .= '<a href="' . $tpUrl . '" class="obbywiki-trending__card">'
+					. $mediaHtml
+					. $metaHtml
+					. '</a>';
+			}
+
+			$trendingHTML = '<section class="obbywiki-trending" aria-label="Trending">' .
+				'<div class="obbywiki-trending__header">' .
+					'<span class="obbywiki-trending__icon"><svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" fill="currentColor"><path d="m136-240-56-56 296-298 160 160 208-206H640v-80h240v240h-80v-104L536-320 376-480 136-240Z"/></svg></span>' .
+					'<h2 class="obbywiki-trending__title">Trending</h2>' .
+				'</div>' .
+				'<div class="obbywiki-trending__grid">' . $trendingListHTML . '</div>' .
+			'</section>';
+		}
+
 		// build category URLs for the aside
 		$categoryURLs = [
 			'classic' => htmlspecialchars( Title::newFromText( 'Category:Classic Obby' )->getLocalURL() ),
@@ -1950,6 +2222,8 @@ SVG;
 	</aside>
 
 	{$archiveHTML}
+
+	{$trendingHTML}
 
 	{$blogPostsHTML}
 

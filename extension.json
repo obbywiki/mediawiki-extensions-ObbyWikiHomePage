@@ -13,6 +13,12 @@
 		"MediaWiki": ">=1.45.1"
 	},
 
+	"suggests": {
+		"extensions": {
+			"TrendingArticles": "*"
+		}
+	},
+
 	"AutoloadClasses": {
 		"MediaWiki\\Extension\\ObbyWikiHomePage\\Hooks": "src/Hooks.php"
 	},
@@ -76,6 +82,14 @@
 		"ObbyWikiHomePageBlogTimelinePage": {
 			"value": "Timeline",
 			"description": "Timeline archive page name within the blog namespace (Blog:Timeline by default)."
+		},
+		"ObbyWikiHomePageTrendingLimit": {
+			"value": 6,
+			"description": "Maximum number of trending pages to show on the home page (requires TrendingArticles)."
+		},
+		"ObbyWikiHomePageTrendingCategory": {
+			"value": "Category:Obby",
+			"description": "Category whose members are ranked for the home page Trending section (requires TrendingArticles)."
 		}
 	}
 }

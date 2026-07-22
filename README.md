@@ -10,7 +10,6 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * **External Links**: Add a section for community hubs (Discord, Twitter, Roblox Groups).
 * **Dynamic Browse**: Move hardcoded categories to extension configuration.
 * **Site Statistics**: Create a visual "At a Glance" section for wiki-wide stats. Somewhere below the area, maybe split the contributing section and put this as the other half.
-* **Trending Section**: Feature pages with high recent growth or view counts. (NEEDS EXTENSION SUPPORT FIRST)
 * **Spotlight carousel**: Fix automatic featured-page selection (displaytitle parsing is finicky) and re-enable when stable; support rotation/diversity so the same pages are not always shown.
 * Add dynamic site events like seasonal obby highlights and other events like sales in games
 * "On this day..." releases (potentialy better with a template and cargo)
