@@ -46,6 +46,32 @@
 	display: none !important;
 }
 
+/* RADIAL BLUR/GLOW EFFECT */
+.obbywiki-homepage {
+	background-image: radial-gradient(
+		ellipse 85% 60% at 50% 0%,
+		color-mix(in srgb, #0061F3 34%, transparent) 0%,
+		color-mix(in srgb, #0061F3 18%, transparent) 22%,
+		color-mix(in srgb, #0061F3 8%, transparent) 48%,
+		transparent 78%
+	);
+	background-repeat: no-repeat;
+	background-size: 100% 48rem;
+	background-position: top center;
+}
+
+.obbywiki-homepage .mw-header,
+.obbywiki-homepage #citizen-header,
+.obbywiki-homepage .citizen-header {
+	background-color: color-mix(
+		in srgb,
+		var(--color-surface-0, var(--background-color-base, #fff)) 55%,
+		transparent
+	) !important;
+	backdrop-filter: saturate(1.15) blur(16px);
+	-webkit-backdrop-filter: saturate(1.15) blur(16px);
+}
+
 /* CONTAINER */
 .obbywiki-home {
 	display: flex;
@@ -1848,6 +1874,17 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 
 /* stack on small screens */
 @media (max-width: 600px) {
+	.obbywiki-homepage {
+		background-image: radial-gradient(
+			ellipse 110% 55% at 100% 0%,
+			color-mix(in srgb, #0061F3 34%, transparent) 0%,
+			color-mix(in srgb, #0061F3 18%, transparent) 22%,
+			color-mix(in srgb, #0061F3 8%, transparent) 48%,
+			transparent 78%
+		);
+		background-position: top right;
+	}
+
 	.obbywiki-home__header {
 		flex-direction: column;
 		gap: 0.75rem;
