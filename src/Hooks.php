@@ -22,7 +22,7 @@ class Hooks {
 	private const BLOG_PROP_AUTHOR = 'modernblog-author';
 	private const BLOG_PROP_SUBTITLE = 'modernblog-subtitle';
 	// cache
-	private const HOME_PAGE_CACHE_VERSION = 'v14'; // only reset for large changes
+	private const HOME_PAGE_CACHE_VERSION = 'v15'; // only reset for large changes
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 	// trending
@@ -1250,7 +1250,7 @@ SVG;
 				$badgeHTML = '<span class="obbywiki-home__nav-badge">' . htmlspecialchars( $link['badge'] ) . '</span>';
 			}
 
-			$navHTML .= '<a href="' . $urlEsc . '" class="obbywiki-home__nav-btn" title="' . $labelEsc . '">'
+			$navHTML .= '<a href="' . $urlEsc . '" class="obbywiki-home__nav-btn" aria-label="' . $labelEsc . '">'
 				. $iconHTML . $badgeHTML
 				. '</a>';
 		}
