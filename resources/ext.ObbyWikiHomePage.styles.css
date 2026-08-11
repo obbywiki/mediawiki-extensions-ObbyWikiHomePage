@@ -1865,6 +1865,16 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	.obbywiki-featured {
 		grid-template-columns: 1fr;
 	}
+
+	.obbywiki-month {
+		min-width: 0;
+	}
+	
+	.obbywiki-month__list {
+		flex: none;
+		min-height: auto;
+		overflow-y: visible;
+	}
 }
 
 html.skin-theme-clientpref-day .obbywiki-home {

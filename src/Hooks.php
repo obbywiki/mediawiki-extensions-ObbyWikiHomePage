@@ -1321,7 +1321,7 @@ SVG;
 			],
 			[
 				'url' => Title::newFromText( 'New' )->getLocalURL(),
-				'label' => 'New Releases',
+				'label' => 'Recent Releases',
 				'image' => $clAssetBase . 'ow_cl_v2_2_1x.webp',
 				'priority' => 2,
 			],
