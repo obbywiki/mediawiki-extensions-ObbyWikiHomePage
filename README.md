@@ -1,10 +1,21 @@
 # ObbyWikiHomePage
 
-Add an ObbyWiki-specific custom home page, overwriting `Home` by default with custom HTML. Intended for use on obbywiki.com. Supports MW 1.45-1.46. Minimum version is locked to 1.45.1, but the extension is mostly compatible with MW 1.43.
+Add an ObbyWiki-specific custom home page, overwriting `Home` by default with custom HTML. Intended for use on obby.wiki. Supports MW 1.45-1.46. Minimum version is locked to 1.45.1, but the extension is mostly compatible with MW 1.43.
 
-Automated pulling for the highlights carousel is currently disabled because it does not work correctly.
+
+This extension was designed for usage on Obby Wiki server architecture and is not guaranteed to be functional elsewhere.
+
+## Dependencies
+
+### Soft Dependencies
+
+The following extensions provide functionality but are not required:
+
+* [TrendingArticles](https://github.com/wikux/mediawiki-extensions-TrendingArticles)
 
 ## TODO
+
+Automated pulling for the highlights carousel is currently disabled because it does not work correctly.
 
 ### Functionality
 * **External Links**: Add a section for community hubs (Discord, Twitter, Roblox Groups).
@@ -19,11 +30,7 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * add JSON-LD (`WebSite` + `SearchAction`), `og:image`, and canonical URL for the home page
 
 ### UX
-* **Mobile Layout**: Refine stacking for "Spotlight" and "Archive" sections on small screens.
-  * Additionally, probably just refine the entire layout
-* **Dark Mode**: Improve dark mode styling
 * respect `prefers-reduced-motion` for carousel autoplay; improve keyboard/focus on spotlight slides (clones are not focusable)
-* move remaining inline styles (announcements stub, etc.) into the stylesheet
 
 ### Technical
 * **Localization (i18n)**: Move hardcoded strings to system messages.
