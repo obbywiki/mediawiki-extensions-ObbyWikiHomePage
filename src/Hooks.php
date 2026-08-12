@@ -1127,7 +1127,7 @@ SVG;
 		return $posts;
 	}
 
-	private static function formatBlogPostDateHTML( string $timestamp ): string {
+	private static function formatRelativeTimeHTML( string $timestamp, string $extraClass = '' ): string {
 		if ( $timestamp === '' ) {
 			return '';
 		}
@@ -1138,10 +1138,19 @@ SVG;
 		}
 
 		$label = self::getRelativeTime( $timestamp );
+		$iso = wfTimestamp( TS_ISO_8601, $timestamp );
+		$classes = 'obbywiki-relative-time';
+		if ( $extraClass !== '' ) {
+			$classes .= ' ' . $extraClass;
+		}
 
-		return '<time class="obbywiki-blog-card__date" datetime="'
-			. htmlspecialchars( $timestamp, ENT_QUOTES ) . '">'
+		return '<time class="' . htmlspecialchars( $classes, ENT_QUOTES ) . '" datetime="'
+			. htmlspecialchars( $iso, ENT_QUOTES ) . '">'
 			. htmlspecialchars( $label, ENT_QUOTES ) . '</time>';
+	}
+
+	private static function formatBlogPostDateHTML( string $timestamp ): string {
+		return self::formatRelativeTimeHTML( $timestamp, 'obbywiki-blog-card__date' );
 	}
 
 	private static function buildBlogPostLogoHTML( string $logoSVG ): string {
@@ -1551,7 +1560,7 @@ SVG;
 				$rcArticleURL = htmlspecialchars( $rc['url'] );
 				$rcTitle = htmlspecialchars( $rc['title'] );
 				$rcUser = htmlspecialchars( $rc['user'] );
-				$rcTime = htmlspecialchars( self::getRelativeTime( $rc['timestamp'] ) );
+				$rcTime = self::formatRelativeTimeHTML( $rc['timestamp'] );
 
 				$rcListHTML .= '<a href="' . $rcArticleURL . '" class="obbywiki-recent__item">' .
 					'<span class="obbywiki-recent__item-title">' . $rcTitle . '</span>' .

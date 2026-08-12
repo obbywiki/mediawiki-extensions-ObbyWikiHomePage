@@ -1,7 +1,57 @@
 ( function () {
 	'use strict';
 
-	function init() {
+	// usually accurate relative time formatter
+
+	var RELATIVE_TIME_INTERVAL_MS = 30000;
+
+	function formatRelativeTime( unixSeconds ) {
+		var diff = Math.max( 0, Math.floor( Date.now() / 1000 ) - unixSeconds );
+
+		if ( diff < 60 ) {
+			return 'Just now';
+		}
+
+		if ( diff < 3600 ) {
+			var mins = Math.floor( diff / 60 );
+			return mins + ' min' + ( mins > 1 ? 's' : '' ) + ' ago';
+		}
+
+		if ( diff < 86400 ) {
+			var hours = Math.floor( diff / 3600 );
+			return hours + ' hr' + ( hours > 1 ? 's' : '' ) + ' ago';
+		}
+
+		var days = Math.floor( diff / 86400 );
+		return days + ' day' + ( days > 1 ? 's' : '' ) + ' ago';
+	}
+
+	function initRelativeTimes() {
+		var elements = document.querySelectorAll( 'time.obbywiki-relative-time[datetime]' );
+		if ( elements.length === 0 ) {
+			return;
+		}
+
+		function updateAll() {
+			for ( var i = 0; i < elements.length; i++ ) {
+				var el = elements[ i ];
+				var parsed = Date.parse( el.getAttribute( 'datetime' ) );
+				if ( isNaN( parsed ) ) {
+					continue;
+				}
+
+				var label = formatRelativeTime( Math.floor( parsed / 1000 ) );
+				if ( el.textContent !== label ) {
+					el.textContent = label;
+				}
+			}
+		}
+
+		updateAll();
+		setInterval( updateAll, RELATIVE_TIME_INTERVAL_MS );
+	}
+
+	function initSpotlight() {
 		var viewport = document.querySelector( '.obbywiki-spotlight__viewport' );
 		var track = document.querySelector( '.obbywiki-spotlight__track' );
 		var originalSlides = document.querySelectorAll( '.obbywiki-spotlight__slide' );
@@ -274,6 +324,11 @@
 		}
 
 		startAutoplay();
+	}
+
+	function init() {
+		initRelativeTimes();
+		initSpotlight();
 	}
 
 	if ( document.readyState === 'loading' ) {
