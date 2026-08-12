@@ -12,6 +12,7 @@ This extension was designed for usage on Obby Wiki server architecture and is no
 The following extensions provide functionality but are not required:
 
 * [TrendingArticles](https://github.com/wikux/mediawiki-extensions-TrendingArticles)
+* [ModernBlog](https://github.com/obbywiki/mediawiki-extensions-ModernBlog)
 
 ## TODO
 
