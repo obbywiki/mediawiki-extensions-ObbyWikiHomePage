@@ -13,6 +13,7 @@ use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
 use Skin;
 use Wikimedia\ObjectCache\WANObjectCache;
+use MediaWiki\Html\TemplateParser;
 
 class Hooks {
 	// modernblog (see https://github.com/obbywiki/mediawiki-extensions-ModernBlog)
@@ -1209,6 +1210,7 @@ SVG;
 	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [], array $trendingPages = [] ): string {
 		global $wgExtensionAssetsPath;
 		$scriptPath = wfScript();
+		$templateParser = new TemplateParser( dirname( __DIR__ ) . '/templates' );
 		$blogPostsHTML = self::buildBlogPostsHTML( $blogPosts, $logoSVG );
 
 		$clAssetBase = ( $wgExtensionAssetsPath ?? '/extensions' ) . '/ObbyWikiHomePage/resources/images/cl/';
@@ -1596,12 +1598,14 @@ SVG;
 		$editsCount = number_format( $siteStats['edits'] );
 		$aboutHTML = '<section class="obbywiki-about" aria-label="About the Wiki">' .
 			'<div class="obbywiki-about__header">' .
-				'<div class="obbywiki-about__header-main">' .
-					'<span class="obbywiki-about__icon">' .
-						'<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M425-265h110v-255H425v255Zm97.5-332.25Q540-614.5 540-640t-17.25-42.75Q505.5-700 480-700t-42.75 17.25Q420-665.5 420-640t17.5 42.75Q455-580 480-580t42.5-17.25ZM480-46q-91 0-169.99-34.08-78.98-34.09-137.41-92.52-58.43-58.43-92.52-137.41Q46-389 46-480q0-91 34.08-169.99 34.09-78.98 92.52-137.41 58.43-58.43 137.41-92.52Q389-914 480-914q91 0 169.99 34.08 78.98 34.09 137.41 92.52 58.43 58.43 92.52 137.41Q914-571 914-480q0 91-34.08 169.99-34.09 78.98-92.52 137.41-58.43 58.43-137.41 92.52Q571-46 480-46Z"/></svg>' .
-					'</span>' .
-					'<h2 class="obbywiki-about__title">About The Obby Wiki</h2>' .
-				'</div>' .
+				$templateParser->processTemplate(
+					'Header',
+					[
+						'id' => 'about',
+						'title' => 'About The Obby Wiki',
+						'svg' => '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M425-265h110v-255H425v255Zm97.5-332.25Q540-614.5 540-640t-17.25-42.75Q505.5-700 480-700t-42.75 17.25Q420-665.5 420-640t17.5 42.75Q455-580 480-580t42.5-17.25ZM480-46q-91 0-169.99-34.08-78.98-34.09-137.41-92.52-58.43-58.43-92.52-137.41Q46-389 46-480q0-91 34.08-169.99 34.09-78.98 92.52-137.41 58.43-58.43 137.41-92.52Q389-914 480-914q91 0 169.99 34.08 78.98 34.09 137.41 92.52 58.43 58.43 92.52 137.41Q914-571 914-480q0 91-34.08 169.99-34.09 78.98-92.52 137.41-58.43 58.43-137.41 92.52Q571-46 480-46Z"/></svg>',
+					]
+				) .
 			'</div>' .
 			'<div class="obbywiki-about__content">' .
 				'<div class="obbywiki-about__stats">' .

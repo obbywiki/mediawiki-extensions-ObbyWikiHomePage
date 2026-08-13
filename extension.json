@@ -47,6 +47,12 @@
 		"ext.ObbyWikiHomePage.scripts": {
 			"scripts": "resources/ext.ObbyWikiHomePage.js",
 			"targets": ["desktop", "mobile"]
+		},
+		"ext.ObbyWikiHomePage.interface": {
+			"templates": {
+				"Header.mustache": "templates/Header.mustache"
+			},
+			"targets": ["desktop", "mobile"]
 		}
 	},
 
