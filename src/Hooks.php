@@ -1597,32 +1597,26 @@ SVG;
 		$userCount = number_format( $siteStats['users'] );
 		$editsCount = number_format( $siteStats['edits'] );
 		$aboutHTML = '<section class="obbywiki-about" aria-label="About the Wiki">' .
-			'<div class="obbywiki-about__header">' .
-				$templateParser->processTemplate(
-					'Header',
-					[
-						'id' => 'about',
-						'title' => 'About The Obby Wiki',
-						'svg' => '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M425-265h110v-255H425v255Zm97.5-332.25Q540-614.5 540-640t-17.25-42.75Q505.5-700 480-700t-42.75 17.25Q420-665.5 420-640t17.5 42.75Q455-580 480-580t42.5-17.25ZM480-46q-91 0-169.99-34.08-78.98-34.09-137.41-92.52-58.43-58.43-92.52-137.41Q46-389 46-480q0-91 34.08-169.99 34.09-78.98 92.52-137.41 58.43-58.43 137.41-92.52Q389-914 480-914q91 0 169.99 34.08 78.98 34.09 137.41 92.52 58.43 58.43 92.52 137.41Q914-571 914-480q0 91-34.08 169.99-34.09 78.98-92.52 137.41-58.43 58.43-137.41 92.52Q571-46 480-46Z"/></svg>',
-					]
-				) .
-			'</div>' .
+			$templateParser->processTemplate(
+				'Header',
+				[
+					'id' => 'about',
+					'title' => 'About The Obby Wiki',
+					'svg' => '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M425-265h110v-255H425v255Zm97.5-332.25Q540-614.5 540-640t-17.25-42.75Q505.5-700 480-700t-42.75 17.25Q420-665.5 420-640t17.5 42.75Q455-580 480-580t42.5-17.25ZM480-46q-91 0-169.99-34.08-78.98-34.09-137.41-92.52-58.43-58.43-92.52-137.41Q46-389 46-480q0-91 34.08-169.99 34.09-78.98 92.52-137.41 58.43-58.43 137.41-92.52Q389-914 480-914q91 0 169.99 34.08 78.98 34.09 137.41 92.52 58.43 58.43 92.52 137.41Q914-571 914-480q0 91-34.08 169.99-34.09 78.98-92.52 137.41-58.43 58.43-137.41 92.52Q571-46 480-46Z"/></svg>',
+				]
+			) .
 			'<div class="obbywiki-about__content">' .
-				'<div class="obbywiki-about__stats">' .
-					'<div class="obbywiki-about__stat">' .
-						'<span class="obbywiki-about__stat-value">' . $articlesCount . '</span>' .
-						'<span class="obbywiki-about__stat-label">Articles</span>' .
-					'</div>' .
-					'<div class="obbywiki-about__stat">' .
-						'<span class="obbywiki-about__stat-value">' . $editsCount . '</span>' .
-						'<span class="obbywiki-about__stat-label">Edits</span>' .
-					'</div>' .
-					'<div class="obbywiki-about__stat">' .
-						'<span class="obbywiki-about__stat-value">' . $userCount . '</span>' .
-						'<span class="obbywiki-about__stat-label">Total Users</span>' .
-					'</div>' .
-					'<div class="obbywiki-about__since">Since April 2025</div>' .
-				'</div>' .
+				$templateParser->processTemplate(
+				'Statsbar',
+				[
+					'stats' => [
+						[ 'value' => $articlesCount, 'label' => 'Articles' ],
+						[ 'value' => $editsCount, 'label' => 'Edits' ],
+						[ 'value' => $userCount, 'label' => 'Total Users' ],
+					]
+					
+				]
+			) .
 				'<p class="obbywiki-about__text">An <a href="' . $obbyURL . '">obby</a> is a genre of game on Roblox that is essentially an obstacle course or 3D platformer. Players complete levels that gradually ascend in difficulty until the end of the game, with countless variations from <a href="' . $classicURL . '">classic platformers</a> to <a href="' . $towerURL . '">towers</a>, <a href="' . $dcoURL . '">difficulty chart obbies</a>, and <a href="' . $gimmickURL . '">unique spins on the genre</a>. It has been one of the platform\'s most popular genres since the mid-2010s, spanning hundreds of thousands of unique games.</p>' .
 				'<p class="obbywiki-about__text">The Obby Wiki (also referred to as the Roblox Obby Wiki) is an independent, community-run encyclopedia dedicated to documenting Roblox obbies and everything surrounding them. From individual games, their creators, studios, mechanics, glitches, terminology, their communities, and more. Our goal is to provide the most comprehensive, accurate, and complete information about as many obbies as possible. The genre is consistently undocumented, with many games being forgotten entirely. This is <a href="' . $aboutWhyURL . '">why the Obby Wiki</a> exists.</p>' .
 				'<p class="obbywiki-about__text">Help contribute to the largest database and collection of Roblox obbies ever created, with over <a href="' . $allObbiesURL . '">' . $articlesCount . '</a> articles and counting.</p>' .

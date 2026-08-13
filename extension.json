@@ -50,7 +50,9 @@
 		},
 		"ext.ObbyWikiHomePage.interface": {
 			"templates": {
-				"Header.mustache": "templates/Header.mustache"
+				"Header.mustache": "templates/Header.mustache",
+				"Stat.mustache": "templates/Stat.mustache",
+				"Statsbar.mustache": "templates/Statsbar.mustache"
 			},
 			"targets": ["desktop", "mobile"]
 		}
