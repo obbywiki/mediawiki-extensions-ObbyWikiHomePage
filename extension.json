@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "ObbyWikiHomePage",
 	"description": "Implements the custom home page for the Obby Wiki. Designed for the Citizen skin.",
-	"author": ["[https://obby.wiki ObbyWiki]"],
+	"author": ["[https://obby.wiki The Obby Wiki]"],
 	"version": "0.2.0",
 	"license-name": "MIT",
 	"url": "https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage",

@@ -634,11 +634,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	justify-content: center;
 	width: 100%;
 	height: 100%;
-	background: linear-gradient(
-		135deg,
-		hsl(var(--card-hue, 210), 60%, 50%),
-		hsl(calc(var(--card-hue, 210) + 50), 50%, 40%)
-	);
+	background: var(--color-surface-2);
 }
 
 .obbywiki-spotlight__slide-placeholder span {
