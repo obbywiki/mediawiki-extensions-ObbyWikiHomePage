@@ -1607,16 +1607,16 @@ SVG;
 			) .
 			'<div class="obbywiki-about__content">' .
 				$templateParser->processTemplate(
-				'Statsbar',
-				[
-					'stats' => [
-						[ 'value' => $articlesCount, 'label' => 'Articles' ],
-						[ 'value' => $editsCount, 'label' => 'Edits' ],
-						[ 'value' => $userCount, 'label' => 'Total Users' ],
+					'Statsbar',
+					[
+						'stats' => [
+							[ 'value' => $articlesCount, 'label' => 'Articles' ],
+							[ 'value' => $editsCount, 'label' => 'Edits' ],
+							[ 'value' => $userCount, 'label' => 'Total Users' ],
+						]
+						
 					]
-					
-				]
-			) .
+				) .
 				'<p class="obbywiki-about__text">An <a href="' . $obbyURL . '">obby</a> is a genre of game on Roblox that is essentially an obstacle course or 3D platformer. Players complete levels that gradually ascend in difficulty until the end of the game, with countless variations from <a href="' . $classicURL . '">classic platformers</a> to <a href="' . $towerURL . '">towers</a>, <a href="' . $dcoURL . '">difficulty chart obbies</a>, and <a href="' . $gimmickURL . '">unique spins on the genre</a>. It has been one of the platform\'s most popular genres since the mid-2010s, spanning hundreds of thousands of unique games.</p>' .
 				'<p class="obbywiki-about__text">The Obby Wiki (also referred to as the Roblox Obby Wiki) is an independent, community-run encyclopedia dedicated to documenting Roblox obbies and everything surrounding them. From individual games, their creators, studios, mechanics, glitches, terminology, their communities, and more. Our goal is to provide the most comprehensive, accurate, and complete information about as many obbies as possible. The genre is consistently undocumented, with many games being forgotten entirely. This is <a href="' . $aboutWhyURL . '">why the Obby Wiki</a> exists.</p>' .
 				'<p class="obbywiki-about__text">Help contribute to the largest database and collection of Roblox obbies ever created, with over <a href="' . $allObbiesURL . '">' . $articlesCount . '</a> articles and counting.</p>' .

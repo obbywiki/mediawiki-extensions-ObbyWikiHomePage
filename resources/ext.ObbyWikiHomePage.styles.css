@@ -192,7 +192,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	align-items: center;
 	justify-content: center;
 	padding: 0.4375rem 0.625rem;
-	background: var(--color-progressive);
+	background: var(--background-color-progressive);
 	color: #fff;
 	border: none;
 	cursor: pointer;
@@ -200,7 +200,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 }
 
 .obbywiki-home__search-btn:hover {
-	background: var(--color-progressive--hover, #447ff5);
+	background: var(--background-color-progressive--hover, #447ff5);
 }
 
 .obbywiki-home__search-btn img {
@@ -1362,8 +1362,8 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 
 .obbywiki-featured__aside-cta-link:hover,
 .obbywiki-featured__aside-cta-link:visited:hover {
-	background: var(--color-progressive);
-	border-color: var(--color-progressive);
+	background: var(--background-color-progressive);
+	border-color: var(--background-color-progressive);
 	color: #fff;
 	text-decoration: none;
 }
