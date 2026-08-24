@@ -1745,8 +1745,8 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 
 .obbywiki-about__link:hover,
 .obbywiki-about__link:visited:hover {
-	background: var(--color-progressive);
-	border-color: var(--color-progressive);
+	background: var(--background-color-progressive);
+	border-color: var(--background-color-progressive);
 	color: #fff;
 	text-decoration: none;
 }
