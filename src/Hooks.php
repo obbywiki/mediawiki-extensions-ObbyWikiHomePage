@@ -1521,7 +1521,7 @@ SVG;
 			'gimmick' => htmlspecialchars( Title::newFromText( 'Category:Gimmick Obby' )->getLocalURL() ),
 			'tier' => htmlspecialchars( Title::newFromText( 'Category:Tier Obby' )->getLocalURL() ),
 			'troll' => htmlspecialchars( Title::newFromText( 'Category:Troll Obby' )->getLocalURL() ),
-			'coop' => htmlspecialchars( Title::newFromText( 'Category:Co-Op Obby' )->getLocalURL() ),
+			'flood' => htmlspecialchars( Title::newFromText( 'Category:Flood-type' )->getLocalURL() ),
 			'obby' => htmlspecialchars( Title::newFromText( 'Category:Obby' )->getLocalURL() ),
 			'stubs' => htmlspecialchars( Title::newFromText( 'Category:Stubs' )->getLocalURL() ),
 			'contributing' => htmlspecialchars( Title::newFromText( 'Help:Contributing' )->getLocalURL() ),
@@ -1717,7 +1717,7 @@ SVG;
 				<a href="{$categoryURLs['gimmick']}" class="obbywiki-aside__type-card" style="--type-hue: 160">Gimmick Obby</a>
 				<a href="{$categoryURLs['tier']}" class="obbywiki-aside__type-card" style="--type-hue: 45">Tiered Obby</a>
 				<a href="{$categoryURLs['troll']}" class="obbywiki-aside__type-card" style="--type-hue: 350">Troll Obby</a>
-				<a href="{$categoryURLs['coop']}" class="obbywiki-aside__type-card" style="--type-hue: 195">Co-Op Obby</a>
+				<a href="{$categoryURLs['flood']}" class="obbywiki-aside__type-card" style="--type-hue: 195">Flood-type</a>
 			</div>
 		</div>
 		<div class="obbywiki-aside__card">
