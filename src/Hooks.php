@@ -23,7 +23,7 @@ class Hooks {
 	private const BLOG_PROP_AUTHOR = 'modernblog-author';
 	private const BLOG_PROP_SUBTITLE = 'modernblog-subtitle';
 	// cache
-	private const HOME_PAGE_CACHE_VERSION = 'v15'; // only reset for large changes
+	private const HOME_PAGE_CACHE_VERSION = 'v22'; // only reset for large changes
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 	// trending
@@ -39,6 +39,18 @@ class Hooks {
 		'Category:Tier Obby' => [ 'label' => 'Tiered', 'hue' => 45 ],
 		'Category:Troll Obby' => [ 'label' => 'Troll', 'hue' => 350 ],
 		'Category:Co-Op Obby' => [ 'label' => 'Co-Op', 'hue' => 195 ],
+	];
+
+	/** @var list<array{key:string,title:string,label:string,hue:int}> */
+	private const SUB_GENRE_CARDS = [
+		[ 'key' => 'classic', 'title' => 'Category:Classic Obby', 'label' => 'Classic Obby', 'hue' => 210 ],
+		[ 'key' => 'tower', 'title' => 'Category:Tower Obby', 'label' => 'Tower Obby', 'hue' => 275 ],
+		[ 'key' => 'towerstage', 'title' => 'Category:Tower Stage Obby', 'label' => 'Tower Stage Obby', 'hue' => 320 ],
+		[ 'key' => 'dco', 'title' => 'Category:Difficulty Chart Obby', 'label' => 'Difficulty Chart Obby', 'hue' => 28 ],
+		[ 'key' => 'gimmick', 'title' => 'Category:Gimmick Obby', 'label' => 'Gimmick Obby', 'hue' => 160 ],
+		[ 'key' => 'tier', 'title' => 'Category:Tier Obby', 'label' => 'Tiered Obby', 'hue' => 45 ],
+		[ 'key' => 'troll', 'title' => 'Category:Troll Obby', 'label' => 'Troll Obby', 'hue' => 350 ],
+		[ 'key' => 'flood', 'title' => 'Category:Flood-type', 'label' => 'Flood-type', 'hue' => 195 ],
 	];
 
 	private static function isTargetPage( Title $title ): bool {
@@ -145,6 +157,9 @@ class Hooks {
 		$recentChanges = self::getRecentChanges();
 		$blogPosts = self::getBlogPosts();
 		$trendingPages = self::getTrendingPages();
+		$subGenreCounts = self::fetchCategoryPageCounts(
+			array_column( self::SUB_GENRE_CARDS, 'title' )
+		);
 		return self::buildHomePageHTML(
 			$logoSVG,
 			$carouselItems,
@@ -153,7 +168,8 @@ class Hooks {
 			$archiveMonths,
 			$recentChanges,
 			$blogPosts,
-			$trendingPages
+			$trendingPages,
+			$subGenreCounts
 		);
 	}
 
@@ -541,6 +557,47 @@ SVG;
 			'url' => $title->getLocalURL(),
 			'count' => $count,
 		];
+	}
+
+	private static function fetchCategoryPageCounts( array $titles ): array {
+		$counts = [];
+		foreach ( $titles as $title ) {
+			$counts[$title] = 0;
+		}
+
+		if ( $titles === [] ) {
+			return $counts;
+		}
+
+		$request = new FauxRequest( [
+			'action' => 'query',
+			'titles' => implode( '|', $titles ),
+			'prop' => 'categoryinfo',
+		] );
+
+		$api = new ApiMain( $request, false );
+
+		try {
+			$api->execute();
+		} catch ( \Throwable $e ) {
+			return $counts;
+		}
+
+		$data = $api->getResult()->getResultData( null, [
+			'Strip' => 'all',
+		] );
+
+		if ( isset( $data['query']['pages'] ) ) {
+			foreach ( $data['query']['pages'] as $page ) {
+				$pageTitle = $page['title'] ?? '';
+				if ( $pageTitle === '' ) {
+					continue;
+				}
+				$counts[$pageTitle] = (int)( $page['categoryinfo']['pages'] ?? 0 );
+			}
+		}
+
+		return $counts;
 	}
 
 	private static function getArchiveMonths(): array {
@@ -1207,7 +1264,7 @@ SVG;
 
 	// MAIN
 	// builds the full html
-	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [], array $trendingPages = [] ): string {
+	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [], array $trendingPages = [], array $subGenreCounts = [] ): string {
 		global $wgExtensionAssetsPath;
 		$scriptPath = wfScript();
 		$templateParser = new TemplateParser( dirname( __DIR__ ) . '/templates' );
@@ -1527,6 +1584,18 @@ SVG;
 			'contributing' => htmlspecialchars( Title::newFromText( 'Help:Contributing' )->getLocalURL() ),
 		];
 
+		$typeGridHTML = '';
+		foreach ( self::SUB_GENRE_CARDS as $card ) {
+			$cardUrl = $categoryURLs[$card['key']] ?? '';
+			$cardCount = (int)( $subGenreCounts[$card['title']] ?? 0 );
+			$cardCountLabel = number_format( $cardCount );
+			$typeGridHTML .= '<a href="' . $cardUrl . '" class="obbywiki-aside__type-card" style="--type-hue: '
+				. (int)$card['hue'] . '">'
+				. htmlspecialchars( $card['label'] )
+				. ' <span class="obbywiki-aside__type-count">(' . htmlspecialchars( $cardCountLabel ) . ')</span>'
+				. '</a>';
+		}
+
 		// archive section html
 		$archiveHTML = '';
 		if ( !empty( $archiveMonths ) ) {
@@ -1596,6 +1665,27 @@ SVG;
 		$articlesCount = number_format( $siteStats['articles'] );
 		$userCount = number_format( $siteStats['users'] );
 		$editsCount = number_format( $siteStats['edits'] );
+		$filesCount = number_format( $siteStats['images'] );
+		$citizenIconUrl = static function ( string $name ): string {
+			return '/load.php?modules=skins.citizen.icons&image=' . rawurlencode( $name )
+				. '&format=original&lang=en&skin=citizen';
+		};
+		$contributeStat = static function ( string $icon, string $value, string $label ) use ( $citizenIconUrl ): string {
+			$icon_url = $citizenIconUrl( $icon );
+			return '<span class="obbywiki-aside__stat" role="listitem" title="'
+				. htmlspecialchars( $label ) . '" aria-label="'
+				. htmlspecialchars( $value . ' ' . $label ) . '">'
+				. '<span class="obbywiki-aside__stat-icon" aria-hidden="true" style="--icon-url: url(&quot;'
+				. htmlspecialchars( $icon_url, ENT_QUOTES ) . '&quot;)"></span>'
+				. '<span>' . htmlspecialchars( $value ) . '</span>'
+				. '</span>';
+		};
+		$contributeStatsHTML = '<div class="obbywiki-aside__stats" role="list" aria-label="Wiki statistics">'
+			. $contributeStat( 'article', $articlesCount, 'Articles' )
+			. $contributeStat( 'image', $filesCount, 'Files' )
+			. $contributeStat( 'edit', $editsCount, 'Edits' )
+			. $contributeStat( 'userAvatar', $userCount, 'Users' )
+			. '</div>';
 		$aboutHTML = '<section class="obbywiki-about" aria-label="About the Wiki">' .
 			$templateParser->processTemplate(
 				'Header',
@@ -1606,17 +1696,6 @@ SVG;
 				]
 			) .
 			'<div class="obbywiki-about__content">' .
-				$templateParser->processTemplate(
-					'Statsbar',
-					[
-						'stats' => [
-							[ 'value' => $articlesCount, 'label' => 'Articles' ],
-							[ 'value' => $editsCount, 'label' => 'Edits' ],
-							[ 'value' => $userCount, 'label' => 'Total Users' ],
-						]
-						
-					]
-				) .
 				'<p class="obbywiki-about__text">An <a href="' . $obbyURL . '">obby</a> is a genre of game on Roblox that is essentially an obstacle course or 3D platformer. Players complete levels that gradually ascend in difficulty until the end of the game, with countless variations from <a href="' . $classicURL . '">classic platformers</a> to <a href="' . $towerURL . '">towers</a>, <a href="' . $dcoURL . '">difficulty chart obbies</a>, and <a href="' . $gimmickURL . '">unique spins on the genre</a>. It has been one of the platform\'s most popular genres since the mid-2010s, spanning hundreds of thousands of unique games.</p>' .
 				'<p class="obbywiki-about__text">The Obby Wiki (also referred to as the Roblox Obby Wiki) is an independent, community-run encyclopedia dedicated to documenting Roblox obbies and everything surrounding them. From individual games, their creators, studios, mechanics, glitches, terminology, their communities, and more. Our goal is to provide the most comprehensive, accurate, and complete information about as many obbies as possible. The genre is consistently undocumented, with many games being forgotten entirely. This is <a href="' . $aboutWhyURL . '">why the Obby Wiki</a> exists.</p>' .
 				'<p class="obbywiki-about__text">Help contribute to the largest database and collection of Roblox obbies ever created, with over <a href="' . $allObbiesURL . '">' . $articlesCount . '</a> articles and counting.</p>' .
@@ -1710,14 +1789,7 @@ SVG;
 				<a href="{$categoryURLs['obby']}" class="obbywiki-aside__all">View all</a>
 			</div>
 			<div class="obbywiki-aside__type-grid">
-				<a href="{$categoryURLs['classic']}" class="obbywiki-aside__type-card" style="--type-hue: 210">Classic Obby</a>
-				<a href="{$categoryURLs['tower']}" class="obbywiki-aside__type-card" style="--type-hue: 275">Tower Obby</a>
-				<a href="{$categoryURLs['towerstage']}" class="obbywiki-aside__type-card" style="--type-hue: 320">Tower Stage Obby</a>
-				<a href="{$categoryURLs['dco']}" class="obbywiki-aside__type-card" style="--type-hue: 28">Difficulty Chart Obby</a>
-				<a href="{$categoryURLs['gimmick']}" class="obbywiki-aside__type-card" style="--type-hue: 160">Gimmick Obby</a>
-				<a href="{$categoryURLs['tier']}" class="obbywiki-aside__type-card" style="--type-hue: 45">Tiered Obby</a>
-				<a href="{$categoryURLs['troll']}" class="obbywiki-aside__type-card" style="--type-hue: 350">Troll Obby</a>
-				<a href="{$categoryURLs['flood']}" class="obbywiki-aside__type-card" style="--type-hue: 195">Flood-type</a>
+				{$typeGridHTML}
 			</div>
 		</div>
 		<div class="obbywiki-aside__card">
@@ -1729,22 +1801,27 @@ SVG;
 			</div>
 			<p class="obbywiki-aside__text">Whether you're a casual obby player, a content creator, or a developer, there's a place for you here. Learn more below.</p>
 			<div class="obbywiki-featured__aside-cta-links">
-				<a href="{$categoryURLs['contributing']}" class="obbywiki-featured__aside-cta-link">
-					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M10 1a9 9 0 109 9 9 9 0 00-9-9m1 14H9v-2h2zm0-4H9V5h2z"/></svg>
-					How to Contribute
-				</a>
-				<a class="obbywiki-featured__aside-cta-link owaf-new-article-trigger" style="cursor:pointer;">
-					<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="M444-288h72v-156h156v-72H516v-156h-72v156H288v72h156v156Zm36.28 192Q401-96 331-126t-122.5-82.5Q156-261 126-330.96t-30-149.5Q96-560 126-629.5q30-69.5 82.5-122T330.96-834q69.96-30 149.5-30t149.04 30q69.5 30 122 82.5T834-629.28q30 69.73 30 149Q864-401 834-331t-82.5 122.5Q699-156 629.28-126q-69.73 30-149 30Z"/></svg>
-					Create a new article
-				</a>
-				<a href="{$categoryURLs['stubs']}" class="obbywiki-featured__aside-cta-link">
-					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
-					Pages that need improvement
-				</a>
-				<a href="/wiki/Special:WantedPages" class="obbywiki-featured__aside-cta-link" rel="nofollow"> <!-- engines cant crawl special pages -->
-					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
-					Wanted new pages
-				</a>
+				<div class="obbywiki-featured__aside-cta-row">
+					<a class="obbywiki-featured__aside-cta-add owaf-new-article-trigger" aria-label="Create a new article">
+						<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+					</a>
+					<span class="obbywiki-featured__aside-cta-divider" aria-hidden="true">|</span>
+					<div class="obbywiki-featured__aside-cta-stack">
+						<a href="{$categoryURLs['contributing']}" class="obbywiki-featured__aside-cta-link">
+							<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M10 1a9 9 0 109 9 9 9 0 00-9-9m1 14H9v-2h2zm0-4H9V5h2z"/></svg>
+							How to Contribute
+						</a>
+						<a href="{$categoryURLs['stubs']}" class="obbywiki-featured__aside-cta-link">
+							<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
+							Pages that need improvement
+						</a>
+						<a href="/wiki/Special:WantedPages" class="obbywiki-featured__aside-cta-link" rel="nofollow"> <!-- engines cant crawl special pages -->
+							<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
+							Wanted new pages
+						</a>
+					</div>
+				</div>
+				{$contributeStatsHTML}
 			</div>
 		</div>
 	</aside>
