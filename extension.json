@@ -2,51 +2,51 @@
 	"manifest_version": 2,
 	"name": "ObbyWikiHomePage",
 	"description": "Implements the custom home page for the Obby Wiki. Designed for the Citizen skin.",
-	"author": ["[https://obby.wiki The Obby Wiki]"],
-	"version": "0.2.0",
+	"author": [
+		"[https://obby.wiki The Obby Wiki]"
+	],
+	"version": "0.3.0",
 	"license-name": "MIT",
 	"url": "https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage",
-
 	"type": "other",
-
 	"requires": {
 		"MediaWiki": ">=1.45.1"
 	},
-
 	"suggests": {
 		"extensions": {
 			"TrendingArticles": "*"
 		}
 	},
-
 	"AutoloadClasses": {
 		"MediaWiki\\Extension\\ObbyWikiHomePage\\Hooks": "src/Hooks.php"
 	},
-
 	"HookHandlers": {
 		"ObbyWikiHomePageHooks": {
 			"class": "MediaWiki\\Extension\\ObbyWikiHomePage\\Hooks"
 		}
 	},
-
 	"Hooks": {
 		"ArticleViewHeader": "ObbyWikiHomePageHooks",
 		"BeforePageDisplay": "ObbyWikiHomePageHooks"
 	},
-
 	"ResourceFileModulePaths": {
 		"localBasePath": "",
 		"remoteExtPath": "ObbyWikiHomePage"
 	},
-
 	"ResourceModules": {
 		"ext.ObbyWikiHomePage.styles": {
 			"styles": "resources/ext.ObbyWikiHomePage.styles.css",
-			"targets": ["desktop", "mobile"]
+			"targets": [
+				"desktop",
+				"mobile"
+			]
 		},
 		"ext.ObbyWikiHomePage.scripts": {
 			"scripts": "resources/ext.ObbyWikiHomePage.js",
-			"targets": ["desktop", "mobile"]
+			"targets": [
+				"desktop",
+				"mobile"
+			]
 		},
 		"ext.ObbyWikiHomePage.interface": {
 			"templates": {
@@ -54,10 +54,12 @@
 				"Stat.mustache": "templates/Stat.mustache",
 				"Statsbar.mustache": "templates/Statsbar.mustache"
 			},
-			"targets": ["desktop", "mobile"]
+			"targets": [
+				"desktop",
+				"mobile"
+			]
 		}
 	},
-
 	"config": {
 		"ObbyWikiHomePageTitle": {
 			"value": "Home",
