@@ -164,7 +164,7 @@ class Hooks {
 									{
 										"media": {"url": "https://obby.wiki/images/thumb/a/aa/GameThumbnail-16851760655-c4fa58dc550d.webp/400px-GameThumbnail-16851760655-c4fa58dc550d.webp"},
 										"description": "Allural"
-									},
+									}
 								]
 							},
 							{
