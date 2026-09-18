@@ -151,10 +151,6 @@ class Hooks {
 						"accent_color": 25075,
 						"components": [
 							{
-								"type": 10,
-								"content": "A wiki all about obbies."
-							},
-							{
 								"type": 2,
 								"style": 5,
 								"label": "All Obbies",
