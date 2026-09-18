@@ -151,22 +151,31 @@ class Hooks {
 						"accent_color": 25075,
 						"components": [
 							{
-								"type": 2,
-								"style": 5,
-								"label": "All Obbies",
-								"url": "https://obby.wiki/Category:Obby"
+								"type": 10,
+								"content": "A wiki all about obbies."
 							},
 							{
-								"type": 2,
-								"style": 5,
-								"label": "About",
-								"url": "https://obby.wiki/Obby_Wiki:About"
-							},
-							{
-								"type": 2,
-								"style": 5,
-								"label": "Blog",
-								"url": "https://obby.wiki/Blog:Timeline"
+								"type": 1,
+								"components": [
+									{
+										"type": 2,
+										"style": 5,
+										"label": "All Obbies",
+										"url": "https://obby.wiki/Category:Obby"
+									},
+									{
+										"type": 2,
+										"style": 5,
+										"label": "About",
+										"url": "https://obby.wiki/Obby_Wiki:About"
+									},
+									{
+										"type": 2,
+										"style": 5,
+										"label": "Blog",
+										"url": "https://obby.wiki/Blog:Timeline"
+									}
+								]
 							}
 						]
 					}
