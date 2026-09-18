@@ -152,7 +152,30 @@ class Hooks {
 						"components": [
 							{
 								"type": 10,
-								"content": "A wiki all about obbies."
+								"content": "# Home"
+							},
+							{
+								"type": 10,
+								"content": "-# The Obby Wiki"
+							},
+							{
+								"type": 12,
+								"items": [
+									{
+										{
+											"media": {"url": "https://obby.wiki/images/thumb/a/aa/GameThumbnail-16851760655-c4fa58dc550d.webp/400px-GameThumbnail-16851760655-c4fa58dc550d.webp"},
+											"description": "Allural"
+										},
+									}
+								]
+							},
+							{
+								"type": 10,
+								"content": "The leading community-run and independent wiki for information and archives on Roblox obbies that anyone can contribute to."
+							},
+							{
+								"type": 10,
+								"content": "> From the Obby Wiki, a wiki all about obbies."
 							},
 							{
 								"type": 1,
