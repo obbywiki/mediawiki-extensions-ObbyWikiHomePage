@@ -23,7 +23,7 @@ class Hooks {
 	private const BLOG_PROP_AUTHOR = 'modernblog-author';
 	private const BLOG_PROP_SUBTITLE = 'modernblog-subtitle';
 	// cache
-	private const HOME_PAGE_CACHE_VERSION = 'v22'; // only reset for large changes
+	private const HOME_PAGE_CACHE_VERSION = 'v16'; // only reset for large changes
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 	// trending
@@ -142,6 +142,41 @@ class Hooks {
 			'og-description',
 			'<meta property="og:description" content="' . htmlspecialchars( $description ) . '"/>'
 		);
+		$out->addHeadItem(
+            'discord-component-embed',
+            '<script id="discord:component-embed" type="application/json">
+				{
+					"component": {
+						"type": 17,
+						"accent_color": 25075,
+						"components": [
+							{
+								"type": 10,
+								"content": "A wiki all about obbies."
+							},
+							{
+								"type": 2,
+								"style": 5,
+								"label": "All Obbies",
+								"url": "https://obby.wiki/Category:Obby"
+							},
+							{
+								"type": 2,
+								"style": 5,
+								"label": "About",
+								"url": "https://obby.wiki/Obby_Wiki:About"
+							},
+							{
+								"type": 2,
+								"style": 5,
+								"label": "Blog",
+								"url": "https://obby.wiki/Blog:Timeline"
+							}
+						]
+					}
+				}
+			</script>'
+        );
 	}
 
 	private static function buildHomePageBusyFallback(): string {
