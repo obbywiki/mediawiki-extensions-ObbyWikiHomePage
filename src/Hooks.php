@@ -164,6 +164,14 @@ class Hooks {
 									{
 										"media": {"url": "https://obby.wiki/images/thumb/a/aa/GameThumbnail-16851760655-c4fa58dc550d.webp/400px-GameThumbnail-16851760655-c4fa58dc550d.webp"},
 										"description": "Allural"
+									},
+									{
+										"media": {"url": "https://obby.wiki/images/thumb/e/e4/GameThumbnail-9827246316-3d6ef9283183.webp/400px-GameThumbnail-9827246316-3d6ef9283183.webp"},
+										"description": "Rubellite"
+									},
+									{
+										"media": {"url": "https://obby.wiki/images/thumb/f/f1/GameThumbnail-17518929500-0ae4457c7994.webp/400px-GameThumbnail-17518929500-0ae4457c7994.webp"},
+										"description": "Nauticus"
 									}
 								]
 							},
