@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.4.0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/compare/v0.3.0...v0.4.0) (2026-09-18)
+
+
+### Features
+
+* add more images ([17d407a](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/17d407a6f4835c97e82a4334f8b18e6698efdfda))
+* **aside:** reorganize aside layout ([96dbc2e](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/96dbc2e3222abffcc6ba0d871d4d3274ce9a1367))
+* discord component embeds ([2f4ef8f](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/2f4ef8fbd25abc83df5fbb55edfcc04f8983a483))
+* experimental with embeds ([321a731](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/321a731c741366d54fbddc902d52fe146a0822d0))
+* improve embeds ([3bac7f3](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/3bac7f3ccc57240b7eac11bd8415f65d925631e4))
+* remove text compomnent from discord component embeds ([8a2f473](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/8a2f473bfc267950efa630e9f59a118c7a8061bf))
+* **type-aside:** replace co-op obby with flood-type ([4385b63](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/4385b63a05083c3f3f1a1f9530ea2dccf7d59d7a))
+
+
+### Bug Fixes
+
+* fix my poor syntax ([8a09a56](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/8a09a569106eff3fb03a1dd225f9926beac04b2b))
+* json syntax error ([15e1131](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/15e11314345a7eb949be86466c8e38f8d0f68eb2))
+* syntax error ([aaf5120](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/aaf512057e69a56b57ac4a82115cacbd8f8a7e30))
+
 ## [0.3.0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/compare/v0.2.0...v0.3.0) (2026-08-29)
 
 
