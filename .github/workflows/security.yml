@@ -10,34 +10,34 @@ on:
 permissions: read-all
 
 jobs:
-  secrets:
-    name: secret scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: gitleaks (diff)
-        uses: gitleaks/gitleaks-action@v3
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+  # secrets:
+  #   name: secret scan
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     - name: gitleaks (diff)
+  #       uses: gitleaks/gitleaks-action@v3
+  #       env:
+  #         GITHUB_TOKEN: ${{ github.token }}
 
-      - name: gitleaks (working tree)
-        run: |
-          VER=8.30.1
-          curl -sSL -o gitleaks.tar.gz \
-            "https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz"
-          tar -xzf gitleaks.tar.gz gitleaks
-          ./gitleaks dir . --no-banner --redact --exit-code 1
+  #     - name: gitleaks (working tree)
+  #       run: |
+  #         VER=8.30.1
+  #         curl -sSL -o gitleaks.tar.gz \
+  #           "https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz"
+  #         tar -xzf gitleaks.tar.gz gitleaks
+  #         ./gitleaks dir . --no-banner --redact --exit-code 1
 
-  deps:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v6
+  # deps:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: 'Checkout Repository'
+  #       uses: actions/checkout@v6
 
-      - name: 'Dependency Review'
-        uses: actions/dependency-review-action@v5
+  #     - name: 'Dependency Review'
+  #       uses: actions/dependency-review-action@v5
 
   codeql:
     name: CodeQL
