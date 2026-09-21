@@ -29,6 +29,7 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * add alt text to thumbnails
 * "find obby games to play" sort/feature
 * add JSON-LD (`WebSite` + `SearchAction`), `og:image`, and canonical URL for the home page
+* Generate a GIF thumbnail carousel to replicate the live HTML carousel and its thumbnail items for Discord's embed components
 
 ### UX
 * respect `prefers-reduced-motion` for carousel autoplay; improve keyboard/focus on spotlight slides (clones are not focusable)
