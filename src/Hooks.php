@@ -43,7 +43,7 @@ class Hooks {
 
 	/** @var list<array{key:string,title:string,label:string,hue:int}> */
 	private const SUB_GENRE_CARDS = [
-		[ 'key' => 'coop', 'title' => 'Category:Co-op Obby', 'label' => 'Co-op Obby', 'hue' => 210 ],
+		[ 'key' => 'coop', 'title' => 'Category:Co-op Obby', 'label' => 'Co-op Obby', 'hue' => 195 ],
 		[ 'key' => 'tower', 'title' => 'Category:Tower Obby', 'label' => 'Tower Obby', 'hue' => 275 ],
 		[ 'key' => 'towerstage', 'title' => 'Category:Tower Stage Obby', 'label' => 'Tower Stage Obby', 'hue' => 320 ],
 		[ 'key' => 'dco', 'title' => 'Category:Difficulty Chart Obby', 'label' => 'Difficulty Chart Obby', 'hue' => 28 ],
