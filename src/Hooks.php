@@ -1862,7 +1862,7 @@ SVG;
 					<h2 class="obbywiki-aside__title">Start Contributing</h2>
 				</div>
 			</div>
-			<p class="obbywiki-aside__text">Whether you're a casual obby player, a content creator, or a developer, there's a place for you here. Learn more below.</p>
+			<p class="obbywiki-aside__text">Help contribute to the largest obby database ever by adding a new obby, editing an existing article, or helping in another way.</p>
 			<div class="obbywiki-featured__aside-cta-links">
 				<div class="obbywiki-featured__aside-cta-row">
 					<a class="obbywiki-featured__aside-cta-add owaf-new-article-trigger" aria-label="Create a new article">
