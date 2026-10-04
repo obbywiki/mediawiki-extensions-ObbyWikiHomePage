@@ -211,12 +211,18 @@ class Hooks {
 	}
 
 	private static function buildDiscordLinkButton( string $label, string $page, bool $external = false ): array {
-		$title = Title::newFromText( $page );
+		if ( $external ) {
+			$url = $page;
+		} else {
+			$title = Title::newFromText( $page );
+			$url = $title ? $title->getFullURL( '', false, PROTO_CANONICAL ) : '';
+		}
+
 		return [
 			'type' => 2,
 			'style' => 5,
 			'label' => $label,
-			'url' => $title ? ( $external ? $title->getLinkURL() : $title->getFullURL( '', false, PROTO_CANONICAL ) ) : ''
+			'url' => $url,
 		];
 	}
 
