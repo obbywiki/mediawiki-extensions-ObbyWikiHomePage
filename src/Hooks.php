@@ -36,7 +36,7 @@ class Hooks {
 		// 'animated' => false
 	];
 	private const DISCORD_DISCORD_EMOJI = [
-		'id' => '1556333261846876240',
+		'id' => '983995541807583242',
 		'name' => 'discord',
 		// 'animated' => false
 	];
