@@ -164,6 +164,7 @@ class Hooks {
 							self::buildDiscordLinkButton( 'All Obbies', 'Category:Obby' ),
 							self::buildDiscordLinkButton( 'About', 'Obby_Wiki:About' ),
 							self::buildDiscordLinkButton( 'More', 'Obby_Wiki:About#More' ),
+							self::buildDiscordLinkButton( 'Discord', 'https://discord.gg/vuJsnzKkKY', true ),
 						],
 					],
 				] ) ),
@@ -209,13 +210,13 @@ class Hooks {
 		];
 	}
 
-	private static function buildDiscordLinkButton( string $label, string $page ): array {
+	private static function buildDiscordLinkButton( string $label, string $page, bool $external = false ): array {
 		$title = Title::newFromText( $page );
 		return [
 			'type' => 2,
 			'style' => 5,
 			'label' => $label,
-			'url' => $title ? $title->getFullURL( '', false, PROTO_CANONICAL ) : ''
+			'url' => $title ? ( $external ? $title->getLinkURL() : $title->getFullURL( '', false, PROTO_CANONICAL ) ) : ''
 		];
 	}
 
