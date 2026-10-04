@@ -1377,7 +1377,12 @@ SVG;
 		foreach ( $contentLinks as $cl ) {
 			$clUrl = htmlspecialchars( $cl['url'] );
 			$clLabel = htmlspecialchars( $cl['label'] );
-			$clImage = htmlspecialchars( $cl['image'] );
+			// $clImage = htmlspecialchars( $cl['image'] );
+			$clStyle = 'background-image: url(' . $cl['image'] . ')';
+			if ( str_starts_with( $cl['image'], $clAssetBase ) && str_ends_with( $cl['image'], '.webp' ) ) {
+				$clAvif = dirname( $clAssetBase ) . '/avif/' . basename( $cl['image'], '.webp' ) . '.avif';
+				$clStyle .= "; background-image: image-set(url('" . $clAvif . "') type('image/avif'), url('" . $cl['image'] . "') type('image/webp'))";
+			}
 			$clPriority = (int)$cl['priority'];
 			$clClass = 'obbywiki-content-link';
 			if ( $clPriority > 5 ) {
@@ -1385,7 +1390,7 @@ SVG;
 			}
 			$contentLinksHTML .= '<a href="' . $clUrl
 				. '" class="' . $clClass . '" data-priority="' . $clPriority
-				. '" style="background-image: url(' . $clImage . ')"'
+				. '" style="' . $clStyle . '"'
 				. '>'
 				. '<span class="obbywiki-content-link__label">' . $clLabel . '</span>'
 				. '</a>';
