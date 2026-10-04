@@ -152,7 +152,7 @@ class Hooks {
 				'type' => 17,
 				'accent_color' => 25075,
 				'components' => array_values( array_filter( [
-					[ 'type' => 10, 'content' => '# <:obbywiki:1556328301260447867> The Obby Wiki' ],
+					[ 'type' => 10, 'content' => '# <:obbywiki:1556328301260447867>  [The Obby Wiki](https://obby.wiki)' ],
 					self::buildDiscordSpotlightGallery(),
 					[
 						'type' => 10,
