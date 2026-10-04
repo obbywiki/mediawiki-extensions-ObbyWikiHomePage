@@ -145,19 +145,20 @@ class Hooks {
 			'<meta property="og:description" content="' . htmlspecialchars( $description ) . '"/>'
 		);
 
+		$articlesCount = self::getSiteStatistics()['articles'];
+
 		$embed = [
 			'component' => [
 				'type' => 17,
 				'accent_color' => 25075,
 				'components' => array_values( array_filter( [
-					[ 'type' => 10, 'content' => '# Home' ],
-					[ 'type' => 10, 'content' => '-# The Obby Wiki' ],
+					[ 'type' => 10, 'content' => '# The Obby Wiki' ],
 					self::buildDiscordSpotlightGallery(),
 					[
 						'type' => 10,
-						'content' => 'The leading community-run and independent wiki for information and archives on Roblox obbies that anyone can contribute to.',
+						'content' => 'The Obby Wiki is an independent and community-run encyclopedia and database dedicated to documenting Roblox obbies and everything surrounding them. Help contribute to the largest database and collection of Roblox obbies ever created, with over ' . number_format( $articlesCount ) . ' articles and counting.',
 					],
-					[ 'type' => 10, 'content' => '> From the Obby Wiki' ],
+					[ 'type' => 10, 'content' => '> From "Home - The Obby Wiki"' ],
 					[
 						'type' => 1,
 						'components' => [
