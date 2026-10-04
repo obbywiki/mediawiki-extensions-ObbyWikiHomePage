@@ -1194,7 +1194,7 @@ SVG;
 		$templateParser = new TemplateParser( dirname( __DIR__ ) . '/templates' );
 		$blogPostsHTML = self::buildBlogPostsHTML( $blogPosts, $logoSVG );
 
-		$clAssetBase = ( $wgExtensionAssetsPath ?? '/extensions' ) . '/ObbyWikiHomePage/resources/images/cl/';
+		$clAssetBase = ( $wgExtensionAssetsPath ?? '/extensions' ) . '/ObbyWikiHomePage/resources/images/cl/webp/';
 
 		// mini nav links
 		$navLinks = [
