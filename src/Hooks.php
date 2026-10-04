@@ -169,8 +169,8 @@ class Hooks {
 						'components' => [
 							self::buildDiscordLinkButton( 'Home', 'Home', false, self::DISCORD_OBBYWIKI_EMOJI ),
 							self::buildDiscordLinkButton( 'All Obbies', 'Category:Obby' ),
-							self::buildDiscordLinkButton( 'About', 'Obby_Wiki:About' ),
-							self::buildDiscordLinkButton( 'More', 'Obby_Wiki:About#More' ),
+							self::buildDiscordLinkButton( 'About', 'Obby_Wiki:About', self::DISCORD_OBBYWIKI_EMOJI ),
+							self::buildDiscordLinkButton( 'More', 'Obby_Wiki:About#More', self::DISCORD_OBBYWIKI_EMOJI ),
 							self::buildDiscordLinkButton( 'Discord', 'https://discord.gg/vuJsnzKkKY', true ),
 						],
 					],
