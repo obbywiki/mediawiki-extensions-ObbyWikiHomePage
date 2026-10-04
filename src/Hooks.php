@@ -35,6 +35,11 @@ class Hooks {
 		'name' => 'obbywiki',
 		// 'animated' => false
 	];
+	private const DISCORD_DISCORD_EMOJI = [
+		'id' => '1556333261846876240',
+		'name' => 'discord',
+		// 'animated' => false
+	];
 
 	/** @var array<string,array{label:string,hue:int}> */
 	private const TRENDING_GENRE_CATEGORIES = [ // only controls the tags that are displayed, not which categories are actually used
@@ -171,7 +176,7 @@ class Hooks {
 							self::buildDiscordLinkButton( 'All Obbies', 'Category:Obby' ),
 							self::buildDiscordLinkButton( 'About', 'Obby_Wiki:About', self::DISCORD_OBBYWIKI_EMOJI ),
 							self::buildDiscordLinkButton( 'More', 'Obby_Wiki:About#More', self::DISCORD_OBBYWIKI_EMOJI ),
-							self::buildDiscordLinkButton( 'Discord', 'https://discord.gg/vuJsnzKkKY', true ),
+							self::buildDiscordLinkButton( 'Discord', 'https://discord.gg/vuJsnzKkKY', true, self::DISCORD_DISCORD_EMOJI ),
 						],
 					],
 				] ) ),
