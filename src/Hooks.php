@@ -30,6 +30,11 @@ class Hooks {
 	private const TRENDING_THUMB_SIZE = 368;
 	// discord
 	private const DISCORD_ALT_TEXT_MAX = 1024;
+	private const DISCORD_OBBYWIKI_EMOJI = [
+		'id' => '1556328301260447867',
+		'name' => 'obbywiki',
+		// 'animated' => false
+	];
 
 	/** @var array<string,array{label:string,hue:int}> */
 	private const TRENDING_GENRE_CATEGORIES = [ // only controls the tags that are displayed, not which categories are actually used
@@ -162,6 +167,7 @@ class Hooks {
 					[
 						'type' => 1,
 						'components' => [
+							self::buildDiscordLinkButton( 'Home', 'Home', false, self::DISCORD_OBBYWIKI_EMOJI ),
 							self::buildDiscordLinkButton( 'All Obbies', 'Category:Obby' ),
 							self::buildDiscordLinkButton( 'About', 'Obby_Wiki:About' ),
 							self::buildDiscordLinkButton( 'More', 'Obby_Wiki:About#More' ),
@@ -211,7 +217,10 @@ class Hooks {
 		];
 	}
 
-	private static function buildDiscordLinkButton( string $label, string $page, bool $external = false ): array {
+	/**
+	 * @param array{id?:string,name?:string,animated?:bool}|null $emoji
+	 */
+	private static function buildDiscordLinkButton( string $label, string $page, bool $external = false, ?array $emoji = null ): array {
 		if ( $external ) {
 			$url = $page;
 		} else {
@@ -219,12 +228,18 @@ class Hooks {
 			$url = $title ? $title->getFullURL( '', false, PROTO_CANONICAL ) : '';
 		}
 
-		return [
+		$button = [
 			'type' => 2,
 			'style' => 5,
 			'label' => $label,
 			'url' => $url,
 		];
+
+		if ( $emoji ) {
+			$button['emoji'] = array_intersect_key( $emoji, [ 'id' => true, 'name' => true, 'animated' => true ] );
+		}
+
+		return $button;
 	}
 
 	private static function buildHomePageBusyFallback(): string {
