@@ -6,10 +6,12 @@ use Imagick;
 use ImagickDraw;
 use ImagickPixel;
 use InvalidArgumentException;
+use MediaWiki\Shell\Shell;
 use Psr\Log\LoggerInterface;
 
 /**
- * Draws the spotlight carousel as an animated image (WebP or GIF, WebP is preferred + more optimized) with Imagick 7+.
+ * Draws the spotlight carousel as an animated image with Imagick 7+. AVIF (encoded by avifenc) is by far the smallest,
+ * then WebP, then GIF.
  *
  * [ 'title' => plain text, 'description' => ?string, 'imagePath' => ?string, 'hue' => int ]
  */
@@ -37,7 +39,8 @@ class SpotlightRenderer {
 	private $measurer = null;
 
 	/**
-	 * @param array $settings format, width, quality, maxBytes, transitionFrames, holdFrames (0 = one per bar pixel), fonts{bold,regular}
+	 * @param array $settings format, width, quality, maxBytes, transitionFrames, holdFrames (0 = one per bar pixel), fonts{bold,regular},
+	 *   avifenc (path, avif only), dumpDir (optional)
 	 * @param LoggerInterface $logger
 	 */
 	public function __construct( array $settings, LoggerInterface $logger ) {
@@ -443,6 +446,18 @@ class SpotlightRenderer {
 
 		$holdFrames = $plan['holdFrames'] ?: self::autoHoldFrames( $count, $scale, $plan['transitionFrames'] > 0 );
 		$timeline = self::buildTimeline( $count, $plan['transitionFrames'], $holdFrames );
+
+		if ( $format === 'avif' ) {
+			try {
+				$this->renderAvif( $bases, $timeline, $count, $width, $height, $scale, $plan['quality'], $outPath );
+			} finally {
+				foreach ( $bases as $base ) {
+					$base->clear();
+				}
+			}
+			return count( $timeline );
+		}
+
 		$palettes = [];
 		$anim = new Imagick();
 
@@ -469,6 +484,10 @@ class SpotlightRenderer {
 			$palette->clear();
 		}
 
+		if ( !empty( $this->settings['dumpDir'] ) ) {
+			$this->dumpFrames( $anim, $this->settings['dumpDir'] );
+		}
+
 		if ( $format === 'gif' && $count > 1 ) {
 			// hold frames then only store the changed bar region
 			$optimized = $anim->optimizeImageLayers();
@@ -491,6 +510,110 @@ class SpotlightRenderer {
 		$anim->clear();
 
 		return $frames;
+	}
+
+	/**
+	 * Here, Imagick draws the frames as PNGs and avifenc encodes them.
+	 * AV1 predicts each frame from the previous one, so the sliding transitions cost a fraction of WebP's independently coded frames.
+	 *
+	 * @param Imagick[] $bases
+	 */
+	private function renderAvif( array $bases, array $timeline, int $count, int $width, int $height, float $scale, int $quality, string $outPath ): void {
+		$dumpDir = $this->settings['dumpDir'] ?? null;
+		$dir = $dumpDir ?: wfTempDir() . '/obbywikihomepage-' . bin2hex( random_bytes( 8 ) );
+		self::prepareFrameDir( $dir );
+
+		try {
+			$inputs = [];
+			$list = '';
+			foreach ( $timeline as $i => $entry ) {
+				$name = sprintf( '%04d.png', $i );
+				$frame = $this->composeFrame( $bases, $entry, $count, $width, $height, $scale );
+				self::writePng( $frame, "$dir/$name" );
+				$frame->clear();
+
+				if ( count( $timeline ) > 1 ) {
+					// durations are in timescale units, so 1/100 s like the GIF/WebP delays
+					array_push( $inputs, '--duration', (string)$entry['delay'] );
+				}
+				$inputs[] = "$dir/$name";
+				$list .= "$name {$entry['delay']}\n";
+			}
+			if ( $dumpDir ) {
+				file_put_contents( "$dir/frames.txt", $list );
+			}
+
+			$result = Shell::command( array_merge(
+				[
+					$this->settings['avifenc'],
+					// aom 3.12 aborts on an internal assertion partway through these sequences; SVT-AV1 is stable, faster, and smaller here. SVT only takes 4:2:0. additionally, discord doesn't turn the avif into a much larger WebP if it's SVT-AV1, so users get the full quality and smaller file size
+					'--codec', 'svt',
+					'--speed', '6',
+					'--jobs', 'all',
+					'--yuv', '420',
+					'--depth', '8',
+					'--qcolor', (string)$quality,
+					'--timescale', '100',
+					'--repetition-count', 'infinite',
+				],
+				$inputs,
+				[ $outPath ]
+			) )
+				// no memory cap: the encoder's thread pool reserves far more address space than it touches
+				->limits( [ 'time' => 600, 'memory' => 0 ] )
+				->execute();
+
+			if ( $result->getExitCode() !== 0 ) {
+				throw new \RuntimeException( 'avifenc failed (exit ' . $result->getExitCode() . '): '
+					. trim( $result->getStderr() ?: $result->getStdout() ) );
+			}
+		} finally {
+			if ( !$dumpDir ) {
+				foreach ( glob( "$dir/*.png" ) ?: [] as $file ) {
+					unlink( $file );
+				}
+				rmdir( $dir );
+			}
+		}
+	}
+
+	/**
+	 * Write each frame as a lossless PNG plus frames.txt ("file delay" per line, delay in 1/100 s) for external encoders.
+	 */
+	private function dumpFrames( Imagick $anim, string $dir ): void {
+		self::prepareFrameDir( $dir );
+
+		$list = '';
+		$count = $anim->getNumberImages();
+		for ( $i = 0; $i < $count; $i++ ) {
+			$anim->setIteratorIndex( $i );
+			$name = sprintf( '%04d.png', $i );
+			$png = $anim->getImage();
+			self::writePng( $png, "$dir/$name" );
+			$png->clear();
+			$list .= $name . ' ' . $anim->getImageDelay() . "\n";
+		}
+		file_put_contents( "$dir/frames.txt", $list );
+	}
+
+	private static function prepareFrameDir( string $dir ): void {
+		if ( !is_dir( $dir ) && !mkdir( $dir, 0777, true ) ) {
+			throw new \RuntimeException( "Could not create $dir" );
+		}
+		foreach ( glob( "$dir/*.png" ) ?: [] as $old ) {
+			unlink( $old );
+		}
+	}
+
+	/**
+	 * Opaque 8-bit RGB. avifenc picks its bit depth and alpha plane from the input
+	 */
+	private static function writePng( Imagick $frame, string $path ): void {
+		$frame->setImageAlphaChannel( Imagick::ALPHACHANNEL_OFF );
+		$frame->setImageDepth( 8 );
+		// the files only live until avifenc reads them
+		$frame->setOption( 'png:compression-level', '1' );
+		$frame->writeImage( 'png24:' . $path );
 	}
 
 	private function renderSlideBase( array $slide, int $width, int $height, float $scale ): Imagick {

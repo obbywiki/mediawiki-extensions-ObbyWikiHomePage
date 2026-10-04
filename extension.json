@@ -110,15 +110,15 @@
 		},
 		"ObbyWikiHomePageSpotlightAnimationFormat": {
 			"value": "webp",
-			"description": "Output format for the spotlight animation: webp or gif."
+			"description": "Output format for the spotlight animation: webp, avif or gif. AVIF is several times smaller than WebP but needs avifenc (libavif 1.x with SVT-AV1) on the server."
 		},
 		"ObbyWikiHomePageSpotlightAnimationWidth": {
 			"value": 960,
-			"description": "Canvas width of the spotlight animation in pixels; the height is width * 9 / 16. GIF output is capped at 800."
+			"description": "Canvas width of the spotlight animation in pixels; the height is width * 9 / 16. GIF output is capped at 800; AVIF is rounded down to a multiple of 32."
 		},
 		"ObbyWikiHomePageSpotlightAnimationQuality": {
-			"value": 80,
-			"description": "Lossy WebP quality for the spotlight animation. Ignored for GIF."
+			"value": null,
+			"description": "Lossy quality (1-100) for the spotlight animation. Null uses the format default: 80 for WebP, 50 for AVIF (avifenc's scale runs higher). Ignored for GIF."
 		},
 		"ObbyWikiHomePageSpotlightAnimationMaxBytes": {
 			"value": 6291456,
@@ -130,6 +130,10 @@
 				"regular": null
 			},
 			"description": "Absolute paths to TTF files that override the bundled Inter fonts, e.g. for scripts Inter lacks."
+		},
+		"ObbyWikiHomePageSpotlightAnimationAvifenc": {
+			"value": null,
+			"description": "Path to avifenc for AVIF output. Null searches the usual bin directories and $PATH."
 		}
 	}
 }

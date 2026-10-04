@@ -5,6 +5,8 @@ namespace MediaWiki\Extension\ObbyWikiHomePage;
 use Imagick;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Shell\Shell;
+use MediaWiki\Utils\ExecutableFinder;
 use Psr\Log\LoggerInterface;
 use Wikimedia\FileBackend\FileBackend;
 use Wikimedia\ObjectCache\WANObjectCache;
@@ -36,11 +38,17 @@ class SpotlightAnimation {
 			$wgObbyWikiHomePageSpotlightAnimationMaxBytes,
 			$wgObbyWikiHomePageSpotlightAnimationFonts;
 
-		$format = strtolower( (string)( $wgObbyWikiHomePageSpotlightAnimationFormat ?? 'webp' ) ) === 'gif' ? 'gif' : 'webp';
+		$format = strtolower( (string)( $wgObbyWikiHomePageSpotlightAnimationFormat ?? 'webp' ) );
+		if ( !in_array( $format, [ 'webp', 'gif', 'avif' ], true ) ) {
+			$format = 'webp';
+		}
 		$width = max( 320, (int)( $wgObbyWikiHomePageSpotlightAnimationWidth ?? 960 ) );
 		if ( $format === 'gif' ) {
 			// GIF transitions are expensive!
 			$width = min( $width, 800 );
+		} elseif ( $format === 'avif' ) {
+			// SVT-AV1 rejects odd dimensions; multiples of 32 keep the 16:9 height even
+			$width = intdiv( $width, 32 ) * 32;
 		}
 		$fonts = is_array( $wgObbyWikiHomePageSpotlightAnimationFonts ?? null ) ? $wgObbyWikiHomePageSpotlightAnimationFonts : [];
 		$fontDir = dirname( __DIR__ ) . '/resources/fonts';
@@ -49,7 +57,8 @@ class SpotlightAnimation {
 			'format' => $format,
 			'width' => $width,
 			'height' => SpotlightRenderer::heightFor( $width ),
-			'quality' => min( 100, max( 1, (int)( $wgObbyWikiHomePageSpotlightAnimationQuality ?? 80 ) ) ),
+			// avifenc's scale runs much higher than WebP's: q50 still beats WebP q80 on PSNR
+			'quality' => min( 100, max( 1, (int)( $wgObbyWikiHomePageSpotlightAnimationQuality ?? ( $format === 'avif' ? 50 : 80 ) ) ) ),
 			'maxBytes' => max( 1, (int)( $wgObbyWikiHomePageSpotlightAnimationMaxBytes ?? 6291456 ) ),
 			// 16 puts the fast part of the ease-out on the 20 ms floor (50 fps)
 			'transitionFrames' => $format === 'gif' ? 4 : 16,
@@ -89,9 +98,27 @@ class SpotlightAnimation {
 	public static function isSupported( string $format ): bool {
 		static $supported = [];
 		if ( !isset( $supported[$format] ) ) {
-			$supported[$format] = class_exists( Imagick::class ) && (bool)Imagick::queryFormats( strtoupper( $format ) );
+			if ( $format === 'avif' ) {
+				// Imagick only draws the PNG frames and avifenc (libavif 1.x with SVT-AV1) encodes them
+				$avifenc = self::getAvifencPath();
+				$supported[$format] = class_exists( Imagick::class ) && Imagick::queryFormats( 'PNG' ) && $avifenc !== null
+					&& str_contains( Shell::command( $avifenc, '--version' )->includeStderr()->execute()->getStdout(), 'svt [enc]' );
+			} else {
+				$supported[$format] = class_exists( Imagick::class ) && (bool)Imagick::queryFormats( strtoupper( $format ) );
+			}
 		}
 		return $supported[$format];
+	}
+
+	/**
+	 * Configured avifenc, else the first one on the usual paths and $PATH.
+	 */
+	private static function getAvifencPath(): ?string {
+		global $wgObbyWikiHomePageSpotlightAnimationAvifenc;
+		if ( $wgObbyWikiHomePageSpotlightAnimationAvifenc ) {
+			return (string)$wgObbyWikiHomePageSpotlightAnimationAvifenc;
+		}
+		return ExecutableFinder::findInDefaultPaths( 'avifenc' ) ?: null;
 	}
 
 	/**
@@ -151,13 +178,17 @@ class SpotlightAnimation {
 	 * @param string|null $expectedHash skip when the current hash differs (job parameter)
 	 * @param bool $force re-render even when the file already exists
 	 * @param string|null $outPath write here instead of storing (development)
+	 * @param string|null $dumpDir also write the frames as PNGs here (development)
 	 * @return array status plus renderer stats when rendered
 	 */
-	public static function renderAndStore( ?string $expectedHash = null, bool $force = false, ?string $outPath = null ): array {
+	public static function renderAndStore(
+		?string $expectedHash = null, bool $force = false, ?string $outPath = null, ?string $dumpDir = null
+	): array {
 		$logger = self::getLogger();
 		$items = SpotlightData::getItems();
 		$settings = self::getSettings();
 		$hash = self::computeHash( $items, $settings );
+		$settings['dumpDir'] = $dumpDir;
 		$format = $settings['format'];
 
 		if ( $expectedHash !== null && $expectedHash !== $hash ) {
@@ -181,6 +212,9 @@ class SpotlightAnimation {
 			return [ 'status' => 'unsupported', 'hash' => $hash ];
 		}
 
+		if ( $format === 'avif' ) {
+			$settings['avifenc'] = self::getAvifencPath();
+		}
 		$renderer = new SpotlightRenderer( $settings, $logger );
 		$slides = self::buildSlides( $items );
 		$start = microtime( true );
@@ -291,7 +325,7 @@ class SpotlightAnimation {
 
 		$files = [];
 		foreach ( $list as $name ) {
-			if ( !preg_match( '/^spotlight-[0-9a-f]{16}\.(webp|gif)$/', $name ) ) {
+			if ( !preg_match( '/^spotlight-[0-9a-f]{16}\.(webp|gif|avif)$/', $name ) ) {
 				continue;
 			}
 

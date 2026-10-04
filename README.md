@@ -16,12 +16,13 @@ This extension was designed for usage on Obby Wiki server architecture and is no
 Optional. Without these the Discord embed falls back to a static thumbnail, or set `$wgObbyWikiHomePageSpotlightAnimation = false;` to turn the feature off.
 
 * PHP `imagick` extension, with an ImageMagick build that can read WebP and write animated WebP (or set `$wgObbyWikiHomePageSpotlightAnimationFormat = 'gif';`).
+* For `$wgObbyWikiHomePageSpotlightAnimationFormat = 'avif';` (several times smaller than WebP): `avifenc` from libavif 1.x built with SVT-AV1, e.g. Debian's `libavif-bin`. MediaWiki must be allowed to shell out.
 * [PageImages](https://www.mediawiki.org/wiki/Extension:PageImages)
 * A working job queue.
 * A writable upload directory or file backend. Output is stored under `obbywikihomepage/` in the public zone.
 * Enough memory or temp disk for the render. A 7-slide animation is roughly 400 MB of uncompressed frames. Imagick is capped at ~256 MB of RAM during the render and spills the rest to its temp directory.
 
-To render on demand: `php maintenance/run.php ObbyWikiHomePage:renderSpotlight [--out /tmp/spotlight.webp] [--force]`
+To render on demand: `php maintenance/run.php ObbyWikiHomePage:renderSpotlight [--out /tmp/spotlight.webp] [--force] [--dump-frames /tmp/frames]`
 
 ### Soft Dependencies
 

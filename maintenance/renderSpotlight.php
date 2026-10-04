@@ -23,6 +23,7 @@ class RenderSpotlight extends Maintenance {
 		$this->addDescription( 'Render the animated spotlight image used in the Discord embed.' );
 		$this->addOption( 'out', 'Write the animation to this path instead of storing it in the upload backend', false, true );
 		$this->addOption( 'force', 'Render even when the stored file for the current hash already exists' );
+		$this->addOption( 'dump-frames', 'Also write every frame as a PNG plus frames.txt (file, delay in 1/100 s) to this directory', false, true );
 		$this->requireExtension( 'ObbyWikiHomePage' );
 	}
 
@@ -31,7 +32,8 @@ class RenderSpotlight extends Maintenance {
 		$result = SpotlightAnimation::renderAndStore(
 			null,
 			$this->hasOption( 'force' ),
-			$this->getOption( 'out' )
+			$this->getOption( 'out' ),
+			$this->getOption( 'dump-frames' )
 		);
 		$seconds = microtime( true ) - $start;
 
