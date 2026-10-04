@@ -17,8 +17,11 @@
 			"TrendingArticles": "*"
 		}
 	},
-	"AutoloadClasses": {
-		"MediaWiki\\Extension\\ObbyWikiHomePage\\Hooks": "src/Hooks.php"
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\ObbyWikiHomePage\\": "src/"
+	},
+	"JobClasses": {
+		"ObbyWikiHomePageRenderSpotlight": "MediaWiki\\Extension\\ObbyWikiHomePage\\RenderSpotlightJob"
 	},
 	"HookHandlers": {
 		"ObbyWikiHomePageHooks": {
@@ -100,6 +103,33 @@
 		"ObbyWikiHomePageTrendingCategory": {
 			"value": "Category:Obby",
 			"description": "Category whose members are ranked for the home page Trending section (requires TrendingArticles)."
+		},
+		"ObbyWikiHomePageSpotlightAnimation": {
+			"value": true,
+			"description": "Use an animated image of the spotlight carousel in the Discord component embed. Falls back to a static thumbnail when Imagick or the output format is unavailable."
+		},
+		"ObbyWikiHomePageSpotlightAnimationFormat": {
+			"value": "webp",
+			"description": "Output format for the spotlight animation: webp or gif."
+		},
+		"ObbyWikiHomePageSpotlightAnimationWidth": {
+			"value": 960,
+			"description": "Canvas width of the spotlight animation in pixels; the height is width * 9 / 16. GIF output is capped at 800."
+		},
+		"ObbyWikiHomePageSpotlightAnimationQuality": {
+			"value": 80,
+			"description": "Lossy WebP quality for the spotlight animation. Ignored for GIF."
+		},
+		"ObbyWikiHomePageSpotlightAnimationMaxBytes": {
+			"value": 6291456,
+			"description": "Size budget in bytes for the spotlight animation. Over budget, the renderer lowers quality, frame counts and canvas size step by step."
+		},
+		"ObbyWikiHomePageSpotlightAnimationFonts": {
+			"value": {
+				"bold": null,
+				"regular": null
+			},
+			"description": "Absolute paths to TTF files that override the bundled Inter fonts, e.g. for scripts Inter lacks."
 		}
 	}
 }

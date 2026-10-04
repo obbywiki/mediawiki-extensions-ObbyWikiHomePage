@@ -28,6 +28,8 @@ class Hooks {
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 	// trending
 	private const TRENDING_THUMB_SIZE = 368;
+	// discord
+	private const DISCORD_ALT_TEXT_MAX = 1024;
 
 	/** @var array<string,array{label:string,hue:int}> */
 	private const TRENDING_GENRE_CATEGORIES = [ // only controls the tags that are displayed, not which categories are actually used
@@ -142,67 +144,79 @@ class Hooks {
 			'og-description',
 			'<meta property="og:description" content="' . htmlspecialchars( $description ) . '"/>'
 		);
+
+		$embed = [
+			'component' => [
+				'type' => 17,
+				'accent_color' => 25075,
+				'components' => array_values( array_filter( [
+					[ 'type' => 10, 'content' => '# Home' ],
+					[ 'type' => 10, 'content' => '-# The Obby Wiki' ],
+					self::buildDiscordSpotlightGallery(),
+					[
+						'type' => 10,
+						'content' => 'The leading community-run and independent wiki for information and archives on Roblox obbies that anyone can contribute to.',
+					],
+					[ 'type' => 10, 'content' => '> From the Obby Wiki' ],
+					[
+						'type' => 1,
+						'components' => [
+							self::buildDiscordLinkButton( 'All Obbies', 'Category:Obby' ),
+							self::buildDiscordLinkButton( 'About', 'Obby_Wiki:About' ),
+							self::buildDiscordLinkButton( 'More', 'Obby_Wiki:About#More' ),
+						],
+					],
+				] ) ),
+			],
+		];
+
+		// JSON_HEX_TAG keeps a page title from closing the script element
 		$out->addHeadItem(
-            'discord-component-embed',
-            '<script id="discord:component-embed" type="application/json">
-				{
-					"component": {
-						"type": 17,
-						"accent_color": 25075,
-						"components": [
-							{
-								"type": 10,
-								"content": "# Home"
-							},
-							{
-								"type": 10,
-								"content": "-# The Obby Wiki"
-							},
-							{
-								"type": 12,
-								"items": [
-									{
-										"media": {"url": "https://obby.wiki/images/thumb/a/aa/GameThumbnail-16851760655-c4fa58dc550d.webp/400px-GameThumbnail-16851760655-c4fa58dc550d.webp"},
-										"description": "Allural"
-									}
-								]
-							},
-							{
-								"type": 10,
-								"content": "The leading community-run and independent wiki for information and archives on Roblox obbies that anyone can contribute to."
-							},
-							{
-								"type": 10,
-								"content": "> From the Obby Wiki"
-							},
-							{
-								"type": 1,
-								"components": [
-									{
-										"type": 2,
-										"style": 5,
-										"label": "All Obbies",
-										"url": "https://obby.wiki/Category:Obby"
-									},
-									{
-										"type": 2,
-										"style": 5,
-										"label": "About",
-										"url": "https://obby.wiki/Obby_Wiki:About"
-									},
-									{
-										"type": 2,
-										"style": 5,
-										"label": "More",
-										"url": "https://obby.wiki/Obby_Wiki:About#More"
-									}
-								]
-							}
-						]
-					}
-				}
-			</script>'
-        );
+			'discord-component-embed',
+			'<script id="discord:component-embed" type="application/json">' . json_encode( $embed, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP ) . '</script>'
+		);
+	}
+
+	private static function buildDiscordSpotlightGallery(): ?array {
+		// media gallery with the animated spotlight, or the first slide's static thumbnail until the animation is ready. returns null when there's nothing
+		$items = SpotlightData::getItems();
+		if ( !$items ) {
+			return null;
+		}
+
+		$url = SpotlightAnimation::getState( $items );
+		if ( $url === null && !empty( $items[0]['thumbnail'] ) ) {
+			$url = MediaWikiServices::getInstance()->getUrlUtils()->expand( $items[0]['thumbnail'], PROTO_CANONICAL );
+		}
+		if ( !$url ) {
+			return null;
+		}
+
+		$titles = array_map( [ SpotlightData::class, 'getPlainTitle' ], $items );
+		$alt = 'Spotlight: ' . implode( ', ', $titles );
+		if ( mb_strlen( $alt ) > self::DISCORD_ALT_TEXT_MAX ) {
+			$alt = mb_substr( $alt, 0, self::DISCORD_ALT_TEXT_MAX - 1 ) . "...";
+		}
+
+		return [
+			'type' => 12,
+			'items' => [
+				[
+					'media' => [ 'url' => $url ],
+					'description' => $alt,
+				],
+			]
+		];
+	}
+
+	private static function buildDiscordLinkButton( string $label, string $page ): array {
+		$title = Title::newFromText( $page );
+		return [
+			'type' => 2,
+			'style' => 5,
+			'label' => $label,
+			'url' => $title ? $title->getFullURL( '', false, PROTO_CANONICAL ) : ''
+		];
 	}
 
 	private static function buildHomePageBusyFallback(): string {
@@ -211,7 +225,7 @@ class Hooks {
 
 	private static function buildHomePage(): string {
 		$logoSVG = self::logoSVG();
-		$carouselItems = self::getObbyPages();
+		$carouselItems = SpotlightData::getItems();
 		$siteStats = self::getSiteStatistics();
 		$thisMonthPages = self::getThisMonthPages();
 		$archiveMonths = self::getArchiveMonths();
@@ -232,184 +246,6 @@ class Hooks {
 			$trendingPages,
 			$subGenreCounts
 		);
-	}
-
-	private static function getObbyPages(): array {
-		global $wgObbyWikiHomePageFeaturedPages;
-
-		if ( isset( $wgObbyWikiHomePageFeaturedPages ) && is_array( $wgObbyWikiHomePageFeaturedPages ) && count( $wgObbyWikiHomePageFeaturedPages ) > 0 ) {
-			return self::getConfiguredObbyPages( $wgObbyWikiHomePageFeaturedPages );
-		}
-
-		// use 'Above 1,000,000 visits' as the source, then filter by 'Category:Obby' membership and exclude 'Category:Stubs'
-		// we want high-enough quality pages to be highlighted, preferrably
-		$request = new FauxRequest( [
-			'action' => 'query',
-			'generator' => 'categorymembers',
-			'gcmtitle' => 'Category:Above 1,000,000 visits',
-			'gcmlimit' => '50',
-			'gcmnamespace' => '0',
-			'gcmsort' => 'timestamp',
-			'gcmdir' => 'desc',
-			'prop' => 'pageimages|pageprops|info|categories',
-			'piprop' => 'thumbnail',
-			'pithumbsize' => '400',
-			'ppprop' => 'shortdesc|displaytitle',
-			'clcategories' => 'Category:Obby|Category:Stubs',
-		] );
-
-		$api = new ApiMain( $request, false );
-
-		try {
-			$api->execute();
-		} catch ( \Throwable $e ) {
-			return [];
-		}
-
-		$data = $api->getResult()->getResultData( null, [
-			'Strip' => 'all',
-		] );
-
-		$pages = [];
-		if ( isset( $data['query']['pages'] ) ) {
-			foreach ( $data['query']['pages'] as $page ) {
-				if ( !isset( $page['title'] ) ) continue;
-
-				$inObby = false;
-				$inStubs = false;
-				if ( isset( $page['categories'] ) ) {
-					foreach ( $page['categories'] as $cat ) {
-						$catTitle = $cat['title'] ?? '';
-						if ( $catTitle === 'Category:Obby' ) {
-							$inObby = true;
-						}
-						if ( $catTitle === 'Category:Stubs' ) {
-							$inStubs = true;
-						}
-					}
-				}
-
-				if ( !$inObby || $inStubs ) {
-					continue;
-				}
-
-				$title = Title::newFromText( $page['title'] );
-				if ( !$title ) {
-					continue;
-				}
-
-				$thumb = isset( $page['thumbnail']['source'] )
-					? $page['thumbnail']['source']
-					: null;
-				$desc = isset( $page['pageprops']['shortdesc'] )
-					? $page['pageprops']['shortdesc']
-					: null;
-
-				$pageLength = isset( $page['length'] ) ? (int)$page['length'] : 0;
-				// $editCount = self::getRevisionCount( $page['title'] );
-
-				// little finicky, TODO FIXME
-				$displayTitle = isset( $page['pageprops']['displaytitle'] )
-					? $page['pageprops']['displaytitle']
-					: ucwords( $title->getText() );
-
-				$pages[] = [
-					'title' => $displayTitle,
-					'url' => $title->getLocalURL(),
-					'thumbnail' => $thumb,
-					'description' => $desc,
-					// 'editCount' => $editCount,
-					'pageLength' => $pageLength,
-				];
-
-				// 7 features only
-				if ( count( $pages ) >= 7 ) {
-					break;
-				}
-			}
-		}
-
-		return $pages;
-	}
-
-	private static function getConfiguredObbyPages( array $pageTitles ): array {
-		if ( empty( $pageTitles ) ) {
-			return [];
-		}
-
-		$request = new FauxRequest( [
-			'action' => 'query',
-			'titles' => implode( '|', $pageTitles ),
-			'prop' => 'pageimages|pageprops|info',
-			'piprop' => 'thumbnail',
-			'pithumbsize' => '400',
-			'ppprop' => 'shortdesc|displaytitle',
-		] );
-
-		$api = new ApiMain( $request, false );
-
-		try {
-			$api->execute();
-		} catch ( \Throwable $e ) {
-			return [];
-		}
-
-		$data = $api->getResult()->getResultData( null, [
-			'Strip' => 'all',
-		] );
-
-		$pages = [];
-		if ( isset( $data['query']['pages'] ) ) {
-			foreach ( $data['query']['pages'] as $page ) {
-				if ( !isset( $page['title'] ) ) continue;
-
-				$title = Title::newFromText( $page['title'] );
-				if ( !$title ) {
-					continue;
-				}
-
-				$thumb = isset( $page['thumbnail']['source'] )
-					? $page['thumbnail']['source']
-					: null;
-				$desc = isset( $page['pageprops']['shortdesc'] )
-					? $page['pageprops']['shortdesc']
-					: null;
-
-				$pageLength = isset( $page['length'] ) ? (int)$page['length'] : 0;
-
-				$displayTitle = isset( $page['pageprops']['displaytitle'] )
-					? $page['pageprops']['displaytitle']
-					: ucwords( $title->getText() );
-
-				$pages[$page['title']] = [
-					'title' => $displayTitle,
-					'url' => $title->getLocalURL(),
-					'thumbnail' => $thumb,
-					'description' => $desc,
-					// 'editCount' => 0,
-					'pageLength' => $pageLength,
-				];
-			}
-		}
-
-		$orderedPages = [];
-		foreach ( $pageTitles as $titleText ) {
-			$wantedTitle = Title::newFromText( $titleText );
-			if ( !$wantedTitle ) {
-				continue;
-			}
-			$wantedPrefixedText = $wantedTitle->getPrefixedText();
-
-			foreach ( $pages as $pTitle => $pData ) {
-				$pTitleObj = Title::newFromText( $pTitle );
-				if ( $pTitleObj && $pTitleObj->getPrefixedText() === $wantedPrefixedText ) {
-					$orderedPages[] = $pData;
-					break;
-				}
-			}
-		}
-
-		return $orderedPages;
 	}
 
 	private static function logoSVG(): string {

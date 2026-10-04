@@ -7,6 +7,22 @@ This extension was designed for usage on Obby Wiki server architecture and is no
 
 ## Dependencies
 
+### Required
+
+* [PageImages](https://www.mediawiki.org/wiki/Extension:PageImages), used for the spotlight carousel images and the animated Discord spotlight.
+
+### Requirements for the animated Discord spotlight
+
+Optional. Without these the Discord embed falls back to a static thumbnail, or set `$wgObbyWikiHomePageSpotlightAnimation = false;` to turn the feature off.
+
+* PHP `imagick` extension, with an ImageMagick build that can read WebP and write animated WebP (or set `$wgObbyWikiHomePageSpotlightAnimationFormat = 'gif';`).
+* [PageImages](https://www.mediawiki.org/wiki/Extension:PageImages)
+* A working job queue.
+* A writable upload directory or file backend. Output is stored under `obbywikihomepage/` in the public zone.
+* Enough memory or temp disk for the render. A 7-slide animation is roughly 400 MB of uncompressed frames. Imagick is capped at ~256 MB of RAM during the render and spills the rest to its temp directory.
+
+To render on demand: `php maintenance/run.php ObbyWikiHomePage:renderSpotlight [--out /tmp/spotlight.webp] [--force]`
+
 ### Soft Dependencies
 
 The following extensions provide functionality but are not required:
@@ -29,7 +45,6 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * add alt text to thumbnails
 * "find obby games to play" sort/feature
 * add JSON-LD (`WebSite` + `SearchAction`), `og:image`, and canonical URL for the home page
-* Generate a GIF thumbnail carousel to replicate the live HTML carousel and its thumbnail items for Discord's embed components
 
 ### UX
 * respect `prefers-reduced-motion` for carousel autoplay; improve keyboard/focus on spotlight slides (clones are not focusable)
