@@ -162,7 +162,7 @@ class Hooks {
 				'type' => 17,
 				'accent_color' => 25075,
 				'components' => array_values( array_filter( [
-					[ 'type' => 10, 'content' => '# <:obbywiki:1556328301260447867>  [The Obby Wiki](https://obby.wiki)' ],
+					[ 'type' => 10, 'content' => '# <:obbywiki:1556328301260447867> [The Obby Wiki](https://obby.wiki)' ],
 					self::buildDiscordSpotlightGallery(),
 					[
 						'type' => 10,
@@ -175,7 +175,6 @@ class Hooks {
 							self::buildDiscordLinkButton( 'Home', 'Home', false, self::DISCORD_OBBYWIKI_EMOJI ),
 							self::buildDiscordLinkButton( 'All Obbies', 'Category:Obby' ),
 							self::buildDiscordLinkButton( 'About', 'Obby_Wiki:About', false, self::DISCORD_OBBYWIKI_EMOJI ),
-							self::buildDiscordLinkButton( 'More', 'Obby_Wiki:About#More', false, self::DISCORD_OBBYWIKI_EMOJI ),
 							self::buildDiscordLinkButton( 'Discord', 'https://discord.gg/vuJsnzKkKY', true, self::DISCORD_DISCORD_EMOJI )
 						],
 					],
