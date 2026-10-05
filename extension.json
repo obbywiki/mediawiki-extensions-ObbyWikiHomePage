@@ -5,7 +5,7 @@
 	"author": [
 		"[https://obby.wiki The Obby Wiki]"
 	],
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"license-name": "MIT",
 	"url": "https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage",
 	"type": "other",
