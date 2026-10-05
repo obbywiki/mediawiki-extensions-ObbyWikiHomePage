@@ -1776,14 +1776,14 @@ SVG;
 
 	{$trendingHTML}
 
-	{$blogPostsHTML}
-
 	<div class="obbywiki-split">
 		{$recentChangesHTML}
 		<aside class="obbywiki-split__aside"></aside>
 	</div>
-
+	
 	{$aboutHTML}
+
+	{$blogPostsHTML}
 </div>
 HTML;
 	}
