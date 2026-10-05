@@ -1483,11 +1483,24 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	transition: color 0.15s ease;
 }
 
+/* SPLIT ROW (recent changes + aside) */
+.obbywiki-split {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+	align-items: start;
+}
+
+.obbywiki-split__aside {
+	min-width: 0;
+}
+
 /* RECENT CHANGES SECTION */
 .obbywiki-recent {
 	display: flex;
 	flex-direction: column;
 	gap: 0.375rem;
+	min-width: 0;
 }
 
 .obbywiki-recent__header {
@@ -1511,18 +1524,19 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 }
 
 .obbywiki-recent__list {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+	display: flex;
+	flex-direction: column;
 	gap: 0.375rem;
 }
 
 .obbywiki-recent__item,
 .obbywiki-recent__item:visited {
 	display: flex;
-	flex-direction: column;
-	gap: 0.375rem;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.75rem;
 	min-width: 0;
-	padding: 1rem 1.125rem;
+	padding: 0.625rem 0.875rem;
 	border-radius: var(--border-radius-base, 8px);
 	background: var(--color-surface-1, #f8f9fa);
 	border: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.06));
@@ -1560,24 +1574,14 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 }
 
 .obbywiki-recent__item-meta {
+	flex-shrink: 0;
+	max-width: 50%;
 	font-size: 0.6875rem;
 	color: var(--color-subtle, #72777d);
 	line-height: 1.2;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-}
-
-@media (max-width: 900px) {
-	.obbywiki-recent__list {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-}
-
-@media (max-width: 480px) {
-	.obbywiki-recent__list {
-		grid-template-columns: 1fr;
-	}
 }
 
 /* ARCHIVE SECTION */
@@ -1989,6 +1993,14 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 
 	.obbywiki-featured {
 		grid-template-columns: 1fr;
+	}
+
+	.obbywiki-split {
+		grid-template-columns: 1fr;
+	}
+
+	.obbywiki-split__aside:empty {
+		display: none;
 	}
 
 	.obbywiki-month {

@@ -23,7 +23,7 @@ class Hooks {
 	private const BLOG_PROP_AUTHOR = 'modernblog-author';
 	private const BLOG_PROP_SUBTITLE = 'modernblog-subtitle';
 	// cache
-	private const HOME_PAGE_CACHE_VERSION = 'v16'; // only reset for large changes
+	private const HOME_PAGE_CACHE_VERSION = 'v17'; // only reset for large changes
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 	// trending
@@ -1778,7 +1778,10 @@ SVG;
 
 	{$blogPostsHTML}
 
-	{$recentChangesHTML}
+	<div class="obbywiki-split">
+		{$recentChangesHTML}
+		<aside class="obbywiki-split__aside"></aside>
+	</div>
 
 	{$aboutHTML}
 </div>
