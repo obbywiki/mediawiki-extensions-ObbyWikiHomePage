@@ -73,7 +73,7 @@
 }
 
 .obbywiki-homepage .citizen-sitenotice-container {
-	background-color: color-mix(in srgb,var(--color-surface-2,var(--background-color-base,#fff)) 55%,transparent) !important;
+	background-color: color-mix(in srgb,var(--color-surface-1,var(--background-color-base,#fff)) 55%,transparent) !important;
     backdrop-filter: saturate(1.15) blur(16px);
 }
 
