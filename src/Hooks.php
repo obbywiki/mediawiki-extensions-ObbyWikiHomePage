@@ -55,7 +55,7 @@ class Hooks {
 
 	/** @var list<array{key:string,title:string,label:string,hue:int}> */
 	private const SUB_GENRE_CARDS = [
-		[ 'key' => 'coop', 'title' => 'Category:Co-op Obby', 'label' => 'Co-op Obby', 'hue' => 195 ],
+		[ 'key' => 'coop', 'title' => 'Category:Co-Op Obby', 'label' => 'Co-Op Obby', 'hue' => 195 ],
 		[ 'key' => 'tower', 'title' => 'Category:Tower Obby', 'label' => 'Tower Obby', 'hue' => 275 ],
 		[ 'key' => 'towerstage', 'title' => 'Category:Tower Stage Obby', 'label' => 'Tower Stage Obby', 'hue' => 320 ],
 		[ 'key' => 'dco', 'title' => 'Category:Difficulty Chart Obby', 'label' => 'Difficulty Chart Obby', 'hue' => 28 ],
@@ -1516,7 +1516,7 @@ SVG;
 		// build category URLs for the aside
 		$categoryURLs = [
 			'classic' => htmlspecialchars( Title::newFromText( 'Category:Classic Obby' )->getLocalURL() ),
-			'coop' => htmlspecialchars( Title::newFromText( 'Category:Co-op Obby' )->getLocalURL() ),
+			'coop' => htmlspecialchars( Title::newFromText( 'Category:Co-Op Obby' )->getLocalURL() ),
 			'tower' => htmlspecialchars( Title::newFromText( 'Category:Tower Obby' )->getLocalURL() ),
 			'towerstage' => htmlspecialchars( Title::newFromText( 'Category:Tower Stage Obby' )->getLocalURL() ),
 			'dco' => htmlspecialchars( Title::newFromText( 'Category:Difficulty Chart Obby' )->getLocalURL() ),
@@ -1604,7 +1604,7 @@ SVG;
 		$styleGuideURL = htmlspecialchars( Title::newFromText( 'OW:Style guide' )->getLocalURL() );
 		$helpURL = htmlspecialchars( Title::newFromText( 'Help:Contents' )->getLocalURL() );
 		$classicURL = htmlspecialchars( Title::newFromText( 'Category:Classic Obby' )->getLocalURL() );
-		$coopURL = htmlspecialchars( Title::newFromText( 'Category:Co-op Obby' )->getLocalURL() );
+		$coopURL = htmlspecialchars( Title::newFromText( 'Category:Co-Op Obby' )->getLocalURL() );
 		$towerURL = htmlspecialchars( Title::newFromText( 'Category:Tower Obby' )->getLocalURL() );
 		$dcoURL = htmlspecialchars( Title::newFromText( 'Category:Difficulty Chart Obby' )->getLocalURL() );
 		$gimmickURL = htmlspecialchars( Title::newFromText( 'Category:Gimmick Obby' )->getLocalURL() );
