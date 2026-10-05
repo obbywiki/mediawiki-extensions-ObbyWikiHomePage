@@ -288,8 +288,7 @@ class Hooks {
 		$onThisDay = self::getOnThisDayReleases();
 		$blogPosts = self::getBlogPosts();
 		$trendingPages = self::getTrendingPages();
-		$subGenreCounts = self::fetchCategoryPageCounts(
-			array_column( self::SUB_GENRE_CARDS, 'title' )
+		$subGenreCounts = self::fetchCategoryPageCounts( array_merge( array_column( self::SUB_GENRE_CARDS, 'title' ), [ 'Category:Obby' ] )
 		);
 		return self::buildHomePageHTML(
 			$logoSVG,
@@ -1639,6 +1638,8 @@ SVG;
 			'contributing' => htmlspecialchars( Title::newFromText( 'Help:Contributing' )->getLocalURL() ),
 		];
 
+		$obbyTotalLabel = htmlspecialchars( number_format( (int)( $subGenreCounts['Category:Obby'] ?? 0 ) ) );
+
 		$typeGridHTML = '';
 		foreach ( self::SUB_GENRE_CARDS as $card ) {
 			$cardUrl = $categoryURLs[$card['key']] ?? '';
@@ -1923,7 +1924,7 @@ SVG;
 					<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="m240-160 40-160H120l20-80h160l40-160H180l20-80h160l40-160h80l-40 160h160l40-160h80l-40 160h160l-20 80H660l-40 160h160l-20 80H600l-40 160h-80l40-160H360l-40 160h-80Zm140-240h160l40-160H420l-40 160Z"/></svg></span>
 					<h2 class="obbywiki-aside__title">Obby Sub-genres</h2>
 				</div>
-				<a href="{$categoryURLs['obby']}" class="obbywiki-aside__all">View all</a>
+				<a href="{$categoryURLs['obby']}" class="obbywiki-aside__all">View all ({$obbyTotalLabel})</a>
 			</div>
 			<div class="obbywiki-aside__type-grid">
 				{$typeGridHTML}
@@ -1939,9 +1940,9 @@ SVG;
 			<p class="obbywiki-aside__text">Help contribute to the largest obby database ever by adding a new obby, editing an existing article, or helping in another way.</p>
 			<div class="obbywiki-featured__aside-cta-links">
 				<div class="obbywiki-featured__aside-cta-row">
-					<a class="obbywiki-featured__aside-cta-add owaf-new-article-trigger" aria-label="Create a new article">
+					<button type="button" class="obbywiki-featured__aside-cta-add owaf-new-article-trigger" aria-label="Create a new article">
 						<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
-					</a>
+					</button>
 					<span class="obbywiki-featured__aside-cta-divider" aria-hidden="true">|</span>
 					<div class="obbywiki-featured__aside-cta-stack">
 						<a href="{$categoryURLs['contributing']}" class="obbywiki-featured__aside-cta-link">
