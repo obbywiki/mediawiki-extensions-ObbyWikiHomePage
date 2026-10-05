@@ -23,7 +23,7 @@ class Hooks {
 	private const BLOG_PROP_AUTHOR = 'modernblog-author';
 	private const BLOG_PROP_SUBTITLE = 'modernblog-subtitle';
 	// cache
-	private const HOME_PAGE_CACHE_VERSION = 'v19'; // only reset for large changes
+	private const HOME_PAGE_CACHE_VERSION = 'v20'; // only reset for large changes
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 	// trending
@@ -626,7 +626,7 @@ SVG;
 		return $changes;
 	}
 
-	/** @return list<array{title:string,url:string,thumbnail:?string,year:int}> */
+	/** @return list<array{title:string,url:string,thumbnail:?string,description:?string,year:int}> */
 	private static function getOnThisDayReleases(): array {
 		if ( !ExtensionRegistry::getInstance()->isLoaded( 'Cargo' ) ) {
 			return [];
@@ -678,7 +678,7 @@ SVG;
 			'prop' => 'pageimages|pageprops',
 			'piprop' => 'thumbnail',
 			'pithumbsize' => '80',
-			'ppprop' => 'displaytitle',
+			'ppprop' => 'shortdesc|displaytitle',
 		] );
 
 		$api = new ApiMain( $request, false );
@@ -713,6 +713,7 @@ SVG;
 				'title' => $page['pageprops']['displaytitle'] ?? $title->getText(),
 				'url' => $title->getLocalURL(),
 				'thumbnail' => $page['thumbnail']['source'] ?? null,
+				'description' => $page['pageprops']['shortdesc'] ?? null,
 				'year' => $year,
 			];
 		}
@@ -1733,9 +1734,16 @@ SVG;
 							. $hue . '">' . htmlspecialchars( mb_substr( $otd['title'], 0, 1 ) ) . '</span>';
 					}
 
+					$otdDescHTML = $otd['description']
+						? '<span class="obbywiki-onthisday__item-desc">' . htmlspecialchars( $otd['description'] ) . '</span>'
+						: '';
+
 					$otdListHTML .= '<a href="' . $otdUrl . '" class="obbywiki-onthisday__item">' .
 						$otdThumbHTML .
-						'<span class="obbywiki-onthisday__item-title">' . $otdTitle . '</span>' .
+						'<span class="obbywiki-onthisday__item-body">' .
+							'<span class="obbywiki-onthisday__item-title">' . $otdTitle . '</span>' .
+							$otdDescHTML .
+						'</span>' .
 					'</a>';
 				}
 			}
@@ -1748,7 +1756,7 @@ SVG;
 				'<div class="obbywiki-onthisday__header">' .
 					'<span class="obbywiki-recent__icon"><svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="currentColor"><path d="M480-400q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-188.5-11.5Q280-423 280-440t11.5-28.5Q303-480 320-480t28.5 11.5Q360-457 360-440t-11.5 28.5Q337-400 320-400t-28.5-11.5ZM640-400q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-188.5-11.5Q280-263 280-280t11.5-28.5Q303-320 320-320t28.5 11.5Q360-297 360-280t-11.5 28.5Q337-240 320-240t-28.5-11.5ZM640-240q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240ZM200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Z"/></svg></span>' .
 					'<h2 class="obbywiki-recent__title">Released On This Day</h2>' .
-					'<span class="obbywiki-onthisday__date">' . htmlspecialchars( $today->format( 'F j' ) ) . '</span>' .
+					'<span class="obbywiki-onthisday__date">' . htmlspecialchars( $today->format( 'F j (Y)' ) ) . '</span>' .
 				'</div>' .
 				'<div class="obbywiki-onthisday__list">' . $otdListHTML . '</div>' .
 			'</section>';
