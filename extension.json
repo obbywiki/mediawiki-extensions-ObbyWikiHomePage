@@ -85,6 +85,10 @@
 			"value": true,
 			"description": "[DEPRECATED] If true, perform one extra GET /t/{id}.json for the featured announcement only (first post text + author). Other topics use list excerpts only. Set false if the forum is slow or unreachable so the home page depends only on the tag list request."
 		},
+		"ObbyWikiHomePageDiscordInvite": {
+			"value": "https://discord.gg/vuJsnzKkKY",
+			"description": "Discord invite URL shown in the home page contributing card and the Discord component embed. Leave this empty to hide the Discord links."
+		},
 		"ObbyWikiHomePageBlogPostLimit": {
 			"value": 4,
 			"description": "Maximum ModernBlog posts from the Blog namespace to show in the home page announcements section."

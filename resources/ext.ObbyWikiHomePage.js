@@ -374,9 +374,50 @@
 		setPaused( reducedMotion.matches );
 	}
 
+	// contributing card stats (one at a time, paused on hover and for reduced motion)
+
+	var STAT_ROTATE_INTERVAL_MS = 3500;
+
+	function initStatRotator() {
+		var container = document.querySelector( '.obbywiki-aside__stats' );
+		var stats = container ? container.querySelectorAll( '.obbywiki-aside__stat' ) : [];
+		if ( stats.length < 2 ) {
+			return;
+		}
+
+		var current = 0;
+		var held = false;
+		var reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' );
+
+		setInterval( function () {
+			if ( held || reducedMotion.matches || document.hidden ) {
+				return;
+			}
+
+			var prev = stats[ current ];
+			current = ( current + 1 ) % stats.length;
+			prev.classList.remove( 'obbywiki-aside__stat--active' );
+			prev.classList.add( 'obbywiki-aside__stat--leaving' );
+			stats[ current ].classList.add( 'obbywiki-aside__stat--active' );
+
+			// once faded out, it resets below, so the next entrance slides up again
+			setTimeout( function () {
+				prev.classList.remove( 'obbywiki-aside__stat--leaving' );
+			}, 400 );
+		}, STAT_ROTATE_INTERVAL_MS );
+
+		container.addEventListener( 'pointerenter', function () {
+			held = true;
+		} );
+		container.addEventListener( 'pointerleave', function () {
+			held = false;
+		} );
+	}
+
 	function init() {
 		initRelativeTimes();
 		initSpotlight();
+		initStatRotator();
 	}
 
 	if ( document.readyState === 'loading' ) {
