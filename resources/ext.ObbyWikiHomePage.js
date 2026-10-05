@@ -58,6 +58,7 @@
 		var bars = document.querySelectorAll( '.obbywiki-spotlight__bar' );
 		var prevBtn = document.querySelector( '.obbywiki-spotlight__arrow--prev' );
 		var nextBtn = document.querySelector( '.obbywiki-spotlight__arrow--next' );
+		var toggleBtn = document.querySelector( '.obbywiki-spotlight__toggle' );
 		var spotlight = document.querySelector( '.obbywiki-spotlight' );
 
 		if ( !viewport || !track || originalSlides.length === 0 ) {
@@ -66,9 +67,10 @@
 
 		var current = 0; // logical index
 		var count = originalSlides.length;
-		var interval = null;
-		var INTERVAL_MS = 4000;
 		var isTransitioning = false;
+		var paused = false;
+		var userToggledPause = false;
+		var reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' );
 
 		var hasClones = count > 1;
 
@@ -112,6 +114,11 @@
 				if ( current === 0 && newIndex === -1 ) isAdjacent = true;
 			}
 
+			// reduced motion: jump straight to the slide, no sliding
+			if ( reducedMotion.matches ) {
+				isAdjacent = false;
+			}
+
 			var physicalIndex;
 
 			if ( newIndex >= count ) {
@@ -127,6 +134,8 @@
 
 			if ( !isAdjacent ) {
 				track.style.transition = 'none';
+				// instant jumps land on the real slide, never a clone
+				physicalIndex = hasClones ? current + 1 : current;
 			}
 
 			track.style.transform = 'translateX(-' + ( physicalIndex * 100 ) + '%)';
@@ -156,6 +165,7 @@
 				if ( j === current ) {
 					bars[ j ].classList.add( 'obbywiki-spotlight__bar--active' );
 					if ( fill ) {
+						fill.style.width = '';
 						fill.style.animation = 'none';
 						void fill.offsetWidth;
 						fill.style.animation = '';
@@ -178,16 +188,29 @@
 			goTo( current - 1 );
 		}
 
-		function startAutoplay() {
-			stopAutoplay();
-			interval = setInterval( next, INTERVAL_MS );
+		bars.length && bars[ 0 ].parentNode.addEventListener( 'animationend', function ( e ) {
+			if ( e.animationName !== 'obbywiki-bar-progress' || paused ) {
+				return;
+			}
+			next();
+		} );
+
+		function setHeld( value ) {
+			if ( spotlight ) {
+				spotlight.classList.toggle( 'obbywiki-spotlight--held', value );
+			}
 		}
 
-		function stopAutoplay() {
-			if ( interval ) {
-				clearInterval( interval );
-				interval = null;
+		function setPaused( value ) {
+			paused = value;
+			if ( spotlight ) {
+				spotlight.classList.toggle( 'obbywiki-spotlight--paused', paused );
 			}
+			if ( toggleBtn ) {
+				toggleBtn.setAttribute( 'aria-label', paused ? 'Play' : 'Pause' );
+			}
+			// restart the active progress bar (which is the timer) from zero
+			updateBars();
 		}
 
 		// ── button / bar navigation (desktop only, too small on mobile) ──
@@ -206,17 +229,23 @@
 				nextBtn.tabIndex = -1;
 			}
 		} else {
+			if ( toggleBtn && hasClones ) {
+				toggleBtn.hidden = false;
+				toggleBtn.addEventListener( 'click', function () {
+					userToggledPause = true;
+					setPaused( !paused );
+				} );
+			}
+
 			if ( prevBtn ) {
 				prevBtn.addEventListener( 'click', function () {
 					prev();
-					startAutoplay();
 				} );
 			}
 
 			if ( nextBtn ) {
 				nextBtn.addEventListener( 'click', function () {
 					next();
-					startAutoplay();
 				} );
 			}
 
@@ -230,21 +259,19 @@
 
 					bar.addEventListener( 'click', function () {
 						goTo( idx );
-						startAutoplay();
 					} );
 
 					bar.addEventListener( 'keydown', function ( e ) {
 						if ( e.key === 'Enter' || e.key === ' ' ) {
 							e.preventDefault();
 							goTo( idx );
-							startAutoplay();
 						}
 					} );
 				} )( i );
 			}
 		}
 
-		// ── touch: real-time drag with momentum snap ──
+		// -- touch: real-time drag with momentum snap --
 
 		var touchStartX = 0;
 		var lastTouchX = 0;
@@ -255,7 +282,7 @@
 			if ( isTransitioning ) {
 				return;
 			}
-			stopAutoplay();
+			setHeld( true );
 			isDragging = true;
 			touchStartX = e.touches[ 0 ].clientX;
 			lastTouchX = touchStartX;
@@ -300,30 +327,51 @@
 				track.style.transform = 'translateX(-' + ( physicalIndex * 100 ) + '%)';
 			}
 
-			startAutoplay();
+			setHeld( false );
 		}, { passive: true } );
 
-		// ── hover pause ──
+		viewport.addEventListener( 'touchcancel', function () {
+			if ( !isDragging ) {
+				return;
+			}
+			isDragging = false;
+			track.style.transition = '';
+			var physicalIndex = hasClones ? current + 1 : current;
+			track.style.transform = 'translateX(-' + ( physicalIndex * 100 ) + '%)';
+			setHeld( false );
+		}, { passive: true } );
+
+		// -- hover hold (real mice only; taps emit a mouseenter that never gets a mouseleave) --
 
 		if ( spotlight ) {
-			spotlight.addEventListener( 'mouseenter', function () {
-				stopAutoplay();
-				var activeFill = spotlight.querySelector( '.obbywiki-spotlight__bar--active .obbywiki-spotlight__bar-fill' );
-				if ( activeFill ) {
-					activeFill.style.animationPlayState = 'paused';
+			spotlight.addEventListener( 'pointerenter', function ( e ) {
+				if ( e.pointerType === 'mouse' ) {
+					setHeld( true );
 				}
 			} );
 
-			spotlight.addEventListener( 'mouseleave', function () {
-				var activeFill = spotlight.querySelector( '.obbywiki-spotlight__bar--active .obbywiki-spotlight__bar-fill' );
-				if ( activeFill ) {
-					activeFill.style.animationPlayState = 'running';
+			spotlight.addEventListener( 'pointerleave', function ( e ) {
+				if ( e.pointerType === 'mouse' ) {
+					setHeld( false );
 				}
-				startAutoplay();
 			} );
 		}
 
-		startAutoplay();
+		// -- reduced motion: no autoplay unless the user explicitly hits play --
+
+		function onReducedMotionChange() {
+			if ( !userToggledPause ) {
+				setPaused( reducedMotion.matches );
+			}
+		}
+
+		if ( reducedMotion.addEventListener ) {
+			reducedMotion.addEventListener( 'change', onReducedMotionChange );
+		} else if ( reducedMotion.addListener ) {
+			reducedMotion.addListener( onReducedMotionChange );
+		}
+
+		setPaused( reducedMotion.matches );
 	}
 
 	function init() {

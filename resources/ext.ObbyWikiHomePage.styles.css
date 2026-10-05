@@ -738,6 +738,29 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	right: -0.5rem;
 }
 
+/* pause/play toggle */
+.obbywiki-spotlight__toggle[hidden] {
+	display: none;
+}
+
+.obbywiki-spotlight__toggle::after {
+	left: -0.1875rem;
+	right: -0.5rem;
+}
+
+.obbywiki-spotlight__arrow--next:has(+ .obbywiki-spotlight__toggle:not([hidden]))::after {
+	right: -0.1875rem;
+}
+
+.obbywiki-spotlight__toggle .obbywiki-spotlight__toggle-play,
+.obbywiki-spotlight--paused .obbywiki-spotlight__toggle-pause {
+	display: none;
+}
+
+.obbywiki-spotlight--paused .obbywiki-spotlight__toggle .obbywiki-spotlight__toggle-play {
+	display: block;
+}
+
 .obbywiki-spotlight__arrow:hover {
 	background: rgba(255, 255, 255, 0.2);
 	opacity: 1;
@@ -822,6 +845,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	background: #fff;
 	border-radius: 999px;
 	pointer-events: none;
+	transition: opacity 0.2s ease;
 }
 
 .obbywiki-spotlight__bar--active .obbywiki-spotlight__bar-fill {
@@ -831,6 +855,27 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 @keyframes obbywiki-bar-progress {
 	from { width: 0%; }
 	to { width: 100%; }
+}
+
+.obbywiki-spotlight--held:not(.obbywiki-spotlight--paused) .obbywiki-spotlight__bar--active .obbywiki-spotlight__bar-fill {
+	animation-play-state: paused;
+	opacity: 0.45;
+}
+
+.obbywiki-spotlight--paused .obbywiki-spotlight__bar--active .obbywiki-spotlight__bar-fill {
+	animation: none;
+	width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.obbywiki-spotlight,
+	.obbywiki-spotlight__track {
+		transition: none;
+	}
+
+	.obbywiki-spotlight__bar--active .obbywiki-spotlight__bar-fill {
+		width: 100% !important;
+	}
 }
 
 @media (max-width: 640px) {

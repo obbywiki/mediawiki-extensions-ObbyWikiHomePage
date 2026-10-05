@@ -48,7 +48,7 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * add JSON-LD (`WebSite` + `SearchAction`), `og:image`, and canonical URL for the home page
 
 ### UX
-* respect `prefers-reduced-motion` for carousel autoplay; improve keyboard/focus on spotlight slides (clones are not focusable)
+* improve keyboard/focus on spotlight slides (clones are not focusable)
 
 ### Technical
 * **Localization (i18n)**: Move hardcoded strings to system messages.
