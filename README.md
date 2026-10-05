@@ -30,6 +30,7 @@ The following extensions provide functionality but are not required:
 
 * [TrendingArticles](https://github.com/wikux/mediawiki-extensions-TrendingArticles)
 * [ModernBlog](https://github.com/obbywiki/mediawiki-extensions-ModernBlog)
+* [Cargo](https://www.mediawiki.org/wiki/Extension:Cargo), used for the "Released On This Day" list. Reads `year`, `month`, `day` and `visits` from the `Obbies` table.
 
 ## TODO
 
@@ -41,7 +42,6 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * **Site Statistics**: Create a visual "At a Glance" section for wiki-wide stats. Somewhere below the area, maybe split the contributing section and put this as the other half.
 * **Spotlight carousel**: Fix automatic featured-page selection (displaytitle parsing is finicky) and re-enable when stable; support rotation/diversity so the same pages are not always shown.
 * Add dynamic site events like seasonal obby highlights and other events like sales in games
-* "On this day..." releases (potentialy better with a template and cargo)
 * **FAQ**: hardest roblox obbies, how do i find new obbies to play, best obbies for beginners, how do i make an obby, etc.
 * add alt text to thumbnails
 * "find obby games to play" sort/feature

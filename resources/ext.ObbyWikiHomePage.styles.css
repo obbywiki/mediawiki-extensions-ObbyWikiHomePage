@@ -1487,7 +1487,8 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 1rem;
-	align-items: start;
+	/* aside frame matches the recent changes height */
+	align-items: stretch;
 }
 
 .obbywiki-split__aside {
@@ -1567,11 +1568,6 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	white-space: nowrap;
 }
 
-.obbywiki-recent__item:hover .obbywiki-recent__item-title,
-.obbywiki-recent__item:visited:hover .obbywiki-recent__item-title {
-	text-decoration: underline;
-}
-
 .obbywiki-recent__item-meta {
 	flex-shrink: 0;
 	max-width: 50%;
@@ -1581,6 +1577,126 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+/* ON THIS DAY SECTION (framed aside next to recent changes) */
+.obbywiki-onthisday {
+	height: 100%;
+	box-sizing: border-box;
+	padding: 1rem 1.125rem;
+	border-radius: var(--border-radius-medium, 12px);
+	background: var(--color-surface-1, #f8f9fa);
+	border: 1px solid var(--border-color-base, rgba(0, 0, 0, 0.06));
+	display: flex;
+	flex-direction: column;
+	gap: 0.625rem;
+	min-width: 0;
+}
+
+.obbywiki-onthisday__header {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+}
+
+.obbywiki-onthisday__date {
+	margin-left: auto;
+	font-size: 0.75rem;
+	color: var(--color-subtle, #72777d);
+}
+
+.obbywiki-onthisday__list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.obbywiki-onthisday__year {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	color: var(--color-subtle, #54595d);
+	margin: 0.625rem 0 0.25rem;
+	padding: 0 0.375rem;
+}
+
+.obbywiki-onthisday__year:first-child {
+	margin-top: 0;
+}
+
+.obbywiki-onthisday__year-ago {
+	font-weight: 400;
+	letter-spacing: normal;
+	color: var(--color-subtle, #72777d);
+}
+
+.obbywiki-onthisday__item,
+.obbywiki-onthisday__item:visited {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+	min-width: 0;
+	padding: 0.3125rem 0.375rem;
+	border-radius: var(--border-radius-base, 8px);
+	text-decoration: none;
+	color: var(--color-base, #202122);
+	transition: background 0.15s ease;
+}
+
+.obbywiki-onthisday__item:hover,
+.obbywiki-onthisday__item:visited:hover {
+	background: var(--color-surface-2, #eaecf0);
+	text-decoration: none;
+	color: var(--color-base, #202122);
+}
+
+.obbywiki-onthisday__item:focus-visible {
+	outline: 2px solid var(--color-progressive);
+	outline-offset: 2px;
+}
+
+.obbywiki-onthisday__thumb {
+	width: 56px;
+	height: 32px;
+	border-radius: var(--border-radius-base, 6px);
+	object-fit: cover;
+	flex-shrink: 0;
+}
+
+.obbywiki-onthisday__thumb--placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(
+		135deg,
+		hsl(var(--thumb-hue, 210), 55%, 52%),
+		hsl(calc(var(--thumb-hue, 210) + 40), 45%, 42%)
+	);
+	color: rgba(255, 255, 255, 0.8);
+	font-size: 0.8125rem;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.obbywiki-onthisday__item-title {
+	flex: 1;
+	min-width: 0;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	line-height: 1.3;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.obbywiki-onthisday__empty {
+	margin: 0;
+	padding: 0 0.375rem;
+	font-size: 0.8125rem;
+	color: var(--color-subtle, #72777d);
 }
 
 /* ARCHIVE SECTION */

@@ -23,11 +23,14 @@ class Hooks {
 	private const BLOG_PROP_AUTHOR = 'modernblog-author';
 	private const BLOG_PROP_SUBTITLE = 'modernblog-subtitle';
 	// cache
-	private const HOME_PAGE_CACHE_VERSION = 'v17'; // only reset for large changes
+	private const HOME_PAGE_CACHE_VERSION = 'v19'; // only reset for large changes
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
 	// trending
 	private const TRENDING_THUMB_SIZE = 368;
+	// on this day (cargo) (may be deprecated in the future, in favor of Bucket)
+	private const ON_THIS_DAY_CARGO_TABLE = 'Obbies';
+	private const ON_THIS_DAY_LIMIT = 8;
 	// discord
 	private const DISCORD_ALT_TEXT_MAX = 1024;
 	private const DISCORD_OBBYWIKI_EMOJI = [
@@ -272,6 +275,7 @@ class Hooks {
 		$thisMonthPages = self::getThisMonthPages();
 		$archiveMonths = self::getArchiveMonths();
 		$recentChanges = self::getRecentChanges();
+		$onThisDay = self::getOnThisDayReleases();
 		$blogPosts = self::getBlogPosts();
 		$trendingPages = self::getTrendingPages();
 		$subGenreCounts = self::fetchCategoryPageCounts(
@@ -286,7 +290,8 @@ class Hooks {
 			$recentChanges,
 			$blogPosts,
 			$trendingPages,
-			$subGenreCounts
+			$subGenreCounts,
+			$onThisDay
 		);
 	}
 
@@ -619,6 +624,100 @@ SVG;
 		}
 
 		return $changes;
+	}
+
+	/** @return list<array{title:string,url:string,thumbnail:?string,year:int}> */
+	private static function getOnThisDayReleases(): array {
+		if ( !ExtensionRegistry::getInstance()->isLoaded( 'Cargo' ) ) {
+			return [];
+		}
+
+		$today = new \DateTimeImmutable( 'now', new \DateTimeZone( 'UTC' ) );
+		$request = new FauxRequest( [
+			'action' => 'cargoquery',
+			'tables' => self::ON_THIS_DAY_CARGO_TABLE,
+			'fields' => '_pageID=id,year',
+			'where' => 'month=' . (int)$today->format( 'n' ) . ' AND day=' . (int)$today->format( 'j' )
+				. ' AND year IS NOT NULL',
+			'order_by' => 'visits DESC',
+			'limit' => 50,
+		] );
+
+		$api = new ApiMain( $request, false );
+
+		try {
+			$api->execute();
+		} catch ( \Throwable $e ) {
+			return [];
+		}
+
+		$data = $api->getResult()->getResultData( null, [
+			'Strip' => 'all',
+		] );
+
+		// pages that call the infobox twice store duplicate rows
+		$years = [];
+		foreach ( $data['cargoquery'] ?? [] as $row ) {
+			$page_id = (int)( $row['title']['id'] ?? 0 );
+			if ( $page_id <= 0 || isset( $years[$page_id] ) ) {
+				continue;
+			}
+			$years[$page_id] = (int)( $row['title']['year'] ?? 0 );
+			if ( count( $years ) >= self::ON_THIS_DAY_LIMIT ) {
+				break;
+			}
+		}
+
+		if ( $years === [] ) {
+			return [];
+		}
+
+		$request = new FauxRequest( [
+			'action' => 'query',
+			'pageids' => implode( '|', array_keys( $years ) ),
+			'prop' => 'pageimages|pageprops',
+			'piprop' => 'thumbnail',
+			'pithumbsize' => '80',
+			'ppprop' => 'displaytitle',
+		] );
+
+		$api = new ApiMain( $request, false );
+
+		try {
+			$api->execute();
+		} catch ( \Throwable $e ) {
+			return [];
+		}
+
+		$data = $api->getResult()->getResultData( null, [
+			'Strip' => 'all',
+		] );
+
+		$pages_by_id = [];
+		foreach ( $data['query']['pages'] ?? [] as $page ) {
+			if ( isset( $page['pageid'], $page['title'] ) ) {
+				$pages_by_id[(int)$page['pageid']] = $page;
+			}
+		}
+
+		// keep cargo's visits ordering
+		$releases = [];
+		foreach ( $years as $page_id => $year ) {
+			$page = $pages_by_id[$page_id] ?? null;
+			$title = $page ? Title::newFromText( $page['title'] ) : null;
+			if ( !$title ) {
+				continue;
+			}
+
+			$releases[] = [
+				'title' => $page['pageprops']['displaytitle'] ?? $title->getText(),
+				'url' => $title->getLocalURL(),
+				'thumbnail' => $page['thumbnail']['source'] ?? null,
+				'year' => $year,
+			];
+		}
+
+		return $releases;
 	}
 
 	// TrendingArticles soft-dep; top pages in a category by recent/all-time views
@@ -1203,7 +1302,7 @@ SVG;
 
 	// MAIN
 	// builds the full html
-	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [], array $trendingPages = [], array $subGenreCounts = [] ): string {
+	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [], array $trendingPages = [], array $subGenreCounts = [], array $onThisDay = [] ): string {
 		global $wgExtensionAssetsPath;
 		$scriptPath = wfScript();
 		$templateParser = new TemplateParser( dirname( __DIR__ ) . '/templates' );
@@ -1593,6 +1692,68 @@ SVG;
 			'</section>';
 		}
 
+		// on this day html (cargo soft-dep)
+		$onThisDayHTML = '';
+		if ( ExtensionRegistry::getInstance()->isLoaded( 'Cargo' ) ) {
+			$today = new \DateTimeImmutable( 'now', new \DateTimeZone( 'UTC' ) );
+			$currentYear = (int)$today->format( 'Y' );
+
+			// group by year (newest first); visits order is kept within a year
+			$otdByYear = [];
+			foreach ( $onThisDay as $otd ) {
+				$otdByYear[$otd['year']][] = $otd;
+			}
+			krsort( $otdByYear );
+
+			$otdListHTML = '';
+			foreach ( $otdByYear as $year => $yearReleases ) {
+				$yearsAgo = $currentYear - $year;
+				if ( $yearsAgo <= 0 ) {
+					$yearsAgoLabel = 'Today';
+				} elseif ( $yearsAgo === 1 ) {
+					$yearsAgoLabel = '1 year ago';
+				} else {
+					$yearsAgoLabel = $yearsAgo . ' years ago';
+				}
+
+				$otdListHTML .= '<h3 class="obbywiki-onthisday__year">' . (int)$year .
+					'<span class="obbywiki-onthisday__year-ago">' . htmlspecialchars( $yearsAgoLabel ) . '</span>' .
+				'</h3>';
+
+				foreach ( $yearReleases as $otd ) {
+					$otdUrl = htmlspecialchars( $otd['url'] );
+					$otdTitle = htmlspecialchars( $otd['title'] );
+
+					if ( $otd['thumbnail'] ) {
+						$otdThumbHTML = '<img class="obbywiki-onthisday__thumb" src="'
+							. htmlspecialchars( $otd['thumbnail'] ) . '" alt="' . $otdTitle . '" loading="lazy">';
+					} else {
+						$hue = abs( crc32( $otd['title'] ) ) % 360;
+						$otdThumbHTML = '<span class="obbywiki-onthisday__thumb obbywiki-onthisday__thumb--placeholder" style="--thumb-hue: '
+							. $hue . '">' . htmlspecialchars( mb_substr( $otd['title'], 0, 1 ) ) . '</span>';
+					}
+
+					$otdListHTML .= '<a href="' . $otdUrl . '" class="obbywiki-onthisday__item">' .
+						$otdThumbHTML .
+						'<span class="obbywiki-onthisday__item-title">' . $otdTitle . '</span>' .
+					'</a>';
+				}
+			}
+
+			if ( $otdListHTML === '' ) {
+				$otdListHTML = '<p class="obbywiki-onthisday__empty">No obbies on the wiki were released on this day.</p>';
+			}
+
+			$onThisDayHTML = '<section class="obbywiki-onthisday" aria-label="Released on this day">' .
+				'<div class="obbywiki-onthisday__header">' .
+					'<span class="obbywiki-recent__icon"><svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="currentColor"><path d="M480-400q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-188.5-11.5Q280-423 280-440t11.5-28.5Q303-480 320-480t28.5 11.5Q360-457 360-440t-11.5 28.5Q337-400 320-400t-28.5-11.5ZM640-400q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-188.5-11.5Q280-263 280-280t11.5-28.5Q303-320 320-320t28.5 11.5Q360-297 360-280t-11.5 28.5Q337-240 320-240t-28.5-11.5ZM640-240q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240ZM200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Z"/></svg></span>' .
+					'<h2 class="obbywiki-recent__title">Released On This Day</h2>' .
+					'<span class="obbywiki-onthisday__date">' . htmlspecialchars( $today->format( 'F j' ) ) . '</span>' .
+				'</div>' .
+				'<div class="obbywiki-onthisday__list">' . $otdListHTML . '</div>' .
+			'</section>';
+		}
+
 		// about section html
 		$aboutURL = htmlspecialchars( Title::newFromText( 'OW:About' )->getLocalURL() );
 		$aboutProjectsURL = htmlspecialchars( Title::newFromText( 'OW:About/Projects' )->getLocalURL() );
@@ -1778,7 +1939,7 @@ SVG;
 
 	<div class="obbywiki-split">
 		{$recentChangesHTML}
-		<aside class="obbywiki-split__aside"></aside>
+		<aside class="obbywiki-split__aside">{$onThisDayHTML}</aside>
 	</div>
 	
 	{$aboutHTML}
