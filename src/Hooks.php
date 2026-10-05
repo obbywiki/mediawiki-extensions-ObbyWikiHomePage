@@ -1897,7 +1897,7 @@ SVG;
 						<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
 					</button>
 					<button class="obbywiki-spotlight__arrow obbywiki-spotlight__toggle" aria-label="Pause" hidden>
-						<svg class="obbywiki-spotlight__toggle-pause" xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="4.25" y="4.25" width="7.5" height="7.5" rx="1.75"/></svg>
+						<svg class="obbywiki-spotlight__toggle-pause" xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="4.5" y="4" width="2.5" height="8" rx="1"/><rect x="9" y="4" width="2.5" height="8" rx="1"/></svg>
 						<svg class="obbywiki-spotlight__toggle-play" xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5.75 4.75v6.5L11.5 8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
 					</button>
 				</nav>
