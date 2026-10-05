@@ -464,7 +464,6 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	align-items: center;
 	justify-content: center;
 	overflow: hidden;
-	background: var(--color-surface-0, #fff);
 }
 
 .obbywiki-blog-card__logo > svg {
