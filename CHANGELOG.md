@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.4.0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/compare/v0.3.0...v0.4.0) (2026-10-05)
+
+
+### Features
+
+* add avif as a rendered slideshow option ([d690f73](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/d690f73f6405387850ccb6134d1cbe230c8eda34))
+* add discord link to discord embed components arr ([f2f2504](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/f2f2504289c26f0ccfe59d276e801ac970f7c070))
+* add emojis to more buttons for discord ([7b2fc1a](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/7b2fc1aa9f7f4d59dfdab2d3b0a35bca5edf7f44))
+* add libavif and svt-av1 to onSoftwareInfo ([4c854ee](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/4c854ee946ba01722d88f6c96279edbfe61c9a9d))
+* add logo emoji to discord embed (experiment) ([2d08b3a](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/2d08b3a5fafa2941cc60c3573332d9f5cb8381fd))
+* add more images ([17d407a](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/17d407a6f4835c97e82a4334f8b18e6698efdfda))
+* animated webp slideshow for discord component embeds media preview ([56f316b](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/56f316b4154aff8db66f34680c1a3db2f827e937))
+* **aside:** reorganize aside layout ([96dbc2e](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/96dbc2e3222abffcc6ba0d871d4d3274ce9a1367))
+* change classic obby to coop obby in subgenre aside ([60d1471](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/60d1471313412efdae87e85a8d9d93f1f0530c07))
+* change contributing aside text ([754b9fe](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/754b9fe8ff623580729be38c05ac3b2161088f79))
+* discord button emoji for discord ([6280ef6](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/6280ef6b1e6af0c7ae174c7c4804ded8ff28aa99))
+* discord component embeds ([2f4ef8f](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/2f4ef8fbd25abc83df5fbb55edfcc04f8983a483))
+* experimental with embeds ([321a731](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/321a731c741366d54fbddc902d52fe146a0822d0))
+* home button for discord ([0fcd4c9](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/0fcd4c9615f678e7e1f3d8744a3799500fec49d8))
+* hyperlink the obby wiki ([07d6696](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/07d669651be40c7815fcc9cb933878676bdaccbe))
+* image-set avif/webp ([7b64bd1](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/7b64bd197db8c882094e073fffe182628056cd6e))
+* import avifs ([fdeb634](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/fdeb634c3bc51af37f522c1421536e5a29d1c584))
+* improve discord embed ([0704f3e](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/0704f3e1a459070a4333c5e10cc366ad88056200))
+* improve embeds ([3bac7f3](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/3bac7f3ccc57240b7eac11bd8415f65d925631e4))
+* remove more button for discord ([22adb30](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/22adb30ed833456df1098f024f2915e5ff373f86))
+* remove text compomnent from discord component embeds ([8a2f473](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/8a2f473bfc267950efa630e9f59a118c7a8061bf))
+* try new discord emoji ([f44fa75](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/f44fa75d60eb973a2171f363bee3f1d657b1ac70))
+* **type-aside:** replace co-op obby with flood-type ([4385b63](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/4385b63a05083c3f3f1a1f9530ea2dccf7d59d7a))
+
+
+### Bug Fixes
+
+* discord embed error ([912b1d7](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/912b1d7e534b3cf2d0fd6f539faf81b156494ca9))
+* fix my poor syntax ([8a09a56](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/8a09a569106eff3fb03a1dd225f9926beac04b2b))
+* json syntax error ([15e1131](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/15e11314345a7eb949be86466c8e38f8d0f68eb2))
+* missing bool ([336aef3](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/336aef36b6fb3a18f5a2df90b3db3c8298aded1b))
+* sync co-op obby hue ([a0b370d](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/a0b370d2b7d86e9fcd6bfef387f9d7cc86eea02f))
+* syntax error ([aaf5120](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/aaf512057e69a56b57ac4a82115cacbd8f8a7e30))
+
 ## [0.3.0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/compare/v0.2.0...v0.3.0) (2026-08-29)
 
 
