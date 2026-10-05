@@ -30,7 +30,8 @@
 	},
 	"Hooks": {
 		"ArticleViewHeader": "ObbyWikiHomePageHooks",
-		"BeforePageDisplay": "ObbyWikiHomePageHooks"
+		"BeforePageDisplay": "ObbyWikiHomePageHooks",
+		"SoftwareInfo": "ObbyWikiHomePageHooks"
 	},
 	"ResourceFileModulePaths": {
 		"localBasePath": "",

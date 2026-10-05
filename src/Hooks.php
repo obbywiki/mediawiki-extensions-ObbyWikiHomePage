@@ -189,6 +189,21 @@ class Hooks {
 		);
 	}
 
+	/**
+	 * Lists avifenc and its SVT-AV1 encoder on Special:Version when the spotlight animation is AVIF.
+	 */
+	public static function onSoftwareInfo( array &$software ) {
+		if ( !SpotlightAnimation::isEnabled() || SpotlightAnimation::getSettings()['format'] !== 'avif' ) {
+			return;
+		}
+
+		$versions = SpotlightAnimation::getAvifencVersions();
+		$software['[https://github.com/AOMediaCodec/libavif libavif] (avifenc)'] = $versions['libavif'] ?? 'not found; AVIF disabled';
+		if ( $versions ) {
+			$software['[https://gitlab.com/AOMediaCodec/SVT-AV1 SVT-AV1]'] = $versions['svt'] ?? 'not in this avifenc build; AVIF disabled';
+		}
+	}
+
 	private static function buildDiscordSpotlightGallery(): ?array {
 		// media gallery with the animated spotlight, or the first slide's static thumbnail until the animation is ready. returns null when there's nothing
 		$items = SpotlightData::getItems();

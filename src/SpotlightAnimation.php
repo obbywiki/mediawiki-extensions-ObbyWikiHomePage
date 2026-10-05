@@ -100,9 +100,8 @@ class SpotlightAnimation {
 		if ( !isset( $supported[$format] ) ) {
 			if ( $format === 'avif' ) {
 				// Imagick only draws the PNG frames and avifenc (libavif 1.x with SVT-AV1) encodes them
-				$avifenc = self::getAvifencPath();
-				$supported[$format] = class_exists( Imagick::class ) && Imagick::queryFormats( 'PNG' ) && $avifenc !== null
-					&& str_contains( Shell::command( $avifenc, '--version' )->includeStderr()->execute()->getStdout(), 'svt [enc]' );
+				$supported[$format] = class_exists( Imagick::class ) && Imagick::queryFormats( 'PNG' )
+					&& ( self::getAvifencVersions()['svt'] ?? null ) !== null;
 			} else {
 				$supported[$format] = class_exists( Imagick::class ) && (bool)Imagick::queryFormats( strtoupper( $format ) );
 			}
@@ -119,6 +118,32 @@ class SpotlightAnimation {
 			return (string)$wgObbyWikiHomePageSpotlightAnimationAvifenc;
 		}
 		return ExecutableFinder::findInDefaultPaths( 'avifenc' ) ?: null;
+	}
+
+	/**
+	 * @return array{libavif: string, svt: ?string}|null
+	 */
+	public static function getAvifencVersions(): ?array {
+		$avifenc = self::getAvifencPath();
+		if ( $avifenc === null || Shell::isDisabled() ) {
+			return null;
+		}
+
+		$cache = MediaWikiServices::getInstance()->getLocalServerObjectCache();
+		// the mtime picks up a reinstalled avifenc without yielding for the TTL
+		$key = $cache->makeKey( 'obbywikihomepage', 'avifenc-version', md5( $avifenc ), (int)@filemtime( $avifenc ) );
+		$versions = $cache->getWithSetCallback( $key, $cache::TTL_HOUR, static function () use ( $avifenc ) {
+			$output = Shell::command( $avifenc, '--version' )->includeStderr()->execute()->getStdout();
+			if ( !preg_match( '/^Version:\s*(\S+)/m', $output, $m ) ) {
+				return [];
+			}
+
+			return [
+				'libavif' => $m[1],
+				'svt' => preg_match( '/svt \[enc\]:\s*v?([^,)\s]+)/', $output, $svt ) ? $svt[1] : null
+			];
+		} );
+		return $versions ?: null;
 	}
 
 	/**

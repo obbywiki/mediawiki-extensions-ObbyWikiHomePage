@@ -16,7 +16,7 @@ This extension was designed for usage on Obby Wiki server architecture and is no
 Optional. Without these the Discord embed falls back to a static thumbnail, or set `$wgObbyWikiHomePageSpotlightAnimation = false;` to turn the feature off.
 
 * PHP `imagick` extension, with an ImageMagick build that can read WebP and write animated WebP (or set `$wgObbyWikiHomePageSpotlightAnimationFormat = 'gif';`).
-* For `$wgObbyWikiHomePageSpotlightAnimationFormat = 'avif';` (several times smaller than WebP): `avifenc` from libavif 1.x built with SVT-AV1, e.g. Debian's `libavif-bin`. MediaWiki must be allowed to shell out.
+* For `$wgObbyWikiHomePageSpotlightAnimationFormat = 'avif';` (several times smaller than WebP): `avifenc` from libavif 1.x built with SVT-AV1, e.g. Debian's `libavif-bin`. MediaWiki must be allowed to shell out. You can see the the detected libavif and SVT-AV1 versions on Special:Version.
 * [PageImages](https://www.mediawiki.org/wiki/Extension:PageImages)
 * A working job queue.
 * A writable upload directory or file backend. Output is stored under `obbywikihomepage/` in the public zone.
