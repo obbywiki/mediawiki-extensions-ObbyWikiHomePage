@@ -43,7 +43,6 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * **Spotlight carousel**: Fix automatic featured-page selection (displaytitle parsing is finicky) and re-enable when stable; support rotation/diversity so the same pages are not always shown.
 * Add dynamic site events like seasonal obby highlights and other events like sales in games
 * **FAQ**: hardest roblox obbies, how do i find new obbies to play, best obbies for beginners, how do i make an obby, etc.
-* add alt text to thumbnails
 * "find obby games to play" sort/feature
 * add JSON-LD (`WebSite` + `SearchAction`), `og:image`, and canonical URL for the home page
 

@@ -1584,7 +1584,7 @@ SVG;
 					$tpThumb = htmlspecialchars( $tp['thumbnail'] );
 					$mediaHTML = '<span class="obbywiki-trending__media">'
 						. '<img class="obbywiki-trending__image" src="' . $tpThumb
-						. '" alt="" loading="lazy" decoding="async">'
+						. '" alt="' . $tpTitle . '" loading="lazy" decoding="async">'
 						. $infoHTML
 						. '</span>';
 				} else {
