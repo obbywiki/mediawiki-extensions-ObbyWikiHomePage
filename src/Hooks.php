@@ -1969,12 +1969,13 @@ SVG;
 
 	{$archiveHTML}
 
-	{$trendingHTML}
-
+	
 	<div class="obbywiki-split">
 		{$recentChangesHTML}
 		<aside class="obbywiki-split__aside">{$onThisDayHTML}</aside>
 	</div>
+	
+	{$trendingHTML}
 	
 	{$aboutHTML}
 
