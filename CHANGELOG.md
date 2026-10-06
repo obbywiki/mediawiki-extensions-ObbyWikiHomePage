@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/compare/v0.5.0...v0.6.0) (2026-10-06)
+
+
+### Features
+
+* add alt to trending articles thumbnails ([e60ca79](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/e60ca797ab03adaae4ceb17bec5bbc35be0daaa6))
+* move random obby button into aside ([ef295ea](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/ef295ea67cbd6dc24baa3df3ff6bee63d7415704))
+* reduce wgObbyWikiHomePageCacheTTL default to 300 ([2497471](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/2497471d30f7c93a7c57b3e9e13a5d269adf07de))
+
 ## [0.5.0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/compare/v0.4.0...v0.5.0) (2026-10-06)
 
 
