@@ -853,6 +853,7 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	transition: opacity 0.2s ease;
 }
 
+/* sync with SLIDE_INTERVAL_MS */
 .obbywiki-spotlight__bar--active .obbywiki-spotlight__bar-fill {
 	animation: obbywiki-bar-progress 4s linear forwards;
 }

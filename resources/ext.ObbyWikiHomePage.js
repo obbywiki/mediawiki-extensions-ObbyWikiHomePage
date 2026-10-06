@@ -70,6 +70,11 @@
 		var isTransitioning = false;
 		var paused = false;
 		var userToggledPause = false;
+		var held = false;
+		var SLIDE_INTERVAL_MS = 4000;
+		var timerId = null;
+		var timerStart = 0;
+		var timerRemaining = SLIDE_INTERVAL_MS;
 		var reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' );
 
 		var hasClones = count > 1;
@@ -145,7 +150,8 @@
 				track.style.transition = '';
 			} else if ( hasClones && ( physicalIndex === 0 || physicalIndex === count + 1 ) ) {
 				isTransitioning = true;
-				// Wait for the slide transition to complete, then snap instantly to the real slide
+				// Wait for the slide transition to complete, then snap instantly to the real slide.
+				// read the computed duration since skins (eg. citizen performance mode) can zero it
 				setTimeout( function () {
 					track.style.transition = 'none';
 					var snapPhysical = current + 1;
@@ -153,10 +159,16 @@
 					void track.offsetWidth;
 					track.style.transition = '';
 					isTransitioning = false;
-				}, 650 ); // Mapped to the CSS 0.65s transition
+				}, getTrackTransitionMs() );
 			}
 
 			updateBars();
+		}
+
+		function getTrackTransitionMs() {
+			var duration = window.getComputedStyle( track ).transitionDuration || '';
+			var value = parseFloat( duration ) || 0;
+			return duration.indexOf( 'ms' ) !== -1 ? value : value * 1000;
 		}
 
 		function updateBars() {
@@ -178,6 +190,42 @@
 					}
 				}
 			}
+			resetTimer();
+		}
+
+		// -- autoplay timer --
+
+		function startTimer() {
+			clearTimeout( timerId );
+			timerId = null;
+			if ( paused || held || !hasClones ) {
+				return;
+			}
+
+			timerStart = Date.now();
+			timerId = setTimeout( function () {
+				timerId = null;
+				timerRemaining = SLIDE_INTERVAL_MS;
+				next();
+
+				if ( timerId === null ) {
+					startTimer();
+				}
+			}, timerRemaining );
+		}
+
+		function resetTimer() {
+			timerRemaining = SLIDE_INTERVAL_MS;
+			startTimer();
+		}
+
+		function holdTimer() {
+			if ( timerId === null ) {
+				return;
+			}
+			clearTimeout( timerId );
+			timerId = null;
+			timerRemaining = Math.max( 0, timerRemaining - ( Date.now() - timerStart ) );
 		}
 
 		function next() {
@@ -188,16 +236,15 @@
 			goTo( current - 1 );
 		}
 
-		bars.length && bars[ 0 ].parentNode.addEventListener( 'animationend', function ( e ) {
-			if ( e.animationName !== 'obbywiki-bar-progress' || paused ) {
-				return;
-			}
-			next();
-		} );
-
 		function setHeld( value ) {
+			held = value;
 			if ( spotlight ) {
 				spotlight.classList.toggle( 'obbywiki-spotlight--held', value );
+			}
+			if ( held ) {
+				holdTimer();
+			} else {
+				startTimer();
 			}
 		}
 
