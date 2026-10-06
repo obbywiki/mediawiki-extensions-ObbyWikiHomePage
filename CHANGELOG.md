@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.5.0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/compare/v0.4.0...v0.5.0) (2026-10-06)
+
+
+### Features
+
+* carousel pause/play toggle + respect reduced motion ([ef3462b](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/ef3462bd27fc33c8096f45b6eaaf10d8ad27f5b4))
+* convert recent changes into a list ([43c95ba](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/43c95badee0134c717da77db2206baed6b365819))
+* improve on this day aside ([d654138](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/d654138ba8321e53227b2eb4fafc3f16eb67561b))
+* improve recently changed/on this day sections ([670bd16](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/670bd16bcbee997d866cc2d879ad0701dd143c2f))
+* improve sitenotice coloring ([cf24597](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/cf2459719698112a9cfc2e6fe0157364a850d268))
+* make sitenotice consistent with header styling ([58a878d](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/58a878dc02307f5fee70813388d2ebda5d81f460))
+* move the announcements html below the about html ([05d0b2d](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/05d0b2dcfc50fa01b04c39c442b46a49443b6eae))
+* move trending section down ([bdde918](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/bdde91867adfc202e9b53f5e2868254ec654f4b3))
+* on this day aside card ([e6c6406](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/e6c64061eb7cf186451778eca6a7106b93b13b98))
+* remove redundant background from obby wiki logo in blog cards ([4adc3c0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/4adc3c0b136c185773754b79fbd4802b2803aa5d))
+* remove year from on this day date ([1d4583a](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/1d4583af481abd6ba32813dd71e6f4f2d41fe25f))
+* revamp contributing aside ([268431a](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/268431a33b877fe6de66cf81099f882f4c37cc0e))
+* switch stop icon with pause ([6baf21b](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/6baf21b6559bfdf661a254207102ebaea9737182))
+* total obby count + fix new button aria errors ([39b6a91](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/39b6a911145e3bfabe466ca4f2712ca12cb9ccd2))
+
+
+### Bug Fixes
+
+* co-op obby category mismatch ([1f85b6c](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/1f85b6c0d3981c6a9ab413eba92615bf21237aec))
+
 ## [0.4.0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/compare/v0.3.0...v0.4.0) (2026-10-05)
 
 
