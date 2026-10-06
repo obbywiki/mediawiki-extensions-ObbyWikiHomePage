@@ -1323,11 +1323,6 @@ SVG;
 		// mini nav links
 		$navLinks = [
 			[
-				'url' => Title::newFromText( 'Special:RandomInCategory/Obby' )->getLocalURL(),
-				'label' => 'Random Obby',
-				'iconSVG' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 -960 960 960" fill="currentColor"><path d="M342.5-257.5Q360-275 360-300t-17.5-42.5Q325-360 300-360t-42.5 17.5Q240-325 240-300t17.5 42.5Q275-240 300-240t42.5-17.5Zm0-360Q360-635 360-660t-17.5-42.5Q325-720 300-720t-42.5 17.5Q240-685 240-660t17.5 42.5Q275-600 300-600t42.5-17.5Zm180 180Q540-455 540-480t-17.5-42.5Q505-540 480-540t-42.5 17.5Q420-505 420-480t17.5 42.5Q455-420 480-420t42.5-17.5Zm180 180Q720-275 720-300t-17.5-42.5Q685-360 660-360t-42.5 17.5Q600-325 600-300t17.5 42.5Q635-240 660-240t42.5-17.5Zm0-360Q720-635 720-660t-17.5-42.5Q685-720 660-720t-42.5 17.5Q600-685 600-660t17.5 42.5Q635-600 660-600t42.5-17.5ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg>',
-			],
-			[
 				'url' => Title::newFromText( 'Help:Contributing' )->getLocalURL(),
 				'label' => 'Contribute',
 				'iconSVG' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"><g fill="currentColor"><path d="m16.77 8 1.94-2a1 1 0 0 0 0-1.41l-3.34-3.3a1 1 0 0 0-1.41 0L12 3.23zM1 14.25V19h4.75l9.96-9.96-4.75-4.75z"/></g></svg>',
@@ -1634,6 +1629,7 @@ SVG;
 			'troll' => htmlspecialchars( Title::newFromText( 'Category:Troll Obby' )->getLocalURL() ),
 			'flood' => htmlspecialchars( Title::newFromText( 'Category:Flood-type' )->getLocalURL() ),
 			'obby' => htmlspecialchars( Title::newFromText( 'Category:Obby' )->getLocalURL() ),
+			'randomObby' => htmlspecialchars( Title::newFromText( 'Special:RandomInCategory/Obby' )->getLocalURL() ),
 			'stubs' => htmlspecialchars( Title::newFromText( 'Category:Stubs' )->getLocalURL() ),
 			'contributing' => htmlspecialchars( Title::newFromText( 'Help:Contributing' )->getLocalURL() ),
 		];
@@ -1924,7 +1920,10 @@ SVG;
 					<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="m240-160 40-160H120l20-80h160l40-160H180l20-80h160l40-160h80l-40 160h160l40-160h80l-40 160h160l-20 80H660l-40 160h160l-20 80H600l-40 160h-80l40-160H360l-40 160h-80Zm140-240h160l40-160H420l-40 160Z"/></svg></span>
 					<h2 class="obbywiki-aside__title">Obby Sub-genres</h2>
 				</div>
-				<a href="{$categoryURLs['obby']}" class="obbywiki-aside__all">View all ({$obbyTotalLabel})</a>
+				<div class="obbywiki-aside__header-actions">
+					<a href="{$categoryURLs['obby']}" class="obbywiki-aside__all">View all ({$obbyTotalLabel})</a>
+					<a href="{$categoryURLs['randomObby']}" class="obbywiki-aside__icon-btn" aria-label="Random Obby" title="Random Obby"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 -960 960 960" fill="currentColor"><path d="M342.5-257.5Q360-275 360-300t-17.5-42.5Q325-360 300-360t-42.5 17.5Q240-325 240-300t17.5 42.5Q275-240 300-240t42.5-17.5Zm0-360Q360-635 360-660t-17.5-42.5Q325-720 300-720t-42.5 17.5Q240-685 240-660t17.5 42.5Q275-600 300-600t42.5-17.5Zm180 180Q540-455 540-480t-17.5-42.5Q505-540 480-540t-42.5 17.5Q420-505 420-480t17.5 42.5Q455-420 480-420t42.5-17.5Zm180 180Q720-275 720-300t-17.5-42.5Q685-360 660-360t-42.5 17.5Q600-325 600-300t17.5 42.5Q635-240 660-240t42.5-17.5Zm0-360Q720-635 720-660t-17.5-42.5Q685-720 660-720t-42.5 17.5Q600-685 600-660t17.5 42.5Q635-600 660-600t42.5-17.5ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg></a>
+				</div>
 			</div>
 			<div class="obbywiki-aside__type-grid">
 				{$typeGridHTML}
@@ -1974,7 +1973,7 @@ SVG;
 		{$recentChangesHTML}
 		<aside class="obbywiki-split__aside">{$onThisDayHTML}</aside>
 	</div>
-	
+
 	{$trendingHTML}
 	
 	{$aboutHTML}
