@@ -10,6 +10,7 @@ use MediaWiki\Parser\Sanitizer;
 use MediaWiki\Registration\ExtensionRegistry;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Revision\SlotRecord;
+use MediaWiki\SiteStats\SiteStats;
 use MediaWiki\Title\Title;
 use Skin;
 use Wikimedia\ObjectCache\WANObjectCache;
@@ -90,7 +91,7 @@ class Hooks {
 
 		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
 		global $wgObbyWikiHomePageCacheTTL;
-		$ttl = (int)( $wgObbyWikiHomePageCacheTTL ?? 900 );
+		$ttl = (int)( $wgObbyWikiHomePageCacheTTL ?? 300 );
 
 		if ( $ttl > 0 ) {
 			$cacheKey = $cache->makeKey(
@@ -158,7 +159,7 @@ class Hooks {
 			'<meta property="og:description" content="' . htmlspecialchars( $description ) . '"/>'
 		);
 
-		$articlesCount = self::getSiteStatistics()['articles'];
+		$articlesCount = (int)SiteStats::articles();
 		$discordInvite = self::getDiscordInvite();
 
 		$embed = [
@@ -1314,7 +1315,6 @@ SVG;
 	// builds the full html
 	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [], array $trendingPages = [], array $subGenreCounts = [], array $onThisDay = [] ): string {
 		global $wgExtensionAssetsPath;
-		$scriptPath = wfScript();
 		$templateParser = new TemplateParser( dirname( __DIR__ ) . '/templates' );
 		$blogPostsHTML = self::buildBlogPostsHTML( $blogPosts, $logoSVG );
 
@@ -1350,12 +1350,7 @@ SVG;
 			$urlEsc = htmlspecialchars( $link['url'] );
 			$labelEsc = htmlspecialchars( $link['label'] );
 
-			if ( isset( $link['iconSVG'] ) ) {
-				$iconHTML = $link['iconSVG'];
-			} else {
-				$iconHTML = '<span class="obbywiki-home__nav-icon">' . $link['icon'] . '</span>';
-			}
-
+			$iconHTML = $link['iconSVG'];
 			$badgeHTML = '';
 			if ( isset( $link['badge'] ) ) {
 				$badgeHTML = '<span class="obbywiki-home__nav-badge">' . htmlspecialchars( $link['badge'] ) . '</span>';
@@ -1402,7 +1397,6 @@ SVG;
 				. '" data-index="' . $index . '">'
 				. '<div class="obbywiki-spotlight__slide-info">'
 				. '<h2 class="obbywiki-spotlight__slide-title">' . $titleEsc . '</h2>'
-				// . $statsHtml
 				. $descHTML
 				. '</div>'
 				. '<div class="obbywiki-spotlight__slide-media">' . $mediaHTML . '</div>'
@@ -1472,24 +1466,12 @@ SVG;
 				'image' => $clAssetBase . 'ow_cl_v2_8_1x.webp',
 				'priority' => 8,
 			],
-			// [
-			// 	'url' => Title::newFromText( 'Category:Developers' )->getLocalURL(),
-			// 	'label' => 'Developers',
-			// 	'image' => 'https://dummyimage.com/400x200/dc2626/ffffff&text=Developers',
-			// 	'priority' => 4,
-			// ],
 			[
 				'url' => Title::newFromText( 'Development:Get Started' )->getLocalURL(),
 				'label' => 'Get Started',
 				'image' => $clAssetBase . 'ow_cl_v2_9_1x.webp',
 				'priority' => 9,
 			],
-			// [
-			// 	'url' => Title::newFromText( 'Difficulties' )->getLocalURL(),
-			// 	'label' => 'Difficulties',
-			// 	'image' => 'https://dummyimage.com/400x200/0891b2/ffffff&text=Difficulties',
-			// 	'priority' => 6,
-			// ],
 		];
 
 		$contentLinksHTML = '';
@@ -1517,7 +1499,6 @@ SVG;
 
 		// this month
 		$thisMonthHTML = '';
-		$monthName = date( 'F' );
 		if ( empty( $thisMonthPages ) ) {
 			$thisMonthHTML = '<p class="obbywiki-featured__aside-month-empty">No new releases recently.</p>';
 		} else {
@@ -1632,6 +1613,7 @@ SVG;
 			'randomObby' => htmlspecialchars( Title::newFromText( 'Special:RandomInCategory/Obby' )->getLocalURL() ),
 			'stubs' => htmlspecialchars( Title::newFromText( 'Category:Stubs' )->getLocalURL() ),
 			'contributing' => htmlspecialchars( Title::newFromText( 'Help:Contributing' )->getLocalURL() ),
+			'wantedPages' => htmlspecialchars( Title::newFromText( 'Special:WantedPages' )->getLocalURL() ),
 		];
 
 		$obbyTotalLabel = htmlspecialchars( number_format( (int)( $subGenreCounts['Category:Obby'] ?? 0 ) ) );
@@ -1667,10 +1649,6 @@ SVG;
 					'</a>';
 			}
 			$archiveHTML = '<section class="obbywiki-archive" aria-label="Monthly archive">' .
-				// '<div class="obbywiki-archive__header">' .
-				// 	'<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg>' .
-				// 	'<h3 class="obbywiki-archive__title">Archive</h3>' .
-				// '</div>' .
 				'<div class="obbywiki-archive__grid">' . $archiveCardsHTML . '</div>' .
 			'</section>';
 		}
@@ -1780,7 +1758,6 @@ SVG;
 		$styleGuideURL = htmlspecialchars( Title::newFromText( 'OW:Style guide' )->getLocalURL() );
 		$helpURL = htmlspecialchars( Title::newFromText( 'Help:Contents' )->getLocalURL() );
 		$classicURL = htmlspecialchars( Title::newFromText( 'Category:Classic Obby' )->getLocalURL() );
-		$coopURL = htmlspecialchars( Title::newFromText( 'Category:Co-Op Obby' )->getLocalURL() );
 		$towerURL = htmlspecialchars( Title::newFromText( 'Category:Tower Obby' )->getLocalURL() );
 		$dcoURL = htmlspecialchars( Title::newFromText( 'Category:Difficulty Chart Obby' )->getLocalURL() );
 		$gimmickURL = htmlspecialchars( Title::newFromText( 'Category:Gimmick Obby' )->getLocalURL() );
@@ -1789,9 +1766,15 @@ SVG;
 		$editsCount = number_format( $siteStats['edits'] );
 		$filesCount = number_format( $siteStats['images'] );
 		$citizenIconUrl = static function ( string $name ): string {
-			return '/load.php?modules=skins.citizen.icons&image=' . rawurlencode( $name )
-				. '&format=original&lang=en&skin=citizen';
+			return wfAppendQuery( wfScript( 'load' ), [
+				'modules' => 'skins.citizen.icons',
+				'image' => $name,
+				'format' => 'original',
+				'lang' => 'en',
+				'skin' => 'citizen',
+			] );
 		};
+		$searchIconURL = htmlspecialchars( $citizenIconUrl( 'search' ) );
 		$contributeStat = static function ( string $icon, string $value, string $label, bool $active ) use ( $citizenIconUrl ): string {
 			$icon_url = $citizenIconUrl( $icon );
 			return '<span class="obbywiki-aside__stat' . ( $active ? ' obbywiki-aside__stat--active' : '' ) . '" role="listitem" title="'
@@ -1866,9 +1849,9 @@ SVG;
 				<div class="obbywiki-home__search-form" role="search" aria-label="Search the wiki">
 					<div class="obbywiki-home__search-input citizen-search-trigger">Search the wiki...</div>
 					<button class="obbywiki-home__search-btn citizen-search-trigger" aria-label="Search">
-						<img src="/load.php?modules=skins.citizen.icons&amp;image=search&amp;format=original&amp;lang=en&amp;skin=citizen" alt="" width="18" height="18">
+						<img src="{$searchIconURL}" alt="" width="18" height="18">
 					</button>
-				</form>
+				</div>
 			</div>
 		</div>
 	</header>
@@ -1952,7 +1935,7 @@ SVG;
 							<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
 							Pages that need improvement
 						</a>
-						<a href="/Special:WantedPages" class="obbywiki-featured__aside-cta-link" rel="nofollow"> <!-- engines cant crawl special pages -->
+						<a href="{$categoryURLs['wantedPages']}" class="obbywiki-featured__aside-cta-link" rel="nofollow"> <!-- engines cant crawl special pages -->
 							<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
 							Wanted new pages
 						</a>
