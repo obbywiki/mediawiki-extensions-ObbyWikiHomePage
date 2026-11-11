@@ -1,21 +1,15 @@
-on:
-    push:
-        branches:
-            - main
-  
-permissions:
-    contents: write
-    issues: write
-    pull-requests: write
-  
 name: release-please
-  
-jobs:
-    release-please:
-        if: github.repository == 'obbywiki/mediawiki-extensions-ObbyWikiHomePage'
-        runs-on: ubuntu-latest
 
-        steps:
-        - uses: googleapis/release-please-action@v4
-          with:
-            token: ${{ secrets.MASTER_RELEASE_TOKEN }}
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  release-please:
+    if: github.repository_owner == 'obbywiki'
+    uses: obbywiki/shared-workflows/.github/workflows/release-please.yml@v2
+    secrets:
+      client-id: ${{ secrets.OW_BOT_CLIENT_ID }}
+      private-key: ${{ secrets.OW_BOT_PRIVATE_KEY }}
