@@ -1,0 +1,21 @@
+{
+	"name": "obbywiki/obbywiki-home-page",
+	"description": "Custom MediaWiki home page for the Obby Wiki",
+	"license": "MIT",
+	"require-dev": {
+		"mediawiki/mediawiki-codesniffer": "52.0.1",
+		"php-parallel-lint/php-parallel-lint": "1.4.0"
+	},
+	"scripts": {
+		"test": [
+			"parallel-lint src maintenance",
+			"@phpcs"
+		],
+		"phpcs": "phpcs -p -s"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
+}

@@ -4,6 +4,7 @@ namespace MediaWiki\Extension\ObbyWikiHomePage;
 
 use Article;
 use MediaWiki\Api\ApiMain;
+use MediaWiki\Html\TemplateParser;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Parser\Sanitizer;
@@ -14,7 +15,6 @@ use MediaWiki\SiteStats\SiteStats;
 use MediaWiki\Title\Title;
 use Skin;
 use Wikimedia\ObjectCache\WANObjectCache;
-use MediaWiki\Html\TemplateParser;
 
 class Hooks {
 	// modernblog (see https://github.com/obbywiki/mediawiki-extensions-ModernBlog)
@@ -76,6 +76,13 @@ class Hooks {
 		return $title->getNamespace() === NS_MAIN && $title->getDBkey() === str_replace( ' ', '_', $target );
 	}
 
+	/**
+	 * Replace the normal article view on the configured home page.
+	 *
+	 * @param Article $article
+	 * @param bool &$outputDone
+	 * @param bool &$pcache
+	 */
 	public static function onArticleViewHeader( Article $article, &$outputDone, &$pcache ) {
 		$title = $article->getTitle();
 		if ( !$title || !self::isTargetPage( $title ) ) {
@@ -251,7 +258,11 @@ class Hooks {
 	}
 
 	/**
+	 * @param string $label
+	 * @param string $page Page title or absolute URL
+	 * @param bool $external Whether $page is an absolute URL
 	 * @param array{id?:string,name?:string,animated?:bool}|null $emoji
+	 * @return array
 	 */
 	private static function buildDiscordLinkButton( string $label, string $page, bool $external = false, ?array $emoji = null ): array {
 		if ( $external ) {
@@ -732,6 +743,7 @@ SVG;
 	}
 
 	// TrendingArticles soft-dep; top pages in a category by recent/all-time views
+
 	/** @return list<array{title:string,url:string,thumbnail:?string,description:?string,genre:?string,genre_hue:?int,views:int,views_period:string}> */
 	private static function getTrendingPages(): array {
 		global $wgObbyWikiHomePageTrendingLimit, $wgObbyWikiHomePageTrendingCategory;
@@ -1032,7 +1044,14 @@ SVG;
 
 		return trim( $t );
 	}
-	
+
+	/**
+	 * Load display titles and ModernBlog metadata keyed by page ID.
+	 *
+	 * @param \Wikimedia\Rdbms\IReadableDatabase $dbr
+	 * @param int[] $pageIds
+	 * @return array
+	 */
 	private static function loadBlogPageProps( $dbr, array $pageIds ): array {
 		if ( $pageIds === [] ) {
 			return [];
@@ -1505,7 +1524,7 @@ SVG;
 			foreach ( $thisMonthPages as $group ) {
 				$monthLabel = htmlspecialchars( $group['month'] );
 				$thisMonthHTML .= '<h3 class="obbywiki-month__label">' . $monthLabel . '</h3>';
-				
+
 				foreach ( $group['pages'] as $mp ) {
 					$mpUrl = htmlspecialchars( $mp['url'] );
 					$mpTitle = htmlspecialchars( $mp['title'] );

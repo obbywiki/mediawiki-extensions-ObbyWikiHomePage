@@ -1,0 +1,4 @@
+# Use one lockfile document so GitHub can index dependencies for security alerts.
+pmOnFail: ignore
+minimumReleaseAge: 1440
+blockExoticSubdeps: true

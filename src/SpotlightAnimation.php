@@ -101,7 +101,7 @@ class SpotlightAnimation {
 			if ( $format === 'avif' ) {
 				// Imagick only draws the PNG frames and avifenc (libavif 1.x with SVT-AV1) encodes them
 				$supported[$format] = class_exists( Imagick::class ) && Imagick::queryFormats( 'PNG' )
-					&& ( self::getAvifencVersions()['svt'] ?? null ) !== null;
+					&& isset( self::getAvifencVersions()['svt'] );
 			} else {
 				$supported[$format] = class_exists( Imagick::class ) && (bool)Imagick::queryFormats( strtoupper( $format ) );
 			}

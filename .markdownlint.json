@@ -1,0 +1,8 @@
+{
+	"line-length": false,
+	"no-multiple-blanks": false,
+	"single-title": false,
+	"no-duplicate-heading": {
+		"siblings_only": true
+	}
+}

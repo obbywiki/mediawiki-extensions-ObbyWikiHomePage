@@ -129,7 +129,9 @@ class SpotlightData {
 		$pages = [];
 		if ( isset( $data['query']['pages'] ) ) {
 			foreach ( $data['query']['pages'] as $page ) {
-				if ( !isset( $page['title'] ) ) continue;
+				if ( !isset( $page['title'] ) ) {
+					continue;
+				}
 
 				$inObby = false;
 				$inStubs = false;
@@ -195,7 +197,9 @@ class SpotlightData {
 		$pages = [];
 		if ( isset( $data['query']['pages'] ) ) {
 			foreach ( $data['query']['pages'] as $page ) {
-				if ( !isset( $page['title'] ) ) continue;
+				if ( !isset( $page['title'] ) ) {
+					continue;
+				}
 
 				$title = Title::newFromText( $page['title'] );
 				if ( !$title ) {

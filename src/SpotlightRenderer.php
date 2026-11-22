@@ -76,7 +76,7 @@ class SpotlightRenderer {
 
 				if ( $bytes <= $this->settings['maxBytes'] || $i === $last ) {
 					$context = [ 'step' => $plan['step'], 'label' => $plan['label'], 'bytes' => $bytes, 'frames' => $frames ];
-					
+
 					if ( $bytes > $this->settings['maxBytes'] ) {
 						$this->logger->warning( 'Spotlight animation exceeds size budget after all steps ({bytes} bytes)', $context );
 					} else {
@@ -211,10 +211,10 @@ class SpotlightRenderer {
 	 * Start times (ms, on 10 ms ticks) of the transition frames.
 	 *
 	 * Each step moves the track at most 1/$frames of the way, so the fast start of the ease-out (~40% of the distance in the first 75 ms) is not one big jump.
-	 * 
+	 *
 	 * Each step also lasts at most TRANSITION_MS / $frames, so the slow tail does not stall and then snap into place.
 	 * Delays never drop below MIN_DELAY_MS, and frames stop once the remaining movement is below TAIL_CUTOFF (about half a pixel at 960 wide).
-	 * 
+	 *
 	 * Ergo, $frames is a density (the returned count is usually a little higher).
 	 *
 	 * @return int[] starting with 0

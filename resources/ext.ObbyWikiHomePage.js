@@ -3,44 +3,44 @@
 
 	// usually accurate relative time formatter
 
-	var RELATIVE_TIME_INTERVAL_MS = 30000;
+	const RELATIVE_TIME_INTERVAL_MS = 30000;
 
 	function formatRelativeTime( unixSeconds ) {
-		var diff = Math.max( 0, Math.floor( Date.now() / 1000 ) - unixSeconds );
+		const diff = Math.max( 0, Math.floor( Date.now() / 1000 ) - unixSeconds );
 
 		if ( diff < 60 ) {
 			return 'Just now';
 		}
 
 		if ( diff < 3600 ) {
-			var mins = Math.floor( diff / 60 );
+			const mins = Math.floor( diff / 60 );
 			return mins + ' min' + ( mins > 1 ? 's' : '' ) + ' ago';
 		}
 
 		if ( diff < 86400 ) {
-			var hours = Math.floor( diff / 3600 );
+			const hours = Math.floor( diff / 3600 );
 			return hours + ' hr' + ( hours > 1 ? 's' : '' ) + ' ago';
 		}
 
-		var days = Math.floor( diff / 86400 );
+		const days = Math.floor( diff / 86400 );
 		return days + ' day' + ( days > 1 ? 's' : '' ) + ' ago';
 	}
 
 	function initRelativeTimes() {
-		var elements = document.querySelectorAll( 'time.obbywiki-relative-time[datetime]' );
+		const elements = document.querySelectorAll( 'time.obbywiki-relative-time[datetime]' );
 		if ( elements.length === 0 ) {
 			return;
 		}
 
 		function updateAll() {
-			for ( var i = 0; i < elements.length; i++ ) {
-				var el = elements[ i ];
-				var parsed = Date.parse( el.getAttribute( 'datetime' ) );
+			for ( let i = 0; i < elements.length; i++ ) {
+				const el = elements[ i ];
+				const parsed = Date.parse( el.getAttribute( 'datetime' ) );
 				if ( isNaN( parsed ) ) {
 					continue;
 				}
 
-				var label = formatRelativeTime( Math.floor( parsed / 1000 ) );
+				const label = formatRelativeTime( Math.floor( parsed / 1000 ) );
 				if ( el.textContent !== label ) {
 					el.textContent = label;
 				}
@@ -52,50 +52,50 @@
 	}
 
 	function initSpotlight() {
-		var viewport = document.querySelector( '.obbywiki-spotlight__viewport' );
-		var track = document.querySelector( '.obbywiki-spotlight__track' );
-		var originalSlides = document.querySelectorAll( '.obbywiki-spotlight__slide' );
-		var bars = document.querySelectorAll( '.obbywiki-spotlight__bar' );
-		var prevBtn = document.querySelector( '.obbywiki-spotlight__arrow--prev' );
-		var nextBtn = document.querySelector( '.obbywiki-spotlight__arrow--next' );
-		var toggleBtn = document.querySelector( '.obbywiki-spotlight__toggle' );
-		var spotlight = document.querySelector( '.obbywiki-spotlight' );
+		const viewport = document.querySelector( '.obbywiki-spotlight__viewport' );
+		const track = document.querySelector( '.obbywiki-spotlight__track' );
+		const originalSlides = document.querySelectorAll( '.obbywiki-spotlight__slide' );
+		const bars = document.querySelectorAll( '.obbywiki-spotlight__bar' );
+		const prevBtn = document.querySelector( '.obbywiki-spotlight__arrow--prev' );
+		const nextBtn = document.querySelector( '.obbywiki-spotlight__arrow--next' );
+		const toggleBtn = document.querySelector( '.obbywiki-spotlight__toggle' );
+		const spotlight = document.querySelector( '.obbywiki-spotlight' );
 
 		if ( !viewport || !track || originalSlides.length === 0 ) {
 			return;
 		}
 
-		var current = 0; // logical index
-		var count = originalSlides.length;
-		var isTransitioning = false;
-		var paused = false;
-		var userToggledPause = false;
-		var held = false;
-		var SLIDE_INTERVAL_MS = 4000;
-		var timerId = null;
-		var timerStart = 0;
-		var timerRemaining = SLIDE_INTERVAL_MS;
-		var reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' );
+		let current = 0; // logical index
+		const count = originalSlides.length;
+		let isTransitioning = false;
+		let paused = false;
+		let userToggledPause = false;
+		let held = false;
+		const SLIDE_INTERVAL_MS = 4000;
+		let timerId = null;
+		let timerStart = 0;
+		let timerRemaining = SLIDE_INTERVAL_MS;
+		const reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' );
 
-		var hasClones = count > 1;
+		const hasClones = count > 1;
 
 		if ( hasClones ) {
 			// clone first and last slides for infinite loop
-			var firstClone = originalSlides[ 0 ].cloneNode( true );
-			var lastClone = originalSlides[ count - 1 ].cloneNode( true );
+			const firstClone = originalSlides[ 0 ].cloneNode( true );
+			const lastClone = originalSlides[ count - 1 ].cloneNode( true );
 
 			firstClone.setAttribute( 'aria-hidden', 'true' );
 			lastClone.setAttribute( 'aria-hidden', 'true' );
-			
+
 			// remove tab index from clones so they aren't focusable
 			firstClone.tabIndex = -1;
 			lastClone.tabIndex = -1;
 
 			// dont let the off-screen first-slide clone keep LCP priority
-			var first_clone_img = firstClone.querySelector( 'img[fetchpriority]' );
-			if ( first_clone_img ) {
-				first_clone_img.removeAttribute( 'fetchpriority' );
-				first_clone_img.setAttribute( 'loading', 'lazy' );
+			const firstCloneImage = firstClone.querySelector( 'img[fetchpriority]' );
+			if ( firstCloneImage ) {
+				firstCloneImage.removeAttribute( 'fetchpriority' );
+				firstCloneImage.setAttribute( 'loading', 'lazy' );
 			}
 
 			track.appendChild( firstClone );
@@ -113,10 +113,14 @@
 				return;
 			}
 
-			var isAdjacent = Math.abs( newIndex - current ) === 1;
+			let isAdjacent = Math.abs( newIndex - current ) === 1;
 			if ( hasClones ) {
-				if ( current === count - 1 && newIndex === count ) isAdjacent = true;
-				if ( current === 0 && newIndex === -1 ) isAdjacent = true;
+				if ( current === count - 1 && newIndex === count ) {
+					isAdjacent = true;
+				}
+				if ( current === 0 && newIndex === -1 ) {
+					isAdjacent = true;
+				}
 			}
 
 			// reduced motion: jump straight to the slide, no sliding
@@ -124,7 +128,7 @@
 				isAdjacent = false;
 			}
 
-			var physicalIndex;
+			let physicalIndex;
 
 			if ( newIndex >= count ) {
 				physicalIndex = count + 1;
@@ -152,9 +156,9 @@
 				isTransitioning = true;
 				// Wait for the slide transition to complete, then snap instantly to the real slide.
 				// read the computed duration since skins (eg. citizen performance mode) can zero it
-				setTimeout( function () {
+				setTimeout( () => {
 					track.style.transition = 'none';
-					var snapPhysical = current + 1;
+					const snapPhysical = current + 1;
 					track.style.transform = 'translateX(-' + ( snapPhysical * 100 ) + '%)';
 					void track.offsetWidth;
 					track.style.transition = '';
@@ -166,14 +170,14 @@
 		}
 
 		function getTrackTransitionMs() {
-			var duration = window.getComputedStyle( track ).transitionDuration || '';
-			var value = parseFloat( duration ) || 0;
-			return duration.indexOf( 'ms' ) !== -1 ? value : value * 1000;
+			const duration = window.getComputedStyle( track ).transitionDuration || '';
+			const value = parseFloat( duration ) || 0;
+			return duration.includes( 'ms' ) ? value : value * 1000;
 		}
 
 		function updateBars() {
-			for ( var j = 0; j < bars.length; j++ ) {
-				var fill = bars[ j ].querySelector( '.obbywiki-spotlight__bar-fill' );
+			for ( let j = 0; j < bars.length; j++ ) {
+				const fill = bars[ j ].querySelector( '.obbywiki-spotlight__bar-fill' );
 				if ( j === current ) {
 					bars[ j ].classList.add( 'obbywiki-spotlight__bar--active' );
 					if ( fill ) {
@@ -203,7 +207,7 @@
 			}
 
 			timerStart = Date.now();
-			timerId = setTimeout( function () {
+			timerId = setTimeout( () => {
 				timerId = null;
 				timerRemaining = SLIDE_INTERVAL_MS;
 				next();
@@ -262,9 +266,9 @@
 
 		// ── button / bar navigation (desktop only, too small on mobile) ──
 
-		var is_mobile_nav = window.matchMedia( '(max-width: 640px)' ).matches;
+		const isMobileNav = window.matchMedia( '(max-width: 640px)' ).matches;
 
-		if ( is_mobile_nav ) {
+		if ( isMobileNav ) {
 			if ( prevBtn ) {
 				prevBtn.hidden = true;
 				prevBtn.setAttribute( 'aria-hidden', 'true' );
@@ -278,54 +282,52 @@
 		} else {
 			if ( toggleBtn && hasClones ) {
 				toggleBtn.hidden = false;
-				toggleBtn.addEventListener( 'click', function () {
+				toggleBtn.addEventListener( 'click', () => {
 					userToggledPause = true;
 					setPaused( !paused );
 				} );
 			}
 
 			if ( prevBtn ) {
-				prevBtn.addEventListener( 'click', function () {
+				prevBtn.addEventListener( 'click', () => {
 					prev();
 				} );
 			}
 
 			if ( nextBtn ) {
-				nextBtn.addEventListener( 'click', function () {
+				nextBtn.addEventListener( 'click', () => {
 					next();
 				} );
 			}
 
-			for ( var i = 0; i < bars.length; i++ ) {
-				( function ( idx ) {
-					var bar = bars[ idx ];
-					bar.removeAttribute( 'aria-hidden' );
-					bar.setAttribute( 'role', 'button' );
-					bar.setAttribute( 'tabindex', '0' );
-					bar.setAttribute( 'aria-label', 'Slide ' + ( idx + 1 ) );
+			for ( let i = 0; i < bars.length; i++ ) {
+				const bar = bars[ i ];
+				bar.removeAttribute( 'aria-hidden' );
+				bar.setAttribute( 'role', 'button' );
+				bar.setAttribute( 'tabindex', '0' );
+				bar.setAttribute( 'aria-label', 'Slide ' + ( i + 1 ) );
 
-					bar.addEventListener( 'click', function () {
-						goTo( idx );
-					} );
+				bar.addEventListener( 'click', () => {
+					goTo( i );
+				} );
 
-					bar.addEventListener( 'keydown', function ( e ) {
-						if ( e.key === 'Enter' || e.key === ' ' ) {
-							e.preventDefault();
-							goTo( idx );
-						}
-					} );
-				} )( i );
+				bar.addEventListener( 'keydown', ( e ) => {
+					if ( e.key === 'Enter' || e.key === ' ' ) {
+						e.preventDefault();
+						goTo( i );
+					}
+				} );
 			}
 		}
 
 		// -- touch: real-time drag with momentum snap --
 
-		var touchStartX = 0;
-		var lastTouchX = 0;
-		var isDragging = false;
-		var SWIPE_THRESHOLD = 40;
+		let touchStartX = 0;
+		let lastTouchX = 0;
+		let isDragging = false;
+		const SWIPE_THRESHOLD = 40;
 
-		viewport.addEventListener( 'touchstart', function ( e ) {
+		viewport.addEventListener( 'touchstart', ( e ) => {
 			if ( isTransitioning ) {
 				return;
 			}
@@ -336,14 +338,14 @@
 			track.style.transition = 'none';
 		}, { passive: true } );
 
-		viewport.addEventListener( 'touchmove', function ( e ) {
+		viewport.addEventListener( 'touchmove', ( e ) => {
 			if ( !isDragging ) {
 				return;
 			}
 			lastTouchX = e.touches[ 0 ].clientX;
-			var delta = lastTouchX - touchStartX;
-			var physicalIndex = hasClones ? current + 1 : current;
-			var baseOffset = -physicalIndex * viewport.offsetWidth;
+			let delta = lastTouchX - touchStartX;
+			const physicalIndex = hasClones ? current + 1 : current;
+			const baseOffset = -physicalIndex * viewport.offsetWidth;
 
 			if ( !hasClones ) {
 				// rubber-band resistance
@@ -355,14 +357,14 @@
 			track.style.transform = 'translateX(' + ( baseOffset + delta ) + 'px)';
 		}, { passive: true } );
 
-		viewport.addEventListener( 'touchend', function () {
+		viewport.addEventListener( 'touchend', () => {
 			if ( !isDragging ) {
 				return;
 			}
 			isDragging = false;
 			track.style.transition = '';
 
-			var delta = lastTouchX - touchStartX;
+			const delta = lastTouchX - touchStartX;
 
 			if ( delta < -SWIPE_THRESHOLD ) {
 				goTo( current + 1 );
@@ -370,20 +372,20 @@
 				goTo( current - 1 );
 			} else {
 				// snap back
-				var physicalIndex = hasClones ? current + 1 : current;
+				const physicalIndex = hasClones ? current + 1 : current;
 				track.style.transform = 'translateX(-' + ( physicalIndex * 100 ) + '%)';
 			}
 
 			setHeld( false );
 		}, { passive: true } );
 
-		viewport.addEventListener( 'touchcancel', function () {
+		viewport.addEventListener( 'touchcancel', () => {
 			if ( !isDragging ) {
 				return;
 			}
 			isDragging = false;
 			track.style.transition = '';
-			var physicalIndex = hasClones ? current + 1 : current;
+			const physicalIndex = hasClones ? current + 1 : current;
 			track.style.transform = 'translateX(-' + ( physicalIndex * 100 ) + '%)';
 			setHeld( false );
 		}, { passive: true } );
@@ -391,13 +393,13 @@
 		// -- hover hold (real mice only; taps emit a mouseenter that never gets a mouseleave) --
 
 		if ( spotlight ) {
-			spotlight.addEventListener( 'pointerenter', function ( e ) {
+			spotlight.addEventListener( 'pointerenter', ( e ) => {
 				if ( e.pointerType === 'mouse' ) {
 					setHeld( true );
 				}
 			} );
 
-			spotlight.addEventListener( 'pointerleave', function ( e ) {
+			spotlight.addEventListener( 'pointerleave', ( e ) => {
 				if ( e.pointerType === 'mouse' ) {
 					setHeld( false );
 				}
@@ -423,40 +425,40 @@
 
 	// contributing card stats (one at a time, paused on hover and for reduced motion)
 
-	var STAT_ROTATE_INTERVAL_MS = 3500;
+	const STAT_ROTATE_INTERVAL_MS = 3500;
 
 	function initStatRotator() {
-		var container = document.querySelector( '.obbywiki-aside__stats' );
-		var stats = container ? container.querySelectorAll( '.obbywiki-aside__stat' ) : [];
+		const container = document.querySelector( '.obbywiki-aside__stats' );
+		const stats = container ? container.querySelectorAll( '.obbywiki-aside__stat' ) : [];
 		if ( stats.length < 2 ) {
 			return;
 		}
 
-		var current = 0;
-		var held = false;
-		var reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' );
+		let current = 0;
+		let held = false;
+		const reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' );
 
-		setInterval( function () {
+		setInterval( () => {
 			if ( held || reducedMotion.matches || document.hidden ) {
 				return;
 			}
 
-			var prev = stats[ current ];
+			const prev = stats[ current ];
 			current = ( current + 1 ) % stats.length;
 			prev.classList.remove( 'obbywiki-aside__stat--active' );
 			prev.classList.add( 'obbywiki-aside__stat--leaving' );
 			stats[ current ].classList.add( 'obbywiki-aside__stat--active' );
 
 			// once faded out, it resets below, so the next entrance slides up again
-			setTimeout( function () {
+			setTimeout( () => {
 				prev.classList.remove( 'obbywiki-aside__stat--leaving' );
 			}, 400 );
 		}, STAT_ROTATE_INTERVAL_MS );
 
-		container.addEventListener( 'pointerenter', function () {
+		container.addEventListener( 'pointerenter', () => {
 			held = true;
 		} );
-		container.addEventListener( 'pointerleave', function () {
+		container.addEventListener( 'pointerleave', () => {
 			held = false;
 		} );
 	}
