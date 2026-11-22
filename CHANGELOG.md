@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/compare/v0.6.0...v0.7.0) (2026-11-22)
+
+
+### Features
+
+* add more changes to recently changed section ([61acb8e](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/61acb8ed67b7a43a4d59872ec1cdf3c4c4124a84))
+* configurable home page sections ([afd3b08](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/afd3b08188b468a1e5c62990248dd2b3c12d61ae))
+* expand months backfill ([227d104](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/227d104957f87964318d061655907232e65564fe))
+* improve month label styling ([0aebdf6](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/0aebdf6ea4ffed73186b3b4becd8e672a74b779c))
+* improve thumbnail auto selection + add wide picks ([9948363](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/99483631db0d48f8f51fa77f99743754c0504cbe))
+* og image preview card generator ([40a1258](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/commit/40a1258542cf9babf7c4afff2377602afede0a6b))
+
 ## [0.6.0](https://github.com/obbywiki/mediawiki-extensions-ObbyWikiHomePage/compare/v0.5.0...v0.6.0) (2026-11-11)
 
 
