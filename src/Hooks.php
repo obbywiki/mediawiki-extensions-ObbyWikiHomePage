@@ -46,6 +46,10 @@ class Hooks {
 	];
 	// trending
 	private const TRENDING_THUMB_SIZE = 368;
+
+	private const RECENT_RELEASES_LIMIT = 8;
+	private const RECENT_RELEASES_BACKFILL_THRESHOLD = 5;
+	private const RECENT_RELEASES_BACKFILL_MONTHS = 3;
 	// on this day (cargo) (may be deprecated in the future, in favor of Bucket)
 	private const ON_THIS_DAY_CARGO_TABLE = 'Obbies';
 	private const ON_THIS_DAY_LIMIT = 8;
@@ -586,29 +590,27 @@ SVG;
 
 	private static function getThisMonthPages(): array {
 		$groups = [];
-		$thisMonth = self::getMonthAnchorInUTC();
-		$thisMonthStr = self::formatMonthCategory( $thisMonth );
-		$pages = self::fetchCategoryPages( $thisMonthStr, 8 );
+		$month = self::getMonthAnchorInUTC();
+		$remaining = self::RECENT_RELEASES_LIMIT;
 
-		if ( count( $pages ) > 0 ) {
-			$groups[] = [
-				'month' => self::formatMonthLabel( $thisMonth ),
-				'pages' => $pages,
-			];
-		}
-
-		if ( count( $pages ) < 5 ) {
-			$lastMonth = $thisMonth->modify( '-1 month' );
-			$lastMonthStr = self::formatMonthCategory( $lastMonth );
-			if ( $lastMonthStr !== $thisMonthStr ) {
-				$lastMonthPages = self::fetchCategoryPages( $lastMonthStr, 8 - count( $pages ) );
-				if ( count( $lastMonthPages ) > 0 ) {
-					$groups[] = [
-						'month' => self::formatMonthLabel( $lastMonth ),
-						'pages' => $lastMonthPages,
-					];
-				}
+		for ( $monthsBack = 0; $monthsBack <= self::RECENT_RELEASES_BACKFILL_MONTHS; $monthsBack++ ) {
+			$pages = self::fetchCategoryPages( self::formatMonthCategory( $month ), $remaining );
+			if ( $pages !== [] ) {
+				$groups[] = [
+					'month' => self::formatMonthLabel( $month ),
+					'pages' => $pages,
+				];
 			}
+
+			$remaining -= count( $pages );
+			if (
+				$remaining === 0 ||
+				( $monthsBack === 0 && count( $pages ) >= self::RECENT_RELEASES_BACKFILL_THRESHOLD )
+			) {
+				break;
+			}
+
+			$month = $month->modify( '-1 month' );
 		}
 
 		return $groups;
