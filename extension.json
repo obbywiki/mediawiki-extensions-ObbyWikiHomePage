@@ -31,7 +31,8 @@
 	"Hooks": {
 		"ArticleViewHeader": "ObbyWikiHomePageHooks",
 		"BeforePageDisplay": "ObbyWikiHomePageHooks",
-		"SoftwareInfo": "ObbyWikiHomePageHooks"
+		"SoftwareInfo": "ObbyWikiHomePageHooks",
+		"WikiSEOPreAddMetadata": "ObbyWikiHomePageHooks"
 	},
 	"ResourceFileModulePaths": {
 		"localBasePath": "",
@@ -106,6 +107,10 @@
 		"ObbyWikiHomePageTrendingCategory": {
 			"value": "Category:Obby",
 			"description": "Category whose members are ranked for the home page Trending section (requires TrendingArticles)."
+		},
+		"ObbyWikiHomePageSocialCard": {
+			"value": true,
+			"description": "Render a 1200x630 link preview card (og:image) for the home page from the spotlight slides. Needs Imagick and the job queue; until it is rendered, or when this is false, the first spotlight image is used."
 		},
 		"ObbyWikiHomePageSpotlightAnimation": {
 			"value": true,

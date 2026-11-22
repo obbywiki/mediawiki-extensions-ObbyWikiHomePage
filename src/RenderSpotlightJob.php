@@ -6,7 +6,7 @@ use MediaWiki\JobQueue\GenericParameterJob;
 use MediaWiki\JobQueue\Job;
 
 /**
- * Renders and stores the spotlight animation for the Discord embed.
+ * Renders and stores a generated home page image: the spotlight animation for the Discord embed (kind 'spotlight', the default for jobs queued before the card existed) or the link preview card (kind 'card').
  */
 class RenderSpotlightJob extends Job implements GenericParameterJob {
 	public function __construct( array $params ) {
@@ -16,7 +16,12 @@ class RenderSpotlightJob extends Job implements GenericParameterJob {
 
 	public function run(): bool {
 		// failures are logged and negatively cached inside
-		SpotlightAnimation::renderAndStore( (string)( $this->params['hash'] ?? '' ) );
+		$hash = (string)( $this->params['hash'] ?? '' );
+		if ( ( $this->params['kind'] ?? 'spotlight' ) === 'card' ) {
+			SocialCard::renderAndStore( $hash );
+		} else {
+			SpotlightAnimation::renderAndStore( $hash );
+		}
 		return true;
 	}
 }

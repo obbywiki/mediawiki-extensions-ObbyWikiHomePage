@@ -51,6 +51,12 @@ Optional. Without these the Discord embed falls back to a static thumbnail, or s
 
 To render on demand: `php maintenance/run.php ObbyWikiHomePage:renderSpotlight [--out /tmp/spotlight.webp] [--force] [--dump-frames /tmp/frames]`
 
+### Link preview card
+
+The home page gets Open Graph and Twitter tags, a canonical URL and schema.org `WebSite` markup with a search action. Its `og:image` is a 1200x630 JPEG card drawn from the spotlight slides, with the logo, site name and tagline. It needs the PHP `imagick` extension and the job queue, and it is stored next to the spotlight animation. Until the card is rendered, or with `$wgObbyWikiHomePageSocialCard = false;`, the first spotlight image is used instead.
+
+To render on demand: `php maintenance/run.php ObbyWikiHomePage:renderSpotlight --card [--out /tmp/card.jpg] [--force]`
+
 ### Soft Dependencies
 
 The following extensions provide functionality but are not required:
@@ -72,7 +78,6 @@ Automated pulling for the highlights carousel is currently disabled because it d
 * Add dynamic site events like seasonal obby highlights and other events like sales in games
 * **FAQ**: hardest roblox obbies, how do i find new obbies to play, best obbies for beginners, how do i make an obby, etc.
 * "find obby games to play" sort/feature
-* add JSON-LD (`WebSite` + `SearchAction`), `og:image`, and canonical URL for the home page
 
 ### UX
 

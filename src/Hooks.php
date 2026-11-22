@@ -4,6 +4,7 @@ namespace MediaWiki\Extension\ObbyWikiHomePage;
 
 use Article;
 use MediaWiki\Api\ApiMain;
+use MediaWiki\Context\RequestContext;
 use MediaWiki\Html\TemplateParser;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Output\OutputPage;
@@ -12,6 +13,7 @@ use MediaWiki\Registration\ExtensionRegistry;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\SiteStats\SiteStats;
+use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
 use Skin;
 use Wikimedia\ObjectCache\WANObjectCache;
@@ -188,6 +190,10 @@ class Hooks {
 			'<meta property="og:description" content="' . htmlspecialchars( $description ) . '"/>'
 		);
 
+		if ( $out->getContext()->getActionName() === 'view' ) {
+			self::addSeoHeadItems( $out, $title );
+		}
+
 		$articlesCount = (int)SiteStats::articles();
 		$discordInvite = self::getDiscordInvite();
 
@@ -221,6 +227,155 @@ class Hooks {
 			'discord-component-embed',
 			'<script id="discord:component-embed" type="application/json">' . json_encode( $embed, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP ) . '</script>'
 		);
+	}
+
+	/**
+	 * Open Graph / Twitter link preview tags, the canonical URL, and schema.org WebSite markup (sitelinks search box).
+	 */
+	private static function addSeoHeadItems( OutputPage $out, Title $title ): void {
+		global $wgSitename;
+
+		$canonical = $title->getCanonicalURL();
+		$out->setCanonicalUrl( $canonical );
+		self::addWebSiteJsonLd( $out, $canonical );
+
+		if ( ExtensionRegistry::getInstance()->isLoaded( 'WikiSEO' ) ) {
+			// WikiSEO writes the same head items after us; the card reaches it through onWikiSEOPreAddMetadata instead
+			return;
+		}
+
+		$meta = [
+			'og:type' => 'website',
+			'og:site_name' => (string)$wgSitename,
+			'og:title' => (string)$wgSitename,
+			'og:url' => $canonical,
+		];
+
+		$image = self::getSocialImage();
+		if ( $image ) {
+			$meta['og:image'] = $image['url'];
+			if ( isset( $image['width'] ) && isset( $image['height'] ) ) {
+				$meta['og:image:width'] = (string)$image['width'];
+				$meta['og:image:height'] = (string)$image['height'];
+			}
+			if ( isset( $image['type'] ) ) {
+				$meta['og:image:type'] = $image['type'];
+			}
+			$meta['og:image:alt'] = $image['alt'];
+		}
+
+		foreach ( $meta as $property => $content ) {
+			$out->addHeadItem(
+				$property,
+				'<meta property="' . htmlspecialchars( $property ) . '" content="' . htmlspecialchars( $content ) . '"/>'
+			);
+		}
+		$out->addMeta( 'twitter:card', $image ? 'summary_large_image' : 'summary' );
+	}
+
+	/**
+	 * Hands the link preview card to WikiSEO, which otherwise emits its own og:image (the wiki logo) over ours.
+	 *
+	 * @param array &$metadata
+	 */
+	public static function onWikiSEOPreAddMetadata( array &$metadata ): void {
+		$context = RequestContext::getMain();
+		$title = $context->getTitle();
+		if ( !$title || !self::isTargetPage( $title ) || $context->getActionName() !== 'view' ) {
+			return;
+		}
+
+		// leave 'type' alone: WikiSEO also uses it as the JSON-LD @type. og:type defaults to website anyway
+		$image = self::getSocialImage();
+		if ( !$image ) {
+			return;
+		}
+
+		$metadata['image'] = $image['url'];
+		$metadata['image_alt'] = $image['alt'];
+		if ( isset( $image['width'] ) && isset( $image['height'] ) ) {
+			$metadata['image_width'] = $image['width'];
+			$metadata['image_height'] = $image['height'];
+		}
+	}
+
+	/**
+	 * schema.org WebSite with a SearchAction (sitelinks search box).
+	 */
+	private static function addWebSiteJsonLd( OutputPage $out, string $canonical ): void {
+		global $wgSitename;
+
+		// placeholder survives URL encoding so the literal {search_term_string} can be put back
+		$searchUrl = str_replace(
+			'SEARCH_TERM_STRING',
+			'{search_term_string}',
+			SpecialPage::getTitleFor( 'Search' )->getCanonicalURL( [ 'search' => 'SEARCH_TERM_STRING' ] )
+		);
+		$jsonLd = [
+			'@context' => 'https://schema.org',
+			'@type' => 'WebSite',
+			'name' => (string)$wgSitename,
+			'url' => $canonical,
+			'potentialAction' => [
+				'@type' => 'SearchAction',
+				'target' => [
+					'@type' => 'EntryPoint',
+					'urlTemplate' => $searchUrl,
+				],
+				'query-input' => 'required name=search_term_string',
+			],
+		];
+		$out->addHeadItem(
+			'obbywiki-jsonld-website',
+			'<script type="application/ld+json">' . json_encode( $jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP ) . '</script>'
+		);
+	}
+
+	/**
+	 * The rendered link preview card, or the first spotlight slide's image while the card is still rendering (or when it is off).
+	 *
+	 * @return array{url:string,alt:string,width?:int,height?:int,type?:string}|null
+	 */
+	private static function getSocialImage(): ?array {
+		// called from both BeforePageDisplay and WikiSEO's hook
+		static $memo = [];
+		if ( !array_key_exists( 'image', $memo ) ) {
+			$memo['image'] = self::buildSocialImage();
+		}
+		return $memo['image'];
+	}
+
+	/**
+	 * @return array{url:string,alt:string,width?:int,height?:int,type?:string}|null
+	 */
+	private static function buildSocialImage(): ?array {
+		$items = SpotlightData::getItems();
+		if ( !$items ) {
+			return null;
+		}
+
+		$url = SocialCard::getState( $items );
+		if ( $url !== null ) {
+			return [
+				'url' => $url,
+				'alt' => SocialCard::getAltText( $items ),
+				'width' => SocialCardRenderer::WIDTH,
+				'height' => SocialCardRenderer::HEIGHT,
+				'type' => 'image/jpeg',
+			];
+		}
+
+		$file = SpotlightData::getSourceFile( $items[0] );
+		$thumb = $file ? $file->createThumb( SocialCardRenderer::WIDTH ) : '';
+		$fallback = $thumb ?: ( $items[0]['thumbnail'] ?? '' );
+		if ( !$fallback ) {
+			return null;
+		}
+
+		return [
+			'url' => MediaWikiServices::getInstance()->getUrlUtils()->expand( $fallback, PROTO_CANONICAL ) ?? $fallback,
+			'alt' => SpotlightData::getPlainTitle( $items[0] ),
+		];
 	}
 
 	/**
@@ -358,7 +513,7 @@ class Hooks {
 		);
 	}
 
-	private static function logoSVG(): string {
+	public static function logoSVG(): string {
 		return <<<'SVG'
 <svg width="1080" height="1080" viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_1192_2)">

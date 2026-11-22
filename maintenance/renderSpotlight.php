@@ -3,6 +3,7 @@
 namespace MediaWiki\Extension\ObbyWikiHomePage\Maintenance;
 
 use Imagick;
+use MediaWiki\Extension\ObbyWikiHomePage\SocialCard;
 use MediaWiki\Extension\ObbyWikiHomePage\SpotlightAnimation;
 use MediaWiki\Maintenance\Maintenance;
 
@@ -13,28 +14,34 @@ if ( $IP === false ) {
 require_once "$IP/maintenance/Maintenance.php";
 
 /**
- * Renders the Discord spotlight animation on demand.
+ * Renders the Discord spotlight animation (or, with --card, the link preview card) on demand.
  *
  * php maintenance/run.php ObbyWikiHomePage:renderSpotlight --out /tmp/spotlight.webp --force
+ * php maintenance/run.php ObbyWikiHomePage:renderSpotlight --card --out /tmp/card.jpg
  */
 class RenderSpotlight extends Maintenance {
 	public function __construct() {
 		parent::__construct();
-		$this->addDescription( 'Render the animated spotlight image used in the Discord embed.' );
+		$this->addDescription( 'Render the animated spotlight image used in the Discord embed, or the link preview card with --card.' );
 		$this->addOption( 'out', 'Write the animation to this path instead of storing it in the upload backend', false, true );
 		$this->addOption( 'force', 'Render even when the stored file for the current hash already exists' );
+		$this->addOption( 'card', 'Render the link preview card (og:image) instead of the animation' );
 		$this->addOption( 'dump-frames', 'Also write every frame as a PNG plus frames.txt (file, delay in 1/100 s) to this directory', false, true );
 		$this->requireExtension( 'ObbyWikiHomePage' );
 	}
 
 	public function execute() {
 		$start = microtime( true );
-		$result = SpotlightAnimation::renderAndStore(
-			null,
-			$this->hasOption( 'force' ),
-			$this->getOption( 'out' ),
-			$this->getOption( 'dump-frames' )
-		);
+		if ( $this->hasOption( 'card' ) ) {
+			$result = SocialCard::renderAndStore( null, $this->hasOption( 'force' ), $this->getOption( 'out' ) );
+		} else {
+			$result = SpotlightAnimation::renderAndStore(
+				null,
+				$this->hasOption( 'force' ),
+				$this->getOption( 'out' ),
+				$this->getOption( 'dump-frames' )
+			);
+		}
 		$seconds = microtime( true ) - $start;
 
 		$this->output( "Status:       {$result['status']}\n" );
@@ -43,6 +50,9 @@ class RenderSpotlight extends Maintenance {
 			if ( isset( $result[$key] ) ) {
 				$this->output( str_pad( "$label:", 14 ) . $result[$key] . "\n" );
 			}
+		}
+		if ( isset( $result['bytes'] ) && !isset( $result['frames'] ) ) {
+			$this->output( "Size:         {$result['width']}x{$result['height']}, {$result['bytes']} bytes\n" );
 		}
 		if ( isset( $result['frames'] ) ) {
 			$this->output( "Format:       {$result['format']} {$result['width']}x{$result['height']}\n" );
