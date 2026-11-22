@@ -974,8 +974,6 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 
 .obbywiki-month__label {
 	font-size: 0.75rem;
-	font-weight: 700;
-	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	color: var(--color-subtle, #54595d);
 	margin: 0.625rem 0 0.25rem;
