@@ -601,7 +601,7 @@ SVG;
 			'rcnamespace' => 0,
 			'rcshow' => '!bot',
 			'rcprop' => 'title|timestamp|user',
-			'rclimit' => 50,
+			'rclimit' => 100,
 		] );
 
 		$api = new ApiMain( $request, false );
@@ -638,7 +638,7 @@ SVG;
 					'timestamp' => $rc['timestamp'] ?? '',
 				];
 
-				if ( count( $changes ) >= 8 ) {
+				if ( count( $changes ) >= 16 ) {
 					break;
 				}
 			}
