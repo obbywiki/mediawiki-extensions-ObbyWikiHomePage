@@ -27,6 +27,21 @@ class Hooks {
 	private const HOME_PAGE_CACHE_VERSION = 'v20'; // only reset for large changes
 	private const HOME_PAGE_CACHE_LOCK_TSE = 120;
 	private const HOME_PAGE_CACHE_STALE_TTL = 3600;
+
+	//  $wgObbyWikiHomePageSections
+	private const SECTIONS = [
+		'contentLinks',
+		'spotlight',
+		'recentReleases',
+		'subGenres',
+		'contributing',
+		'archive',
+		'recentChanges',
+		'onThisDay',
+		'trending',
+		'about',
+		'blog',
+	];
 	// trending
 	private const TRENDING_THUMB_SIZE = 368;
 	// on this day (cargo) (may be deprecated in the future, in favor of Bucket)
@@ -84,6 +99,8 @@ class Hooks {
 	 * @param bool &$pcache
 	 */
 	public static function onArticleViewHeader( Article $article, &$outputDone, &$pcache ) {
+		global $wgObbyWikiHomePageCacheTTL;
+
 		$title = $article->getTitle();
 		if ( !$title || !self::isTargetPage( $title ) ) {
 			return;
@@ -97,27 +114,32 @@ class Hooks {
 		$out->setSubtitle( '' );
 
 		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
-		global $wgObbyWikiHomePageCacheTTL;
 		$ttl = (int)( $wgObbyWikiHomePageCacheTTL ?? 300 );
+		$sections = self::getSections();
 
 		if ( $ttl > 0 ) {
+			$sectionsKeyPart = substr( md5( json_encode( $sections ) ), 0, 8 );
 			$cacheKey = $cache->makeKey(
 				'obbywikihomepage',
 				'html',
-				self::HOME_PAGE_CACHE_VERSION
+				self::HOME_PAGE_CACHE_VERSION,
+				$sectionsKeyPart
 			);
+
 			$backupKey = $cache->makeKey(
 				'obbywikihomepage',
 				'html',
 				self::HOME_PAGE_CACHE_VERSION,
+				$sectionsKeyPart,
 				'backup'
 			);
+
 			$html = $cache->getWithSetCallback(
 				$cacheKey,
 				$ttl,
-				static function ( $oldValue, &$callbackTtl, array &$setOpts, $oldAsOf ) use ( $cache, $backupKey ) {
+				static function ( $oldValue, &$callbackTtl, array &$setOpts, $oldAsOf ) use ( $cache, $backupKey, $sections ) {
 					unset( $oldValue, $callbackTtl, $setOpts, $oldAsOf );
-					$html = self::buildHomePage();
+					$html = self::buildHomePage( $sections );
 
 					if ( $html !== '' ) {
 						$cache->set( $backupKey, $html, WANObjectCache::TTL_DAY );
@@ -141,7 +163,7 @@ class Hooks {
 				]
 			);
 		} else {
-			$html = self::buildHomePage();
+			$html = self::buildHomePage( $sections );
 		}
 
 		$out->addHTML( $html );
@@ -249,6 +271,23 @@ class Hooks {
 	}
 
 	/**
+	 * Section toggles from $wgObbyWikiHomePageSections, with every known section present.
+	 * Unknown keys are ignored and sections that are left out are rendered enabled.
+	 *
+	 * @return array<string,bool>
+	 */
+	private static function getSections(): array {
+		global $wgObbyWikiHomePageSections;
+		$configured = is_array( $wgObbyWikiHomePageSections ?? null ) ? $wgObbyWikiHomePageSections : [];
+
+		$sections = [];
+		foreach ( self::SECTIONS as $name ) {
+			$sections[$name] = (bool)( $configured[$name] ?? true );
+		}
+		return $sections;
+	}
+
+	/**
 	 * Configured Discord invite URL, or an empty string when unset or not http(s).
 	 */
 	private static function getDiscordInvite(): string {
@@ -290,18 +329,20 @@ class Hooks {
 		return '<div class="obbywiki-home obbywiki-home--loading"><p>The home page is currently being refreshed. Please refresh the page in 6-12 seconds.</p></div>';
 	}
 
-	private static function buildHomePage(): string {
+	/**
+	 * @param array<string,bool> $sections from getSections(); disabled sections skip their queries
+	 */
+	private static function buildHomePage( array $sections ): string {
 		$logoSVG = self::logoSVG();
-		$carouselItems = SpotlightData::getItems();
+		$carouselItems = $sections['spotlight'] ? SpotlightData::getItems() : [];
 		$siteStats = self::getSiteStatistics();
-		$thisMonthPages = self::getThisMonthPages();
-		$archiveMonths = self::getArchiveMonths();
-		$recentChanges = self::getRecentChanges();
-		$onThisDay = self::getOnThisDayReleases();
-		$blogPosts = self::getBlogPosts();
-		$trendingPages = self::getTrendingPages();
-		$subGenreCounts = self::fetchCategoryPageCounts( array_merge( array_column( self::SUB_GENRE_CARDS, 'title' ), [ 'Category:Obby' ] )
-		);
+		$thisMonthPages = $sections['recentReleases'] ? self::getThisMonthPages() : [];
+		$archiveMonths = $sections['archive'] ? self::getArchiveMonths() : [];
+		$recentChanges = $sections['recentChanges'] ? self::getRecentChanges() : [];
+		$onThisDay = $sections['onThisDay'] ? self::getOnThisDayReleases() : [];
+		$blogPosts = $sections['blog'] ? self::getBlogPosts() : [];
+		$trendingPages = $sections['trending'] ? self::getTrendingPages() : [];
+		$subGenreCounts = $sections['subGenres'] ? self::fetchCategoryPageCounts( array_merge( array_column( self::SUB_GENRE_CARDS, 'title' ), [ 'Category:Obby' ] ) ) : [];
 		return self::buildHomePageHTML(
 			$logoSVG,
 			$carouselItems,
@@ -312,7 +353,8 @@ class Hooks {
 			$blogPosts,
 			$trendingPages,
 			$subGenreCounts,
-			$onThisDay
+			$onThisDay,
+			$sections
 		);
 	}
 
@@ -1332,7 +1374,7 @@ SVG;
 
 	// MAIN
 	// builds the full html
-	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [], array $trendingPages = [], array $subGenreCounts = [], array $onThisDay = [] ): string {
+	private static function buildHomePageHTML( string $logoSVG, array $carouselItems, array $siteStats, array $thisMonthPages, array $archiveMonths, array $recentChanges = [], array $blogPosts = [], array $trendingPages = [], array $subGenreCounts = [], array $onThisDay = [], array $sections = [] ): string {
 		global $wgExtensionAssetsPath;
 		$templateParser = new TemplateParser( dirname( __DIR__ ) . '/templates' );
 		$blogPostsHTML = self::buildBlogPostsHTML( $blogPosts, $logoSVG );
@@ -1852,6 +1894,162 @@ SVG;
 
 		// RAW CONSTRUCT
 
+		$on = static function ( string $name ) use ( $sections ): bool {
+			return $sections[$name] ?? true;
+		};
+
+		$contentLinksNavHTML = $on( 'contentLinks' )
+			? '<nav class="obbywiki-content-links" aria-label="Content categories">' . $contentLinksHTML . '</nav>'
+			: '';
+
+		$spotlightSectionHTML = '';
+		if ( $on( 'spotlight' ) ) {
+			$spotlightSectionHTML = <<<HTML
+<div class="obbywiki-spotlight">
+	<div class="obbywiki-spotlight__viewport">
+		<!-- <span class="obbywiki-spotlight__chip">OBBY WIKI HIGHLIGHTS</span> -->
+		<div class="obbywiki-spotlight__track">
+			{$slidesHTML}
+		</div>
+		{$emptyState}
+		<nav class="obbywiki-spotlight__nav">
+			<button class="obbywiki-spotlight__arrow obbywiki-spotlight__arrow--prev" aria-label="Previous">
+				<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/></svg>
+			</button>
+			<div class="obbywiki-spotlight__bars">{$dotsHTML}</div>
+			<button class="obbywiki-spotlight__arrow obbywiki-spotlight__arrow--next" aria-label="Next">
+				<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
+			</button>
+			<button class="obbywiki-spotlight__arrow obbywiki-spotlight__toggle" aria-label="Pause" hidden>
+				<svg class="obbywiki-spotlight__toggle-pause" xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="4.5" y="4" width="2.5" height="8" rx="1"/><rect x="9" y="4" width="2.5" height="8" rx="1"/></svg>
+				<svg class="obbywiki-spotlight__toggle-play" xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5.75 4.75v6.5L11.5 8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+			</button>
+		</nav>
+	</div>
+</div>
+HTML;
+		}
+
+		$monthSectionHTML = '';
+		if ( $on( 'recentReleases' ) ) {
+			$monthSectionHTML = <<<HTML
+<div class="obbywiki-month">
+	<div class="obbywiki-month__header">
+		<span class="obbywiki-month__icon">
+			<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg>
+		</span>
+		<h2 class="obbywiki-month__title">Recent Releases</h2>
+	</div>
+	<div class="obbywiki-month__list">
+		{$thisMonthHTML}
+	</div>
+</div>
+HTML;
+		}
+
+		$subGenresCardHTML = '';
+		if ( $on( 'subGenres' ) ) {
+			$subGenresCardHTML = <<<HTML
+<div class="obbywiki-aside__card">
+	<div class="obbywiki-aside__header">
+		<div class="obbywiki-aside__header-main">
+			<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="m240-160 40-160H120l20-80h160l40-160H180l20-80h160l40-160h80l-40 160h160l40-160h80l-40 160h160l-20 80H660l-40 160h160l-20 80H600l-40 160h-80l40-160H360l-40 160h-80Zm140-240h160l40-160H420l-40 160Z"/></svg></span>
+			<h2 class="obbywiki-aside__title">Obby Sub-genres</h2>
+		</div>
+		<div class="obbywiki-aside__header-actions">
+			<a href="{$categoryURLs['obby']}" class="obbywiki-aside__all">View all ({$obbyTotalLabel})</a>
+			<a href="{$categoryURLs['randomObby']}" class="obbywiki-aside__icon-btn" aria-label="Random Obby" title="Random Obby"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 -960 960 960" fill="currentColor"><path d="M342.5-257.5Q360-275 360-300t-17.5-42.5Q325-360 300-360t-42.5 17.5Q240-325 240-300t17.5 42.5Q275-240 300-240t42.5-17.5Zm0-360Q360-635 360-660t-17.5-42.5Q325-720 300-720t-42.5 17.5Q240-685 240-660t17.5 42.5Q275-600 300-600t42.5-17.5Zm180 180Q540-455 540-480t-17.5-42.5Q505-540 480-540t-42.5 17.5Q420-505 420-480t17.5 42.5Q455-420 480-420t42.5-17.5Zm180 180Q720-275 720-300t-17.5-42.5Q685-360 660-360t-42.5 17.5Q600-325 600-300t17.5 42.5Q635-240 660-240t42.5-17.5Zm0-360Q720-635 720-660t-17.5-42.5Q685-720 660-720t-42.5 17.5Q600-685 600-660t17.5 42.5Q635-600 660-600t42.5-17.5ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg></a>
+		</div>
+	</div>
+	<div class="obbywiki-aside__type-grid">
+		{$typeGridHTML}
+	</div>
+</div>
+HTML;
+		}
+
+		$contributingCardHTML = '';
+		if ( $on( 'contributing' ) ) {
+			$contributingCardHTML = <<<HTML
+<div class="obbywiki-aside__card">
+	<div class="obbywiki-aside__header">
+		<div class="obbywiki-aside__header-main">
+			<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"><title>edit</title><g fill="currentColor"><path d="m16.77 8 1.94-2a1 1 0 0 0 0-1.41l-3.34-3.3a1 1 0 0 0-1.41 0L12 3.23zM1 14.25V19h4.75l9.96-9.96-4.75-4.75z"/></g></svg></span>
+			<h2 class="obbywiki-aside__title">Start Contributing</h2>
+		</div>
+	</div>
+	<p class="obbywiki-aside__text">Help contribute to the largest obby database ever by adding a new obby, editing an existing article, or helping in another way.</p>
+	<div class="obbywiki-featured__aside-cta-links">
+		<div class="obbywiki-featured__aside-cta-row">
+			<button type="button" class="obbywiki-featured__aside-cta-add owaf-new-article-trigger" aria-label="Create a new article">
+				<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+			</button>
+			<span class="obbywiki-featured__aside-cta-divider" aria-hidden="true">|</span>
+			<div class="obbywiki-featured__aside-cta-stack">
+				<a href="{$categoryURLs['contributing']}" class="obbywiki-featured__aside-cta-link">
+					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M10 1a9 9 0 109 9 9 9 0 00-9-9m1 14H9v-2h2zm0-4H9V5h2z"/></svg>
+					How to Contribute
+				</a>
+				<a href="{$categoryURLs['stubs']}" class="obbywiki-featured__aside-cta-link">
+					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
+					Pages that need improvement
+				</a>
+				<a href="{$categoryURLs['wantedPages']}" class="obbywiki-featured__aside-cta-link" rel="nofollow"> <!-- engines cant crawl special pages -->
+					<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
+					Wanted new pages
+				</a>
+			</div>
+		</div>
+		<div class="obbywiki-aside__footer">
+			{$contributeDiscordHTML}
+			{$contributeStatsHTML}
+		</div>
+	</div>
+</div>
+HTML;
+		}
+
+		// two-column rows fall back to one column when a half is disabled
+		$featuredHTML = '';
+		if ( $spotlightSectionHTML !== '' || $monthSectionHTML !== '' ) {
+			$featuredClass = $spotlightSectionHTML !== '' && $monthSectionHTML !== ''
+				? 'obbywiki-featured'
+				: 'obbywiki-featured obbywiki-featured--single';
+			$featuredHTML = '<section class="' . $featuredClass . '">' . $spotlightSectionHTML . $monthSectionHTML . '</section>';
+		}
+
+		$asideHTML = '';
+		if ( $subGenresCardHTML !== '' || $contributingCardHTML !== '' ) {
+			$asideHTML = '<aside class="obbywiki-aside">' . $subGenresCardHTML . $contributingCardHTML . '</aside>';
+		}
+
+		if ( !$on( 'recentChanges' ) ) {
+			$recentChangesHTML = '';
+		}
+		if ( !$on( 'onThisDay' ) ) {
+			$onThisDayHTML = '';
+		}
+		$splitHTML = '';
+		if ( $recentChangesHTML !== '' && $onThisDayHTML !== '' ) {
+			$splitHTML = '<div class="obbywiki-split">' . $recentChangesHTML
+				. '<aside class="obbywiki-split__aside">' . $onThisDayHTML . '</aside></div>';
+		} elseif ( $recentChangesHTML !== '' || $onThisDayHTML !== '' ) {
+			$splitHTML = '<div class="obbywiki-split obbywiki-split--single">' . $recentChangesHTML . $onThisDayHTML . '</div>';
+		}
+
+		if ( !$on( 'archive' ) ) {
+			$archiveHTML = '';
+		}
+		if ( !$on( 'trending' ) ) {
+			$trendingHTML = '';
+		}
+		if ( !$on( 'about' ) ) {
+			$aboutHTML = '';
+		}
+		if ( !$on( 'blog' ) ) {
+			$blogPostsHTML = '';
+		}
+
 		return <<<HTML
 <div class="obbywiki-home">
 	<header class="obbywiki-home__header">
@@ -1875,109 +2073,18 @@ SVG;
 		</div>
 	</header>
 
-	<nav class="obbywiki-content-links" aria-label="Content categories">
-		{$contentLinksHTML}
-	</nav>
+	{$contentLinksNavHTML}
 
-	<section class="obbywiki-featured">
-		<div class="obbywiki-spotlight">
-			<div class="obbywiki-spotlight__viewport">
-				<!-- <span class="obbywiki-spotlight__chip">OBBY WIKI HIGHLIGHTS</span> -->
-				<div class="obbywiki-spotlight__track">
-					{$slidesHTML}
-				</div>
-				{$emptyState}
-				<nav class="obbywiki-spotlight__nav">
-					<button class="obbywiki-spotlight__arrow obbywiki-spotlight__arrow--prev" aria-label="Previous">
-						<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/></svg>
-					</button>
-					<div class="obbywiki-spotlight__bars">{$dotsHTML}</div>
-					<button class="obbywiki-spotlight__arrow obbywiki-spotlight__arrow--next" aria-label="Next">
-						<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
-					</button>
-					<button class="obbywiki-spotlight__arrow obbywiki-spotlight__toggle" aria-label="Pause" hidden>
-						<svg class="obbywiki-spotlight__toggle-pause" xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="4.5" y="4" width="2.5" height="8" rx="1"/><rect x="9" y="4" width="2.5" height="8" rx="1"/></svg>
-						<svg class="obbywiki-spotlight__toggle-play" xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5.75 4.75v6.5L11.5 8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-					</button>
-				</nav>
-			</div>
-		</div>
-		<div class="obbywiki-month">
-			<div class="obbywiki-month__header">
-				<span class="obbywiki-month__icon">
-					<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg>
-				</span>
-				<h2 class="obbywiki-month__title">Recent Releases</h2>
-			</div>
-			<div class="obbywiki-month__list">
-				{$thisMonthHTML}
-			</div>
-		</div>
-	</section>
+	{$featuredHTML}
 
-	<aside class="obbywiki-aside">
-		<div class="obbywiki-aside__card">
-			<div class="obbywiki-aside__header">
-				<div class="obbywiki-aside__header-main">
-					<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor"><path d="m240-160 40-160H120l20-80h160l40-160H180l20-80h160l40-160h80l-40 160h160l40-160h80l-40 160h160l-20 80H660l-40 160h160l-20 80H600l-40 160h-80l40-160H360l-40 160h-80Zm140-240h160l40-160H420l-40 160Z"/></svg></span>
-					<h2 class="obbywiki-aside__title">Obby Sub-genres</h2>
-				</div>
-				<div class="obbywiki-aside__header-actions">
-					<a href="{$categoryURLs['obby']}" class="obbywiki-aside__all">View all ({$obbyTotalLabel})</a>
-					<a href="{$categoryURLs['randomObby']}" class="obbywiki-aside__icon-btn" aria-label="Random Obby" title="Random Obby"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 -960 960 960" fill="currentColor"><path d="M342.5-257.5Q360-275 360-300t-17.5-42.5Q325-360 300-360t-42.5 17.5Q240-325 240-300t17.5 42.5Q275-240 300-240t42.5-17.5Zm0-360Q360-635 360-660t-17.5-42.5Q325-720 300-720t-42.5 17.5Q240-685 240-660t17.5 42.5Q275-600 300-600t42.5-17.5Zm180 180Q540-455 540-480t-17.5-42.5Q505-540 480-540t-42.5 17.5Q420-505 420-480t17.5 42.5Q455-420 480-420t42.5-17.5Zm180 180Q720-275 720-300t-17.5-42.5Q685-360 660-360t-42.5 17.5Q600-325 600-300t17.5 42.5Q635-240 660-240t42.5-17.5Zm0-360Q720-635 720-660t-17.5-42.5Q685-720 660-720t-42.5 17.5Q600-685 600-660t17.5 42.5Q635-600 660-600t42.5-17.5ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg></a>
-				</div>
-			</div>
-			<div class="obbywiki-aside__type-grid">
-				{$typeGridHTML}
-			</div>
-		</div>
-		<div class="obbywiki-aside__card">
-			<div class="obbywiki-aside__header">
-				<div class="obbywiki-aside__header-main">
-					<span class="obbywiki-aside__icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"><title>edit</title><g fill="currentColor"><path d="m16.77 8 1.94-2a1 1 0 0 0 0-1.41l-3.34-3.3a1 1 0 0 0-1.41 0L12 3.23zM1 14.25V19h4.75l9.96-9.96-4.75-4.75z"/></g></svg></span>
-					<h2 class="obbywiki-aside__title">Start Contributing</h2>
-				</div>
-			</div>
-			<p class="obbywiki-aside__text">Help contribute to the largest obby database ever by adding a new obby, editing an existing article, or helping in another way.</p>
-			<div class="obbywiki-featured__aside-cta-links">
-				<div class="obbywiki-featured__aside-cta-row">
-					<button type="button" class="obbywiki-featured__aside-cta-add owaf-new-article-trigger" aria-label="Create a new article">
-						<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
-					</button>
-					<span class="obbywiki-featured__aside-cta-divider" aria-hidden="true">|</span>
-					<div class="obbywiki-featured__aside-cta-stack">
-						<a href="{$categoryURLs['contributing']}" class="obbywiki-featured__aside-cta-link">
-							<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M10 1a9 9 0 109 9 9 9 0 00-9-9m1 14H9v-2h2zm0-4H9V5h2z"/></svg>
-							How to Contribute
-						</a>
-						<a href="{$categoryURLs['stubs']}" class="obbywiki-featured__aside-cta-link">
-							<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
-							Pages that need improvement
-						</a>
-						<a href="{$categoryURLs['wantedPages']}" class="obbywiki-featured__aside-cta-link" rel="nofollow"> <!-- engines cant crawl special pages -->
-							<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M15.5 1h-11A1.5 1.5 0 003 2.5v15A1.5 1.5 0 004.5 19h11a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0015.5 1M5 12h5.5v1H5zm0 3h3v1H5zm0-12h10v1H5zm0 3h10v1H5zm0 3h10v1H5z"/></svg>
-							Wanted new pages
-						</a>
-					</div>
-				</div>
-				<div class="obbywiki-aside__footer">
-					{$contributeDiscordHTML}
-					{$contributeStatsHTML}
-				</div>
-			</div>
-		</div>
-	</aside>
+	{$asideHTML}
 
 	{$archiveHTML}
 
-	
-	<div class="obbywiki-split">
-		{$recentChangesHTML}
-		<aside class="obbywiki-split__aside">{$onThisDayHTML}</aside>
-	</div>
+	{$splitHTML}
 
 	{$trendingHTML}
-	
+
 	{$aboutHTML}
 
 	{$blogPostsHTML}

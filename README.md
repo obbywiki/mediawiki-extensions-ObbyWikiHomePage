@@ -4,6 +4,34 @@ Add an ObbyWiki-specific custom home page, overwriting `Home` by default with cu
 
 This extension was designed for usage on Obby Wiki server architecture and is not guaranteed to be functional elsewhere.
 
+## Configuration
+
+### Sections
+
+Every home page section can be turned off with `$wgObbyWikiHomePageSections` in `LocalSettings.php`. List only the sections you want to change; anything left out stays on. For example, to temporarily hide the blog announcements:
+
+```php
+$wgObbyWikiHomePageSections = [
+    'blog' => false,
+];
+```
+
+| Key | Section |
+| --- | --- |
+| `contentLinks` | Content category links under the header |
+| `spotlight` | Spotlight carousel |
+| `recentReleases` | Recent Releases list beside the spotlight |
+| `subGenres` | Obby Sub-genres card |
+| `contributing` | Start Contributing card |
+| `archive` | Monthly archive |
+| `recentChanges` | Recent Changes |
+| `onThisDay` | Released On This Day (requires Cargo) |
+| `trending` | Trending (requires TrendingArticles) |
+| `about` | About The Obby Wiki |
+| `blog` | Blog announcements (requires ModernBlog posts) |
+
+Disabled sections also skip their database queries. Changes take effect without clearing the cache. When one half of a two-column row is off, the other half fills the row. The header, search and shortcut buttons are always shown.
+
 ## Dependencies
 
 ### Required

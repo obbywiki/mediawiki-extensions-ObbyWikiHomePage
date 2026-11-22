@@ -554,6 +554,11 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	align-items: stretch;
 }
 
+/* only one of spotlight / recent releases is enabled */
+.obbywiki-featured--single {
+	grid-template-columns: minmax(0, 1fr);
+}
+
 .obbywiki-spotlight {
 	position: relative;
 	border-radius: var(--border-radius-medium, 8px);
@@ -1679,6 +1684,11 @@ div.obbywiki-home__search-input.citizen-search-trigger {
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
+}
+
+/* only one of recent changes / on this day is enabled */
+.obbywiki-split--single {
+	grid-template-columns: minmax(0, 1fr);
 }
 
 /* RECENT CHANGES SECTION (framed, left half of the split row) */

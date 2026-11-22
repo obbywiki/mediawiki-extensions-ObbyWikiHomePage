@@ -70,6 +70,23 @@
 			"value": "https://discord.gg/vuJsnzKkKY",
 			"description": "Discord invite URL shown in the home page contributing card and the Discord component embed. Leave this empty to hide the Discord links."
 		},
+		"ObbyWikiHomePageSections": {
+			"value": {
+				"contentLinks": true,
+				"spotlight": true,
+				"recentReleases": true,
+				"subGenres": true,
+				"contributing": true,
+				"archive": true,
+				"recentChanges": true,
+				"onThisDay": true,
+				"trending": true,
+				"about": true,
+				"blog": true
+			},
+			"merge_strategy": "array_plus",
+			"description": "Which home page sections to show, keyed by section name. Set a section to false to hide it and skip its queries; sections left out stay on. Sections: contentLinks, spotlight, recentReleases, subGenres, contributing, archive, recentChanges, onThisDay, trending, about, blog."
+		},
 		"ObbyWikiHomePageBlogPostLimit": {
 			"value": 4,
 			"description": "Maximum ModernBlog posts from the Blog namespace to show in the home page announcements section."
