@@ -121,11 +121,15 @@ class Hooks {
 
 		if ( $ttl > 0 ) {
 			$sectionsKeyPart = substr( md5( json_encode( $sections ) ), 0, 8 );
+			$spotlightKeyPart = $sections['spotlight']
+				? substr( md5( json_encode( array_column( SpotlightData::getItems(), 'pageId' ) ) ), 0, 8 )
+				: '-';
 			$cacheKey = $cache->makeKey(
 				'obbywikihomepage',
 				'html',
 				self::HOME_PAGE_CACHE_VERSION,
-				$sectionsKeyPart
+				$sectionsKeyPart,
+				$spotlightKeyPart
 			);
 
 			$backupKey = $cache->makeKey(
@@ -354,7 +358,7 @@ class Hooks {
 			return null;
 		}
 
-		$url = SocialCard::getState( $items );
+		$url = SocialCard::getState( SpotlightData::getWideItems() );
 		if ( $url !== null ) {
 			return [
 				'url' => $url,
@@ -651,9 +655,7 @@ SVG;
 					continue;
 				}
 
-				$displayTitle = isset( $page['pageprops']['displaytitle'] )
-					? $page['pageprops']['displaytitle']
-					: ucwords( $title->getText() );
+				$displayTitle = SpotlightData::displayTitle( $page['pageprops']['displaytitle'] ?? null, $title );
 
 				$thumb = isset( $page['thumbnail']['source'] )
 					? $page['thumbnail']['source']
@@ -928,7 +930,7 @@ SVG;
 			}
 
 			$releases[] = [
-				'title' => $page['pageprops']['displaytitle'] ?? $title->getText(),
+				'title' => SpotlightData::displayTitle( $page['pageprops']['displaytitle'] ?? null, $title ),
 				'url' => $title->getLocalURL(),
 				'thumbnail' => $page['thumbnail']['source'] ?? null,
 				'description' => $page['pageprops']['shortdesc'] ?? null,

@@ -68,7 +68,7 @@ class SocialCard {
 	 * @return array status plus renderer stats when rendered
 	 */
 	public static function renderAndStore( ?string $expectedHash = null, bool $force = false, ?string $outPath = null ): array {
-		$items = SpotlightData::getItems();
+		$items = SpotlightData::getWideItems();
 		$text = self::getText();
 		$hash = self::computeHash( $items, $text );
 

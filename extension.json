@@ -65,7 +65,42 @@
 		},
 		"ObbyWikiHomePageFeaturedPages": {
 			"value": [],
-			"description": "An array of specific page titles to feature in the highlight carousel instead of automatically fetching them."
+			"description": "An array of specific page titles to feature in the highlight carousel instead of picking them automatically. The wide pick (link preview card) is topped up with automatic picks."
+		},
+		"ObbyWikiHomePageSpotlight": {
+			"value": {
+				"count": 7,
+				"wideCount": 15,
+				"poolSize": 250,
+				"category": "Category:Obby",
+				"excludeCategories": [
+					"Category:Stubs",
+					"Category:Example"
+				],
+				"requireImage": false,
+				"requireDescription": false,
+				"requirePublic": true,
+				"excludePlayability": [
+					"verified_broken",
+					"verified_does_not_load"
+				],
+				"minVisits": 0,
+				"minLength": 0,
+				"maxPerSubgenre": 2,
+				"rotation": 86400,
+				"temperature": 0.05,
+				"recencyHalfLife": 365,
+				"weights": {
+					"visits": 1,
+					"rating": 0.5,
+					"favorites": 0.5,
+					"length": 0.5,
+					"description": 0.25,
+					"recency": 0.25
+				}
+			},
+			"merge_strategy": "array_plus",
+			"description": "Adjust how automatic spotlight selection works."
 		},
 		"ObbyWikiHomePageDiscordInvite": {
 			"value": "https://discord.gg/vuJsnzKkKY",
